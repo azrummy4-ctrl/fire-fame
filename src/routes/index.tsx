@@ -1,24 +1,94 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
+import { TournamentTile } from "@/components/TournamentCard";
+import { tournaments } from "@/data/tournaments";
+import promoBanner from "@/assets/promo-banner.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "FireZone — Daily Free Fire Tournaments & Prizes" },
+      {
+        name: "description",
+        content:
+          "Join daily Free Fire style esports tournaments, track room details, leaderboards and wallet rewards in one app.",
+      },
+      { property: "og:title", content: "FireZone — Daily Free Fire Tournaments" },
+      {
+        property: "og:description",
+        content: "Browse live and upcoming tournaments, join matches and follow results.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const matchShortcuts = [
+  { label: "Ongoing", icon: RefreshCw, tone: "bg-success" },
+  { label: "Upcoming", icon: CalendarDays, tone: "bg-primary" },
+  { label: "Completed", icon: CheckSquare, tone: "bg-gold" },
+] as const;
+
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <AppShell>
+      <h1 className="sr-only">FireZone tournaments</h1>
+
+      <div className="flex items-stretch gap-3 rounded-xl border border-border bg-surface p-2">
+        <span className="grid w-14 shrink-0 place-items-center rounded-lg bg-surface-2 text-primary">
+          <Megaphone className="size-6" />
+        </span>
+        <p className="line-clamp-2 self-center text-sm font-semibold leading-snug">
+          Rules update: har player ko apna POV / screen recording rakhna zaroori hai.
+        </p>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-primary/40">
+        <div className="relative">
+          <img
+            src={promoBanner}
+            alt="Join daily tournaments promotional banner"
+            width={1200}
+            height={688}
+            className="h-44 w-full object-cover"
+          />
+          <Link
+            to="/tournaments"
+            className="absolute bottom-3 left-3 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+          >
+            More details
+          </Link>
+        </div>
+      </div>
+
+      <h2 className="mt-6 text-center font-display text-2xl font-bold">My Matches</h2>
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        {matchShortcuts.map(({ label, icon: Icon, tone }) => (
+          <Link
+            key={label}
+            to="/my-games"
+            className="card-elevated flex flex-col items-center gap-2 rounded-xl border border-border py-3"
+          >
+            <span className={`grid size-11 place-items-center rounded-xl ${tone} text-primary-foreground`}>
+              <Icon className="size-6" />
+            </span>
+            <span className="text-sm font-semibold">{label}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-6 flex items-baseline justify-between">
+        <h2 className="font-display text-xl font-bold">Esports Games</h2>
+        <Link to="/tournaments" className="text-xs font-semibold text-primary">
+          See all
+        </Link>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        {tournaments.map((t) => (
+          <TournamentTile key={t.id} tournament={t} />
+        ))}
+      </div>
+    </AppShell>
   );
 }
