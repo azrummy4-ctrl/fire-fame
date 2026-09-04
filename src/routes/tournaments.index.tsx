@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentRow } from "@/components/TournamentCard";
-import { tournaments, type TournamentStatus } from "@/data/tournaments";
+import { useSlotCounts, useTournaments } from "@/lib/api";
 
 export const Route = createFileRoute("/tournaments/")({
   head: () => ({
@@ -19,15 +19,17 @@ export const Route = createFileRoute("/tournaments/")({
   component: TournamentsPage,
 });
 
-const tabs: { key: TournamentStatus; label: string }[] = [
+const tabs = [
   { key: "upcoming", label: "Upcoming" },
   { key: "live", label: "Live" },
   { key: "completed", label: "Completed" },
-];
+] as const;
 
 function TournamentsPage() {
-  const [tab, setTab] = useState<TournamentStatus>("upcoming");
-  const list = tournaments.filter((t) => t.status === tab);
+  const [tab, setTab] = useState<(typeof tabs)[number]["key"]>("upcoming");
+  const { data, isLoading } = useTournaments();
+  const { data: counts } = useSlotCounts();
+  const list = (data ?? []).filter((t) => t.status === tab);
 
   return (
     <AppShell>
@@ -49,12 +51,14 @@ function TournamentsPage() {
       </div>
 
       <div className="mt-4 space-y-4">
-        {list.length === 0 ? (
+        {isLoading ? (
+          <div className="h-64 animate-pulse rounded-2xl border border-border bg-surface" />
+        ) : list.length === 0 ? (
           <p className="rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
             No {tab} tournaments right now. Check back soon.
           </p>
         ) : (
-          list.map((t) => <TournamentRow key={t.id} tournament={t} />)
+          list.map((t) => <TournamentRow key={t.id} tournament={t} joined={counts?.[t.id] ?? 0} />)
         )}
       </div>
     </AppShell>
