@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { tournaments } from "@/data/tournaments";
+import { useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -31,6 +31,9 @@ const matchShortcuts = [
 ] as const;
 
 function Home() {
+  const { data: tournaments, isLoading } = useTournaments();
+  const { data: counts } = useSlotCounts();
+
   return (
     <AppShell>
       <h1 className="sr-only">FireZone tournaments</h1>
@@ -85,10 +88,19 @@ function Home() {
         </Link>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {tournaments.map((t) => (
-          <TournamentTile key={t.id} tournament={t} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
+            ))
+          : (tournaments ?? []).map((t) => (
+              <TournamentTile key={t.id} tournament={t} joined={counts?.[t.id] ?? 0} />
+            ))}
       </div>
+      {!isLoading && (tournaments ?? []).length === 0 && (
+        <p className="mt-3 rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
+          Abhi koi tournament nahi hai.
+        </p>
+      )}
     </AppShell>
   );
 }

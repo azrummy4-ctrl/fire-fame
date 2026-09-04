@@ -1,21 +1,21 @@
 import { Link } from "@tanstack/react-router";
-import { formatINR, type Tournament } from "@/data/tournaments";
+import { bannerFor, formatDateTime, formatINR, type Tournament } from "@/lib/api";
 
-const statusLabel: Record<Tournament["status"], string> = {
+const statusLabel: Record<string, string> = {
   live: "LIVE",
   upcoming: "UPCOMING",
   completed: "COMPLETED",
-  full: "FULL",
+  cancelled: "CANCELLED",
 };
 
-const statusClass: Record<Tournament["status"], string> = {
+const statusClass: Record<string, string> = {
   live: "bg-live text-foreground",
   upcoming: "bg-primary text-primary-foreground",
   completed: "bg-muted text-muted-foreground",
-  full: "bg-gold text-gold-foreground",
+  cancelled: "bg-gold text-gold-foreground",
 };
 
-export function TournamentTile({ tournament }: { tournament: Tournament }) {
+export function TournamentTile({ tournament, joined = 0 }: { tournament: Tournament; joined?: number }) {
   return (
     <Link
       to="/tournaments/$id"
@@ -23,7 +23,7 @@ export function TournamentTile({ tournament }: { tournament: Tournament }) {
       className="card-elevated block overflow-hidden rounded-xl border border-border"
     >
       <img
-        src={tournament.banner}
+        src={bannerFor(tournament.banner_url)}
         alt={`${tournament.name} banner`}
         loading="lazy"
         width={1088}
@@ -34,21 +34,21 @@ export function TournamentTile({ tournament }: { tournament: Tournament }) {
         <span className="truncate text-sm font-semibold">{tournament.category}</span>
         <span className="flex items-center gap-1.5 text-sm font-semibold text-success">
           <span className="size-2 rounded-full bg-success" />
-          {tournament.joined}
+          {joined}
         </span>
       </div>
     </Link>
   );
 }
 
-export function TournamentRow({ tournament }: { tournament: Tournament }) {
-  const fill = Math.min(100, Math.round((tournament.joined / tournament.maxPlayers) * 100));
+export function TournamentRow({ tournament, joined = 0 }: { tournament: Tournament; joined?: number }) {
+  const fill = Math.min(100, Math.round((joined / tournament.max_players) * 100));
 
   return (
     <article className="card-elevated overflow-hidden rounded-2xl border border-border">
       <div className="relative">
         <img
-          src={tournament.banner}
+          src={bannerFor(tournament.banner_url)}
           alt={`${tournament.name} banner`}
           loading="lazy"
           width={1088}
@@ -56,29 +56,31 @@ export function TournamentRow({ tournament }: { tournament: Tournament }) {
           className="h-32 w-full object-cover"
         />
         <span
-          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-widest ${statusClass[tournament.status]}`}
+          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-widest ${
+            statusClass[tournament.status] ?? "bg-muted"
+          }`}
         >
-          {statusLabel[tournament.status]}
+          {statusLabel[tournament.status] ?? tournament.status.toUpperCase()}
         </span>
       </div>
       <div className="p-3.5">
         <h3 className="font-display text-lg font-bold">{tournament.name}</h3>
         <p className="text-xs text-muted-foreground">
-          {tournament.mode} · {tournament.map} · {tournament.startsAt}
+          {tournament.mode} · {tournament.map} · {formatDateTime(tournament.starts_at)}
         </p>
 
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-lg bg-surface-2 py-2">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Prize</p>
-            <p className="text-sm font-bold text-gold">{formatINR(tournament.prizePool)}</p>
+            <p className="text-sm font-bold text-gold">{formatINR(Number(tournament.prize_pool))}</p>
           </div>
           <div className="rounded-lg bg-surface-2 py-2">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Per kill</p>
-            <p className="text-sm font-bold">{formatINR(tournament.perKill)}</p>
+            <p className="text-sm font-bold">{formatINR(Number(tournament.per_kill))}</p>
           </div>
           <div className="rounded-lg bg-surface-2 py-2">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Entry</p>
-            <p className="text-sm font-bold">{formatINR(tournament.entryFee)}</p>
+            <p className="text-sm font-bold">{formatINR(Number(tournament.entry_fee))}</p>
           </div>
         </div>
 
@@ -86,7 +88,7 @@ export function TournamentRow({ tournament }: { tournament: Tournament }) {
           <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
             <span>Joined</span>
             <span>
-              {tournament.joined}/{tournament.maxPlayers}
+              {joined}/{tournament.max_players}
             </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">

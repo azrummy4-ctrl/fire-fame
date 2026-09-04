@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Coins, Home, Trophy, Gamepad2, Wallet, User } from "lucide-react";
+import { Bell, Coins, Home, Trophy, Gamepad2, Wallet, User, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
+import { formatINR, useIsAdmin, useSession, useWallet } from "@/lib/api";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
@@ -12,6 +13,9 @@ const navItems = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { session } = useSession();
+  const { data: wallet } = useWallet();
+  const { data: isAdmin } = useIsAdmin();
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">
@@ -24,14 +28,25 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="font-display text-2xl font-bold tracking-wide">FireZone</span>
           </Link>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                aria-label="Admin panel"
+                className="grid size-9 place-items-center rounded-full bg-surface-2 text-gold"
+              >
+                <ShieldCheck className="size-4.5" />
+              </Link>
+            )}
             <Link
-              to="/wallet"
+              to={session ? "/wallet" : "/auth"}
               className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2 py-1 pl-1 pr-3"
             >
               <span className="grid size-6 place-items-center rounded-full bg-gold text-gold-foreground">
                 <Coins className="size-3.5" />
               </span>
-              <span className="text-sm font-semibold">₹0</span>
+              <span className="text-sm font-semibold">
+                {session ? formatINR(Number(wallet?.balance ?? 0)) : "Sign in"}
+              </span>
             </Link>
             <Link
               to="/notifications"
