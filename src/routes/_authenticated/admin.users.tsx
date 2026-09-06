@@ -39,7 +39,10 @@ function AdminUsers() {
 
   async function setStatus(id: string, status: string) {
     const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`Account ${status}`);
     qc.invalidateQueries({ queryKey: ["admin", "users"] });
   }

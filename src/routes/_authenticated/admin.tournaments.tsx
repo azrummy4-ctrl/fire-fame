@@ -148,27 +148,39 @@ function Manage({
       _room_id: roomId,
       _room_password: pass,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Room published, players notified");
     qc.invalidateQueries();
   }
 
-  async function saveScore(id: string, patch: Record<string, number>) {
+  async function saveScore(id: string, patch: Partial<{ kills: number; placement: number; placement_points: number; bonus_points: number; prize_amount: number }>) {
     const { error } = await supabase.from("participants").update(patch).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     qc.invalidateQueries({ queryKey: ["admin", "participants", tournamentId] });
   }
 
   async function publishResults() {
     const { error } = await supabase.rpc("admin_publish_results", { _tournament_id: tournamentId });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Results published, prizes credited");
     qc.invalidateQueries();
   }
 
   async function removePlayer(id: string) {
     const { error } = await supabase.from("participants").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Player removed");
     qc.invalidateQueries({ queryKey: ["admin", "participants", tournamentId] });
   }
