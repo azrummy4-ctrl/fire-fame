@@ -40,14 +40,20 @@ function AdminPayments() {
 
   async function settleDeposit(id: string, decision: "completed" | "failed") {
     const { error } = await supabase.rpc("admin_settle_deposit", { _id: id, _decision: decision });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`Deposit ${decision}`);
     qc.invalidateQueries();
   }
 
   async function settleWithdrawal(id: string, decision: "completed" | "rejected") {
-    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision, _note: null });
-    if (error) return toast.error(error.message);
+    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(`Withdrawal ${decision}`);
     qc.invalidateQueries();
   }
