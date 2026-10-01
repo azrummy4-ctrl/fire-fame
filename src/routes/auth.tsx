@@ -73,14 +73,22 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    // Standard Supabase OAuth — works on any Supabase project (standalone or Lovable Cloud).
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
     });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
+    if (error) {
+      // Fallback: managed Lovable social login (used on Lovable Cloud preview).
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Google sign-in failed");
+        return;
+      }
+      if (result.redirected) return;
     }
-    if (result.redirected) return;
     navigate({ to: "/", replace: true });
   }
 
