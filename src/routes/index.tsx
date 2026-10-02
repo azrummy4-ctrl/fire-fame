@@ -34,6 +34,15 @@ function Home() {
   const { data: tournaments, isLoading } = useTournaments();
   const { data: counts } = useSlotCounts();
 
+  // Ek game ka ek hi card — pehla tournament us category ka representative hai
+  const games = (tournaments ?? []).filter(
+    (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
+  );
+  const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
+    acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
+    return acc;
+  }, {});
+
   return (
     <AppShell>
       <h1 className="sr-only">FireZone tournaments</h1>
@@ -92,8 +101,8 @@ function Home() {
           ? Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
             ))
-          : (tournaments ?? []).map((t) => (
-              <TournamentTile key={t.id} tournament={t} joined={counts?.[t.id] ?? 0} />
+          : games.map((t) => (
+              <TournamentTile key={t.id} tournament={t} joined={joinedByCategory[t.category] ?? 0} />
             ))}
       </div>
       {!isLoading && (tournaments ?? []).length === 0 && (
