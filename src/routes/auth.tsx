@@ -58,11 +58,11 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        if (!data.session) {
-          setSent(true);
-          toast.success("Account banaya! Email confirm karke login karein.");
-        } else {
+        if (data.session) {
+          toast.success("Account ban gaya! Welcome to FireZone 🔥");
           navigate({ to: "/", replace: true });
+        } else {
+          setSent(true);
         }
       }
     } catch (err) {
