@@ -20,9 +20,9 @@ export const Route = createFileRoute("/tournaments/")({
 });
 
 const tabs = [
+  { key: "live", label: "Ongoing" },
   { key: "upcoming", label: "Upcoming" },
-  { key: "live", label: "Live" },
-  { key: "completed", label: "Completed" },
+  { key: "completed", label: "Resulted" },
 ] as const;
 
 function TournamentsPage() {
@@ -33,19 +33,24 @@ function TournamentsPage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-2xl font-bold">Tournaments</h1>
+      <h1 className="text-center font-display text-2xl font-bold tracking-wide">
+        FireZone Contests
+      </h1>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 grid grid-cols-3 border-b border-border">
         {tabs.map((t) => (
           <button
             key={t.key}
             type="button"
             onClick={() => setTab(t.key)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
-              tab === t.key ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground"
+            className={`relative pb-2.5 pt-1 text-center text-sm font-semibold ${
+              tab === t.key ? "text-foreground" : "text-muted-foreground"
             }`}
           >
             {t.label}
+            {tab === t.key && (
+              <span className="absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-primary" />
+            )}
           </button>
         ))}
       </div>

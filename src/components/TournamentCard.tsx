@@ -41,7 +41,30 @@ export function TournamentTile({ tournament, joined = 0 }: { tournament: Tournam
   );
 }
 
+function CoinStat({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
+  return (
+    <div className="text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 flex items-center justify-center gap-1 text-base font-extrabold ${gold ? "text-gold" : ""}`}>
+        <span aria-hidden>🪙</span>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function MetaStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-0.5 font-display text-base font-bold uppercase leading-tight">{value}</p>
+    </div>
+  );
+}
+
 export function TournamentRow({ tournament, joined = 0 }: { tournament: Tournament; joined?: number }) {
+  const left = Math.max(0, tournament.max_players - joined);
+  const full = left === 0;
   const fill = Math.min(100, Math.round((joined / tournament.max_players) * 100));
 
   return (
@@ -53,7 +76,7 @@ export function TournamentRow({ tournament, joined = 0 }: { tournament: Tourname
           loading="lazy"
           width={1088}
           height={608}
-          className="h-32 w-full object-cover"
+          className="h-36 w-full object-cover"
         />
         <span
           className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-widest ${
@@ -63,46 +86,61 @@ export function TournamentRow({ tournament, joined = 0 }: { tournament: Tourname
           {statusLabel[tournament.status] ?? tournament.status.toUpperCase()}
         </span>
       </div>
+
       <div className="p-3.5">
-        <h3 className="font-display text-lg font-bold">{tournament.name}</h3>
-        <p className="text-xs text-muted-foreground">
-          {tournament.mode} · {tournament.map} · {formatDateTime(tournament.starts_at)}
+        <h3 className="font-display text-lg font-bold uppercase leading-snug">
+          {tournament.name} 😈⚔️
+        </h3>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Time : {formatDateTime(tournament.starts_at)}
         </p>
 
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-lg bg-surface-2 py-2">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Prize</p>
-            <p className="text-sm font-bold text-gold">{formatINR(Number(tournament.prize_pool))}</p>
-          </div>
-          <div className="rounded-lg bg-surface-2 py-2">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Per kill</p>
-            <p className="text-sm font-bold">{formatINR(Number(tournament.per_kill))}</p>
-          </div>
-          <div className="rounded-lg bg-surface-2 py-2">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Entry</p>
-            <p className="text-sm font-bold">{formatINR(Number(tournament.entry_fee))}</p>
-          </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <CoinStat label="Prize Pool" value={formatINR(Number(tournament.prize_pool))} gold />
+          <CoinStat label="Per Kill" value={formatINR(Number(tournament.per_kill))} />
+          <CoinStat label="Entry Fee" value={formatINR(Number(tournament.entry_fee))} />
         </div>
 
-        <div className="mt-3">
-          <div className="mb-1 flex justify-between text-[11px] text-muted-foreground">
-            <span>Joined</span>
-            <span>
-              {joined}/{tournament.max_players}
+        <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+          <MetaStat label="Type" value={tournament.category} />
+          <MetaStat label="Entry per player" value={formatINR(Number(tournament.entry_fee))} />
+          <MetaStat label="Map" value={tournament.map} />
+        </div>
+
+        <div className="mt-3 flex items-center gap-3">
+          <div className="flex-1">
+            <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div
+                className={`h-full rounded-full ${full ? "bg-live" : "bg-primary"}`}
+                style={{ width: `${fill}%` }}
+              />
+            </div>
+            <p className={`mt-1 text-[11px] font-semibold ${full ? "text-live" : "text-muted-foreground"}`}>
+              Only {left} Spot Left {joined}/{tournament.max_players}
+            </p>
+          </div>
+          {tournament.status === "completed" ? (
+            <Link
+              to="/tournaments/$id"
+              params={{ id: tournament.id }}
+              className="rounded-xl bg-surface-2 px-5 py-2.5 text-sm font-bold text-foreground"
+            >
+              Results
+            </Link>
+          ) : full ? (
+            <span className="cursor-not-allowed rounded-xl bg-primary/50 px-5 py-2.5 text-sm font-bold text-primary-foreground">
+              Joining Full
             </span>
-          </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${fill}%` }} />
-          </div>
+          ) : (
+            <Link
+              to="/tournaments/$id"
+              params={{ id: tournament.id }}
+              className="rounded-xl bg-success px-5 py-2.5 text-sm font-bold text-success-foreground"
+            >
+              Join Now
+            </Link>
+          )}
         </div>
-
-        <Link
-          to="/tournaments/$id"
-          params={{ id: tournament.id }}
-          className="mt-3 block rounded-xl bg-primary py-2.5 text-center text-sm font-bold text-primary-foreground"
-        >
-          {tournament.status === "completed" ? "View Results" : "View Details"}
-        </Link>
       </div>
     </article>
   );
