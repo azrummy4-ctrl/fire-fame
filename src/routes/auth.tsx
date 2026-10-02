@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useSession } from "@/lib/api";
 
 export const Route = createFileRoute("/auth")({
@@ -76,19 +75,6 @@ function AuthPage() {
     } finally {
       setBusy(false);
     }
-  }
-
-  async function google() {
-    // Managed by Lovable — no Google Cloud credentials needed.
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
-    }
-    if (result.redirected) return;
-    navigate({ to: "/", replace: true });
   }
 
   return (
@@ -191,36 +177,6 @@ function AuthPage() {
           )}
         </form>
       )}
-
-      <div className="my-4 flex items-center gap-3 text-[11px] text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> OR <span className="h-px flex-1 bg-border" />
-      </div>
-
-      <button
-        type="button"
-        onClick={google}
-        className="flex w-full items-center justify-center gap-3 rounded-xl bg-white py-3 text-sm font-bold text-gray-800 shadow-md transition active:scale-[0.98]"
-      >
-        <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="#4285F4"
-            d="M23.5 12.3c0-.9-.1-1.5-.3-2.2H12v4.1h6.5c-.1 1.1-.8 2.7-2.4 3.8l-.02.15 3.5 2.7.24.02c2.2-2 3.5-5 3.5-8.6z"
-          />
-          <path
-            fill="#34A853"
-            d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.8-2.9c-1 .7-2.4 1.2-4.1 1.2-3.2 0-5.8-2.1-6.8-5l-.14.01-3.6 2.8-.05.13C3.4 21.3 7.4 24 12 24z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M5.2 14.4c-.25-.75-.4-1.55-.4-2.4s.15-1.65.42-2.4l-.01-.16-3.65-2.83-.12.06C.52 8.2 0 10 0 12s.52 3.8 1.44 5.3l3.76-2.9z"
-          />
-          <path
-            fill="#EA4335"
-            d="M12 4.6c2.3 0 3.8.97 4.7 1.8l3.4-3.3C17.9 1.2 15.2 0 12 0 7.4 0 3.4 2.7 1.44 6.7l3.77 2.9c1-2.9 3.6-5 6.79-5z"
-          />
-        </svg>
-        Continue with Google
-      </button>
 
       <p className="mt-6 text-center text-[11px] text-muted-foreground">
         Continue karke aap Terms, Privacy Policy aur responsible gaming rules accept karte hain. FireZone
