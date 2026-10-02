@@ -87,6 +87,7 @@ function TournamentDetail() {
 
   return (
     <AppShell>
+      {/* Banner */}
       <div className="overflow-hidden rounded-2xl border border-border">
         <img
           src={bannerFor(t.banner_url)}
@@ -97,50 +98,88 @@ function TournamentDetail() {
         />
       </div>
 
-      <h1 className="mt-3 font-display text-2xl font-bold">{t.name}</h1>
-      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Users className="size-3.5" /> {t.mode}
-        </span>
-        <span className="flex items-center gap-1">
-          <MapIcon className="size-3.5" /> {t.map}
-        </span>
-        <span className="flex items-center gap-1">
-          <Clock className="size-3.5" /> {formatDateTime(t.starts_at)}
+      {/* Time left countdown */}
+      <Countdown startsAt={t.starts_at} status={t.status} />
+
+      {/* Title */}
+      <h1 className="mt-3 text-center font-display text-lg font-bold uppercase leading-snug text-primary">
+        {t.name}
+      </h1>
+
+      {/* Info chips — Team / Mode / Map */}
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <InfoChip label="Team" value={t.mode} />
+        <InfoChip label="Mode" value={t.category} />
+        <InfoChip label="Map" value={t.map} />
+      </div>
+
+      {/* Match type + entry fee */}
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <InfoChip
+          label="Match Type"
+          value={Number(t.entry_fee) > 0 ? "Paid" : "Free"}
+        />
+        <div className="rounded-lg border border-border bg-surface px-3 py-2 text-center">
+          <p className="text-xs text-muted-foreground">Entry Fee:</p>
+          <p className="flex items-center justify-center gap-1 font-display text-lg font-bold text-gold">
+            🪙 {formatINR(Number(t.entry_fee))}
+          </p>
+        </div>
+      </div>
+
+      {/* Match schedule */}
+      <div className="mt-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-center text-sm">
+        <span className="text-muted-foreground">Match Schedule: </span>
+        <span className="font-bold">{formatDateTime(t.starts_at)}</span>
+      </div>
+
+      {/* Slots */}
+      <div className="mt-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-center text-sm">
+        <span className="text-muted-foreground">Slots: </span>
+        <span className="font-bold">
+          {joined}/{t.max_players} joined
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <Stat label="Prize pool" value={formatINR(Number(t.prize_pool))} gold />
-        <Stat label="Entry" value={formatINR(Number(t.entry_fee))} />
-        <Stat label="Slots" value={`${joined}/${t.max_players}`} />
-      </div>
-
+      {/* Prize details */}
       <section className="mt-5">
-        <h2 className="font-display text-lg font-bold">Prize distribution</h2>
-        <ul className="mt-2 space-y-2">
-          {t.prize_split.map((p) => (
-            <li
-              key={p.place}
-              className="flex items-center justify-between rounded-xl border border-border bg-surface px-3 py-2 text-sm"
-            >
-              <span className="font-semibold">{p.place}</span>
-              <span className="font-bold text-gold">{formatINR(Number(p.amount))}</span>
-            </li>
-          ))}
-        </ul>
+        <h2 className="font-display text-lg font-bold text-primary">Prize Details</h2>
+        <div className="mt-2 rounded-lg border border-border bg-surface p-3">
+          <p className="font-display text-base font-bold uppercase text-gold">
+            Prize pool {formatINR(Number(t.prize_pool))}
+            {t.per_kill > 0 && ` + ${formatINR(Number(t.per_kill))} per kill`}
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {t.prize_split.map((p) => (
+              <li
+                key={p.place}
+                className="flex items-center justify-between border-b border-border/60 pb-1.5 text-sm last:border-0 last:pb-0"
+              >
+                <span className="font-semibold">{p.place}</span>
+                <span className="font-bold text-gold">{formatINR(Number(p.amount))}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
+      {/* Rules and regulations */}
       <section className="mt-5">
-        <h2 className="font-display text-lg font-bold">Rules</h2>
-        <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-          {t.rules.map((rule) => (
-            <li key={rule} className="flex gap-2">
-              <span className="text-primary">›</span>
-              {rule}
-            </li>
-          ))}
-        </ul>
+        <h2 className="font-display text-lg font-bold text-primary">About this Match</h2>
+        <div className="mt-2 rounded-lg border border-border bg-surface p-4">
+          <h3 className="text-center font-display text-base font-bold">
+            Rules and Regulations
+          </h3>
+          <div className="mx-auto mt-2 h-0.5 w-24 bg-border" />
+          <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+            {t.rules.map((rule) => (
+              <li key={rule} className="flex gap-2">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-foreground" />
+                {rule}
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="mt-5 rounded-2xl border border-border bg-surface p-4">
