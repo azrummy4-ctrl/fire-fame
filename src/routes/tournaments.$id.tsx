@@ -269,9 +269,28 @@ function TournamentDetail() {
         </ul>
       )}
 
-      <Link to="/tournaments" className="mt-4 block text-center text-xs font-semibold text-primary">
+      <div className="h-8" />
+      <Link to="/tournaments" className="block text-center text-xs font-semibold text-primary">
         ← All tournaments
       </Link>
+
+      {/* Floating Join button — bottom, above nav */}
+      <div className="fixed inset-x-0 bottom-[68px] z-30 mx-auto w-full max-w-[480px] px-4 pb-2">
+        <button
+          type="button"
+          onClick={join}
+          disabled={busy || alreadyJoined || t.status !== "upcoming"}
+          className="w-full rounded-2xl bg-success py-3.5 font-display text-base font-bold uppercase tracking-wide text-success-foreground shadow-[var(--shadow-card)] disabled:opacity-50"
+        >
+          {alreadyJoined
+            ? "Already Joined ✓"
+            : t.status !== "upcoming"
+              ? "Registration Closed"
+              : busy
+                ? "Joining…"
+                : "Join Match"}
+        </button>
+      </div>
     </AppShell>
   );
 }
