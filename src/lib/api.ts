@@ -15,6 +15,19 @@ const banners: Record<string, string> = {
   "solo-survival": soloSurvival,
 };
 
+export const homeGameCatalog = [
+  { category: "BR SURVIVAL", banner_url: "solo-survival" },
+  { category: "LW 1V1 / 2V2", banner_url: "lone-wolf" },
+  { category: "BR SURVIVAL 2", banner_url: "br-full-map" },
+  { category: "CS ONETAP", banner_url: "clash-squad" },
+  { category: "LW LOSE", banner_url: "lone-wolf" },
+  { category: "BR RUSH FULL MAP", banner_url: "br-full-map" },
+  { category: "ONLY UMP", banner_url: "clash-squad" },
+  { category: "FREE MATCH", banner_url: "solo-survival" },
+  { category: "CS 4V4", banner_url: "clash-squad" },
+  { category: "LW HEADSHOT", banner_url: "lone-wolf" },
+] as const;
+
 export function bannerFor(key: string | null | undefined) {
   if (!key) return brFullMap;
   if (key.startsWith("http")) return key;

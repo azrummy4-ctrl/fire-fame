@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -36,9 +36,15 @@ function Home() {
   const { data: isAdmin } = useIsAdmin();
 
   // Ek game ka ek hi card — pehla tournament us category ka representative hai
-  const games = (tournaments ?? []).filter(
+  const tournamentGames = (tournaments ?? []).filter(
     (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
   );
+  const games = [
+    ...tournamentGames,
+    ...homeGameCatalog
+      .filter((game) => !tournamentGames.some((t) => t.category.toLowerCase() === game.category.toLowerCase()))
+      .map((game) => ({ ...game, id: `catalog-${game.category}` })),
+  ];
   const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
     acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
     return acc;
