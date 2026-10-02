@@ -17,6 +17,7 @@ import { Route as AuthenticatedMyGamesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
+import { Route as GamesCategoryRouteImport } from './routes/games.$category'
 import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -64,6 +65,11 @@ const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const GamesCategoryRoute = GamesCategoryRouteImport.update({
+  id: '/games/$category',
+  path: '/games/$category',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
   id: '/tournaments/',
   path: '/tournaments/',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/games/$category': typeof GamesCategoryRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/games/$category': typeof GamesCategoryRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments': typeof TournamentsIndexRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/games/$category': typeof GamesCategoryRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/wallet'
+    | '/games/$category'
     | '/tournaments/$id'
     | '/tournaments/'
     | '/admin/payments'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/wallet'
+    | '/games/$category'
     | '/tournaments/$id'
     | '/tournaments'
     | '/admin/payments'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/wallet'
+    | '/games/$category'
     | '/tournaments/$id'
     | '/tournaments/'
     | '/_authenticated/admin/payments'
@@ -198,6 +210,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  GamesCategoryRoute: typeof GamesCategoryRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
 }
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/wallet'
       preLoaderRoute: typeof AuthenticatedWalletRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/games/$category': {
+      id: '/games/$category'
+      path: '/games/$category'
+      fullPath: '/games/$category'
+      preLoaderRoute: typeof GamesCategoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/tournaments/': {
       id: '/tournaments/'
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  GamesCategoryRoute: GamesCategoryRoute,
   TournamentsIdRoute: TournamentsIdRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
 }
