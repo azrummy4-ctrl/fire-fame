@@ -292,11 +292,40 @@ function TournamentDetail() {
   );
 }
 
-function Stat({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
+function InfoChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card-elevated rounded-xl border border-border py-3">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className={`font-bold ${gold ? "text-gold" : ""}`}>{value}</p>
+    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-center">
+      <p className="text-xs text-muted-foreground">{label}:</p>
+      <p className="font-display text-base font-bold uppercase">{value}</p>
+    </div>
+  );
+}
+
+function Countdown({ startsAt, status }: { startsAt: string; status: string }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const diff = new Date(startsAt).getTime() - now;
+  let text: string;
+  if (status === "live") text = "Match LIVE hai!";
+  else if (status === "completed") text = "Match completed";
+  else if (diff <= 0) text = "Starting…";
+  else {
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    text = `${d}d ${h}h ${m}m ${s}s`;
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-surface py-3 text-center">
+      <p className="font-display text-lg font-bold">
+        Time Left: <span className="text-primary">{text}</span>
+      </p>
     </div>
   );
 }
