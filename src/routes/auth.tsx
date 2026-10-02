@@ -118,7 +118,7 @@ function AuthPage() {
 
       {sent ? (
         <p className="card-elevated mt-5 rounded-xl border border-border p-5 text-center text-sm">
-          Confirmation email bheja gaya hai <b>{email}</b> par. Link click karke wapas aakar login karein.
+          Account ban gaya hai <b>{email}</b> ke liye. Ab <b>Login</b> tab se sign in karein.
         </p>
       ) : (
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
