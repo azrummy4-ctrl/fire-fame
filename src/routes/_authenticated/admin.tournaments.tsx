@@ -65,6 +65,14 @@ function BannerPicker({ value, onChange }: { value: string; onChange: (url: stri
   );
 }
 
+const DEFAULT_RULES = [
+  "Emulator not allowed — smartphones only",
+  "No teaming with other players",
+  "No aimbot, hacks or mods — permanent ban",
+  "Screenshot / recording proof required",
+  "No refund for missed matches",
+];
+
 const empty = {
   name: "",
   category: "BR FULL MAP",
@@ -76,6 +84,7 @@ const empty = {
   max_players: "48",
   starts_at: "",
   banner_url: "",
+  rules: DEFAULT_RULES.join("\n"),
 };
 
 function AdminTournaments() {
@@ -106,7 +115,7 @@ function AdminTournaments() {
       per_kill: Number(form.per_kill),
       max_players: Number(form.max_players),
       starts_at: new Date(form.starts_at).toISOString(),
-      rules: ["Emulator not allowed", "No teaming", "Screenshot proof required"],
+      rules: form.rules.split("\n").map((r) => r.trim()).filter(Boolean),
       prize_split: [
         { place: "1st", amount: Number(form.prize_pool) * 0.5 },
         { place: "2nd", amount: Number(form.prize_pool) * 0.3 },
@@ -138,6 +147,7 @@ function AdminTournaments() {
           <F label="Max players" type="number" value={form.max_players} onChange={(v) => setForm({ ...form, max_players: v })} />
         </div>
         <F label="Starts at" type="datetime-local" value={form.starts_at} onChange={(v) => setForm({ ...form, starts_at: v })} />
+        <RulesBox value={form.rules} onChange={(v) => setForm({ ...form, rules: v })} />
         <button className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground">
           Create
         </button>
