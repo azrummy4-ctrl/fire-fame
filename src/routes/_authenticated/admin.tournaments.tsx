@@ -15,8 +15,55 @@ export const Route = createFileRoute("/_authenticated/admin/tournaments")({
       { property: "og:description", content: "Tournament creation, room publishing and result entry." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    category: typeof s.category === "string" ? s.category : undefined,
+  }),
   component: AdminTournaments,
 });
+
+export async function uploadBanner(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("Sirf image file upload karein");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Image 5MB se chhoti honi chahiye");
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from("banners").upload(path, file, { contentType: file.type });
+  if (error) throw error;
+  const { data, error: e2 } = await supabase.storage
+    .from("banners")
+    .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+  if (e2 || !data) throw e2 ?? new Error("URL nahi bana");
+  return data.signedUrl;
+}
+
+function BannerPicker({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <label className="block cursor-pointer">
+      <span className="text-[11px] font-semibold text-muted-foreground">Banner image</span>
+      <div className="mt-1 grid h-32 place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-surface-2 text-xs text-muted-foreground">
+        {busy ? "Uploading..." : value ? <img src={value} alt="Banner preview" className="h-full w-full object-cover" /> : "Tap to upload image"}
+      </div>
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          setBusy(true);
+          try {
+            onChange(await uploadBanner(f));
+            toast.success("Image upload ho gayi");
+          } catch (err) {
+            toast.error((err as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      />
+    </label>
+  );
+}
 
 const empty = {
   name: "",
@@ -28,11 +75,13 @@ const empty = {
   per_kill: "10",
   max_players: "48",
   starts_at: "",
+  banner_url: "",
 };
 
 function AdminTournaments() {
   const qc = useQueryClient();
-  const [form, setForm] = useState(empty);
+  const search = Route.useSearch();
+  const [form, setForm] = useState({ ...empty, category: search.category ?? empty.category });
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: list } = useQuery({
@@ -48,7 +97,8 @@ function AdminTournaments() {
     e.preventDefault();
     const { error } = await supabase.from("tournaments").insert({
       name: form.name,
-      category: form.category,
+      category: form.category.trim().toUpperCase(),
+      banner_url: form.banner_url || null,
       mode: form.mode,
       map: form.map,
       entry_fee: Number(form.entry_fee),
@@ -76,7 +126,9 @@ function AdminTournaments() {
     <AdminShell>
       <form onSubmit={create} className="space-y-3 rounded-2xl border border-border bg-surface p-4">
         <h2 className="font-display text-lg font-bold">Create tournament</h2>
+        <BannerPicker value={form.banner_url} onChange={(v) => setForm({ ...form, banner_url: v })} />
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+        <F label="Game / Category (e.g. BR FULL MAP)" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
         <div className="grid grid-cols-2 gap-2">
           <F label="Mode" value={form.mode} onChange={(v) => setForm({ ...form, mode: v })} />
           <F label="Map" value={form.map} onChange={(v) => setForm({ ...form, map: v })} />
@@ -108,6 +160,18 @@ function AdminTournaments() {
               </div>
               <span className="text-xs text-primary">{openId === t.id ? "Close" : "Manage"}</span>
             </button>
+            {openId === t.id && (
+              <div className="mt-3">
+                <BannerPicker
+                  value={t.banner_url?.startsWith("http") ? t.banner_url : ""}
+                  onChange={async (url) => {
+                    const { error } = await supabase.from("tournaments").update({ banner_url: url }).eq("id", t.id);
+                    if (error) toast.error(error.message);
+                    else qc.invalidateQueries();
+                  }}
+                />
+              </div>
+            )}
             {openId === t.id && <Manage tournamentId={t.id} roomPublished={t.room_published} resultsPublished={t.results_published} />}
           </li>
         ))}

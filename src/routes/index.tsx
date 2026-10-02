@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
+import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { useSlotCounts, useTournaments } from "@/lib/api";
+import { useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -33,6 +33,7 @@ const matchShortcuts = [
 function Home() {
   const { data: tournaments, isLoading } = useTournaments();
   const { data: counts } = useSlotCounts();
+  const { data: isAdmin } = useIsAdmin();
 
   // Ek game ka ek hi card — pehla tournament us category ka representative hai
   const games = (tournaments ?? []).filter(
@@ -104,6 +105,19 @@ function Home() {
           : games.map((t) => (
               <TournamentTile key={t.id} tournament={t} joined={joinedByCategory[t.category] ?? 0} />
             ))}
+        {isAdmin && !isLoading && (
+          <Link
+            to="/admin/tournaments"
+            search={{ category: undefined }}
+            className="flex h-full min-h-36 flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/50 bg-surface text-primary"
+          >
+            <span className="grid size-11 place-items-center rounded-full bg-primary/15">
+              <Plus className="size-6" />
+            </span>
+            <span className="text-sm font-bold">Add Tournament</span>
+            <span className="text-[10px] text-muted-foreground">Admin only</span>
+          </Link>
+        )}
       </div>
       {!isLoading && (tournaments ?? []).length === 0 && (
         <p className="mt-3 rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
