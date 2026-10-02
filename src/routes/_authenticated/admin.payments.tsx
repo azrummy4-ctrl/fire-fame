@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/admin/payments")({
       { name: "description", content: "Verify deposits and settle player withdrawal requests securely." },
       { property: "og:title", content: "Payments | FireZone Admin" },
       { property: "og:description", content: "Deposit verification and withdrawal settlement." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminPayments,

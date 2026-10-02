@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -19,6 +19,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Browse live and upcoming tournaments, join matches and follow results.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -35,10 +37,14 @@ function Home() {
   const { data: counts } = useSlotCounts();
   const { data: isAdmin } = useIsAdmin();
 
-  // Ek game ka ek hi card — pehla tournament us category ka representative hai
-  const games = (tournaments ?? []).filter(
+  // Keep all reference game modes visible even before an admin creates their first contest.
+  const tournamentGames = (tournaments ?? []).filter(
     (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
   );
+  const games = [
+    ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),
+    ...tournamentGames.filter((t) => !homeGameCatalog.some((game) => game.category.toLowerCase() === t.category.toLowerCase())),
+  ];
   const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
     acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
     return acc;
@@ -98,11 +104,7 @@ function Home() {
         </Link>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
-            ))
-          : games.map((t) => (
+        {games.map((t) => (
               <div key={t.id} className="relative">
                 <TournamentTile tournament={t} joined={joinedByCategory[t.category] ?? 0} />
                 {isAdmin && (
@@ -130,11 +132,6 @@ function Home() {
           </Link>
         )}
       </div>
-      {!isLoading && (tournaments ?? []).length === 0 && (
-        <p className="mt-3 rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
-          Abhi koi tournament nahi hai.
-        </p>
-      )}
     </AppShell>
   );
 }

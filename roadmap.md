@@ -1,7 +1,5 @@
-# Migration roadmap
+# Product roadmap
 
-- [x] Inventory existing backend integration and schema scripts; preserve current app connection.
-- [x] Document safe standalone migration sequence, financial reconciliation, auth, and testing requirements.
-- [x] Destination project URL + publishable key received (qquoyedomixbcpxhhigj).
-- [ ] Obtain an authorized consistent private source export including auth identities and financial data (blocked: managed source export access unavailable here).
-- [ ] Import and reconcile on destination, adapt standalone OAuth/configuration, test critical flows, then cut over (blocked: previous two items).
+- [x] Keep the app on Lovable Cloud and preserve existing tournament flows.
+- [x] Add the full Home game-mode catalogue shown in the latest reference.
+- [x] Keep each game card linked to its own contests window and admin add shortcut.

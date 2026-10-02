@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
       { name: "description", content: "Search players by name or Free Fire UID and manage account status." },
       { property: "og:title", content: "Users | FireZone Admin" },
       { property: "og:description", content: "Player search, UID lookup and ban/unban controls." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminUsers,

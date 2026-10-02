@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/profile")({
       { name: "description", content: "Manage your in-game name, Free Fire UID, referral code and account settings." },
       { property: "og:title", content: "Profile | FireZone" },
       { property: "og:description", content: "Your player profile, referrals and account settings." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProfilePage,

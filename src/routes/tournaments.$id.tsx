@@ -24,6 +24,8 @@ export const Route = createFileRoute("/tournaments/$id")({
       },
       { property: "og:title", content: "Tournament details | FireZone" },
       { property: "og:description", content: "Prize pool, rules, room details and leaderboard." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: TournamentDetail,

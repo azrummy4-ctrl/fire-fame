@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/wallet")({
       { name: "description", content: "Check your tournament wallet balance, deposits, prizes and withdrawal history." },
       { property: "og:title", content: "Wallet | FireZone" },
       { property: "og:description", content: "Balance, transactions and withdrawal requests." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: WalletPage,

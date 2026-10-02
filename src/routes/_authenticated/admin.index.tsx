@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_authenticated/admin/")({
       { name: "description", content: "Overview of users, tournaments, deposits and pending withdrawals." },
       { property: "og:title", content: "Admin Dashboard | FireZone" },
       { property: "og:description", content: "Users, tournaments and payment overview." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminDashboard,

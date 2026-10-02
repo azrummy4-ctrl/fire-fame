@@ -15,25 +15,38 @@ const statusClass: Record<string, string> = {
   cancelled: "bg-gold text-gold-foreground",
 };
 
-export function TournamentTile({ tournament, joined = 0 }: { tournament: Tournament; joined?: number }) {
+export function TournamentTile({
+  tournament,
+  joined = 0,
+}: {
+  tournament: Pick<Tournament, "category" | "banner_url">;
+  joined?: number;
+}) {
   return (
     <Link
       to="/games/$category"
       params={{ category: tournament.category }}
-      className="card-elevated block overflow-hidden rounded-xl border border-border"
+      className="card-elevated group block overflow-hidden rounded-lg border border-primary/80"
     >
-      <img
-        src={bannerFor(tournament.banner_url)}
-        alt={`${tournament.name} banner`}
-        loading="lazy"
-        width={1088}
-        height={608}
-        className="h-24 w-full object-cover"
-      />
-      <div className="flex items-center justify-between gap-2 px-3 py-2">
-        <span className="truncate text-sm font-semibold">{tournament.category}</span>
-        <span className="flex items-center gap-1.5 text-sm font-semibold text-success">
-          <span className="size-2 rounded-full bg-success" />
+      <div className="relative overflow-hidden">
+        <img
+          src={bannerFor(tournament.banner_url)}
+          alt={`${tournament.category} artwork`}
+          loading="lazy"
+          width={512}
+          height={288}
+          className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
+        />
+        {tournament.banner_url?.startsWith("mode-") && (
+          <span className="absolute bottom-1 right-1 max-w-[66%] bg-surface/80 px-1 text-right font-display text-base font-extrabold uppercase leading-none text-foreground drop-shadow-md">
+            {tournament.category}
+          </span>
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-2 bg-surface/95 px-2 py-2">
+        <span className="truncate text-sm font-medium uppercase">{tournament.category}</span>
+        <span className="flex items-center gap-1.5 text-sm font-bold text-success">
+          <span className="size-2.5 rounded-full bg-success/70" />
           {joined}
         </span>
       </div>
