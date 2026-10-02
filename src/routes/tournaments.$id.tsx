@@ -242,27 +242,27 @@ function TournamentDetail() {
         </section>
       )}
 
-      <div className="mt-5 flex gap-2">
+      <div className="mt-6 space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setShowPlayers((v) => !v)}
+          className="w-full rounded-xl bg-gold py-3 text-sm font-bold uppercase tracking-wide text-gold-foreground"
+        >
+          View All Joinings
+        </button>
         <button
           type="button"
           onClick={join}
           disabled={busy || alreadyJoined || t.status !== "upcoming"}
-          className="flex-1 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="w-full rounded-xl bg-success py-3.5 font-display text-base font-bold uppercase tracking-wide text-success-foreground disabled:opacity-50"
         >
           {alreadyJoined
-            ? "Already joined"
+            ? "Already Joined ✓"
             : t.status !== "upcoming"
-              ? "Registration closed"
+              ? "Registration Closed"
               : busy
                 ? "Joining…"
-                : `Join for ${formatINR(Number(t.entry_fee))}`}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowPlayers((v) => !v)}
-          className="rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold"
-        >
-          Players
+                : "Join Match"}
         </button>
       </div>
 
