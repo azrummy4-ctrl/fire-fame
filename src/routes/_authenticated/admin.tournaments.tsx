@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/admin/tournaments")({
       { property: "og:description", content: "Tournament creation, room publishing and result entry." },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { category?: string } => ({
     category: typeof s.category === "string" ? s.category : undefined,
   }),
   component: AdminTournaments,

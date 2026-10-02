@@ -108,7 +108,6 @@ function Home() {
         {isAdmin && !isLoading && (
           <Link
             to="/admin/tournaments"
-            search={{ category: undefined }}
             className="flex h-full min-h-36 flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/50 bg-surface text-primary"
           >
             <span className="grid size-11 place-items-center rounded-full bg-primary/15">
