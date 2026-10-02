@@ -35,15 +35,13 @@ function Home() {
   const { data: counts } = useSlotCounts();
   const { data: isAdmin } = useIsAdmin();
 
-  // Ek game ka ek hi card — pehla tournament us category ka representative hai
+  // Keep all reference game modes visible even before an admin creates their first contest.
   const tournamentGames = (tournaments ?? []).filter(
     (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
   );
   const games = [
-    ...tournamentGames,
-    ...homeGameCatalog
-      .filter((game) => !tournamentGames.some((t) => t.category.toLowerCase() === game.category.toLowerCase()))
-      .map((game) => ({ ...game, id: `catalog-${game.category}` })),
+    ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),
+    ...tournamentGames.filter((t) => !homeGameCatalog.some((game) => game.category.toLowerCase() === t.category.toLowerCase())),
   ];
   const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
     acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
@@ -104,11 +102,7 @@ function Home() {
         </Link>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
-            ))
-          : games.map((t) => (
+        {games.map((t) => (
               <div key={t.id} className="relative">
                 <TournamentTile tournament={t} joined={joinedByCategory[t.category] ?? 0} />
                 {isAdmin && (
@@ -136,11 +130,6 @@ function Home() {
           </Link>
         )}
       </div>
-      {!isLoading && (tournaments ?? []).length === 0 && (
-        <p className="mt-3 rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
-          Abhi koi tournament nahi hai.
-        </p>
-      )}
     </AppShell>
   );
 }

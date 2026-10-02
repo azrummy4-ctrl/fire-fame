@@ -7,25 +7,45 @@ import brFullMap from "@/assets/banner-br-full-map.jpg";
 import clashSquad from "@/assets/banner-clash-squad.jpg";
 import loneWolf from "@/assets/banner-lone-wolf.jpg";
 import soloSurvival from "@/assets/banner-solo-survival.jpg";
+import brSurvival from "@/assets/mode-br-survival.jpg";
+import lwDuel from "@/assets/mode-lw-1v1-2v2.jpg";
+import brSurvival2 from "@/assets/mode-br-survival-2.jpg";
+import csOnetap from "@/assets/mode-cs-onetap.jpg";
+import lwLose from "@/assets/mode-lw-lose.jpg";
+import brRush from "@/assets/mode-br-rush-full-map.jpg";
+import onlyUmp from "@/assets/mode-only-ump.jpg";
+import freeMatch from "@/assets/mode-free-match.jpg";
+import cs4v4 from "@/assets/mode-cs-4v4.jpg";
+import lwHeadshot from "@/assets/mode-lw-headshot.jpg";
 
 const banners: Record<string, string> = {
   "br-full-map": brFullMap,
   "clash-squad": clashSquad,
   "lone-wolf": loneWolf,
   "solo-survival": soloSurvival,
+  "mode-br-survival": brSurvival,
+  "mode-lw-1v1-2v2": lwDuel,
+  "mode-br-survival-2": brSurvival2,
+  "mode-cs-onetap": csOnetap,
+  "mode-lw-lose": lwLose,
+  "mode-br-rush-full-map": brRush,
+  "mode-only-ump": onlyUmp,
+  "mode-free-match": freeMatch,
+  "mode-cs-4v4": cs4v4,
+  "mode-lw-headshot": lwHeadshot,
 };
 
 export const homeGameCatalog = [
-  { category: "BR SURVIVAL", banner_url: "solo-survival" },
-  { category: "LW 1V1 / 2V2", banner_url: "lone-wolf" },
-  { category: "BR SURVIVAL 2", banner_url: "br-full-map" },
-  { category: "CS ONETAP", banner_url: "clash-squad" },
-  { category: "LW LOSE", banner_url: "lone-wolf" },
-  { category: "BR RUSH FULL MAP", banner_url: "br-full-map" },
-  { category: "ONLY UMP", banner_url: "clash-squad" },
-  { category: "FREE MATCH", banner_url: "solo-survival" },
-  { category: "CS 4V4", banner_url: "clash-squad" },
-  { category: "LW HEADSHOT", banner_url: "lone-wolf" },
+  { category: "BR SURVIVAL", banner_url: "mode-br-survival" },
+  { category: "LW 1V1 / 2V2", banner_url: "mode-lw-1v1-2v2" },
+  { category: "BR SURVIVAL 2", banner_url: "mode-br-survival-2" },
+  { category: "CS ONETAP", banner_url: "mode-cs-onetap" },
+  { category: "LW LOSE", banner_url: "mode-lw-lose" },
+  { category: "BR RUSH FULL MAP", banner_url: "mode-br-rush-full-map" },
+  { category: "ONLY UMP", banner_url: "mode-only-ump" },
+  { category: "FREE MATCH", banner_url: "mode-free-match" },
+  { category: "CS 4V4", banner_url: "mode-cs-4v4" },
+  { category: "LW HEADSHOT", banner_url: "mode-lw-headshot" },
 ] as const;
 
 export function bannerFor(key: string | null | undefined) {
