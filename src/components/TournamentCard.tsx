@@ -18,8 +18,8 @@ const statusClass: Record<string, string> = {
 export function TournamentTile({ tournament, joined = 0 }: { tournament: Tournament; joined?: number }) {
   return (
     <Link
-      to="/tournaments/$id"
-      params={{ id: tournament.id }}
+      to="/games/$category"
+      params={{ category: tournament.category }}
       className="card-elevated block overflow-hidden rounded-xl border border-border"
     >
       <img
