@@ -242,29 +242,13 @@ function TournamentDetail() {
         </section>
       )}
 
-      <div className="mt-6 space-y-2.5">
-        <button
-          type="button"
-          onClick={() => setShowPlayers((v) => !v)}
-          className="w-full rounded-xl bg-gold py-3 text-sm font-bold uppercase tracking-wide text-gold-foreground"
-        >
-          View All Joinings
-        </button>
-        <button
-          type="button"
-          onClick={join}
-          disabled={busy || alreadyJoined || t.status !== "upcoming"}
-          className="w-full rounded-xl bg-success py-3.5 font-display text-base font-bold uppercase tracking-wide text-success-foreground disabled:opacity-50"
-        >
-          {alreadyJoined
-            ? "Already Joined ✓"
-            : t.status !== "upcoming"
-              ? "Registration Closed"
-              : busy
-                ? "Joining…"
-                : "Join Match"}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setShowPlayers((v) => !v)}
+        className="mt-6 w-full rounded-xl bg-gold py-3 text-sm font-bold uppercase tracking-wide text-gold-foreground"
+      >
+        View All Joinings
+      </button>
 
       {showPlayers && (
         <ul className="mt-3 space-y-1.5">
