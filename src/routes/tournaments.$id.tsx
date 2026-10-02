@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Lock, Users, Map as MapIcon, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,6 +87,7 @@ function TournamentDetail() {
 
   return (
     <AppShell>
+      {/* Banner */}
       <div className="overflow-hidden rounded-2xl border border-border">
         <img
           src={bannerFor(t.banner_url)}
@@ -97,50 +98,88 @@ function TournamentDetail() {
         />
       </div>
 
-      <h1 className="mt-3 font-display text-2xl font-bold">{t.name}</h1>
-      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Users className="size-3.5" /> {t.mode}
-        </span>
-        <span className="flex items-center gap-1">
-          <MapIcon className="size-3.5" /> {t.map}
-        </span>
-        <span className="flex items-center gap-1">
-          <Clock className="size-3.5" /> {formatDateTime(t.starts_at)}
+      {/* Time left countdown */}
+      <Countdown startsAt={t.starts_at} status={t.status} />
+
+      {/* Title */}
+      <h1 className="mt-3 text-center font-display text-lg font-bold uppercase leading-snug text-primary">
+        {t.name}
+      </h1>
+
+      {/* Info chips — Team / Mode / Map */}
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <InfoChip label="Team" value={t.mode} />
+        <InfoChip label="Mode" value={t.category} />
+        <InfoChip label="Map" value={t.map} />
+      </div>
+
+      {/* Match type + entry fee */}
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <InfoChip
+          label="Match Type"
+          value={Number(t.entry_fee) > 0 ? "Paid" : "Free"}
+        />
+        <div className="rounded-lg border border-border bg-surface px-3 py-2 text-center">
+          <p className="text-xs text-muted-foreground">Entry Fee:</p>
+          <p className="flex items-center justify-center gap-1 font-display text-lg font-bold text-gold">
+            🪙 {formatINR(Number(t.entry_fee))}
+          </p>
+        </div>
+      </div>
+
+      {/* Match schedule */}
+      <div className="mt-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-center text-sm">
+        <span className="text-muted-foreground">Match Schedule: </span>
+        <span className="font-bold">{formatDateTime(t.starts_at)}</span>
+      </div>
+
+      {/* Slots */}
+      <div className="mt-2 rounded-lg border border-border bg-surface px-3 py-2.5 text-center text-sm">
+        <span className="text-muted-foreground">Slots: </span>
+        <span className="font-bold">
+          {joined}/{t.max_players} joined
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-        <Stat label="Prize pool" value={formatINR(Number(t.prize_pool))} gold />
-        <Stat label="Entry" value={formatINR(Number(t.entry_fee))} />
-        <Stat label="Slots" value={`${joined}/${t.max_players}`} />
-      </div>
-
+      {/* Prize details */}
       <section className="mt-5">
-        <h2 className="font-display text-lg font-bold">Prize distribution</h2>
-        <ul className="mt-2 space-y-2">
-          {t.prize_split.map((p) => (
-            <li
-              key={p.place}
-              className="flex items-center justify-between rounded-xl border border-border bg-surface px-3 py-2 text-sm"
-            >
-              <span className="font-semibold">{p.place}</span>
-              <span className="font-bold text-gold">{formatINR(Number(p.amount))}</span>
-            </li>
-          ))}
-        </ul>
+        <h2 className="font-display text-lg font-bold text-primary">Prize Details</h2>
+        <div className="mt-2 rounded-lg border border-border bg-surface p-3">
+          <p className="font-display text-base font-bold uppercase text-gold">
+            Prize pool {formatINR(Number(t.prize_pool))}
+            {t.per_kill > 0 && ` + ${formatINR(Number(t.per_kill))} per kill`}
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {t.prize_split.map((p) => (
+              <li
+                key={p.place}
+                className="flex items-center justify-between border-b border-border/60 pb-1.5 text-sm last:border-0 last:pb-0"
+              >
+                <span className="font-semibold">{p.place}</span>
+                <span className="font-bold text-gold">{formatINR(Number(p.amount))}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
+      {/* Rules and regulations */}
       <section className="mt-5">
-        <h2 className="font-display text-lg font-bold">Rules</h2>
-        <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-          {t.rules.map((rule) => (
-            <li key={rule} className="flex gap-2">
-              <span className="text-primary">›</span>
-              {rule}
-            </li>
-          ))}
-        </ul>
+        <h2 className="font-display text-lg font-bold text-primary">About this Match</h2>
+        <div className="mt-2 rounded-lg border border-border bg-surface p-4">
+          <h3 className="text-center font-display text-base font-bold">
+            Rules and Regulations
+          </h3>
+          <div className="mx-auto mt-2 h-0.5 w-24 bg-border" />
+          <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+            {t.rules.map((rule) => (
+              <li key={rule} className="flex gap-2">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-foreground" />
+                {rule}
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="mt-5 rounded-2xl border border-border bg-surface p-4">
@@ -203,27 +242,27 @@ function TournamentDetail() {
         </section>
       )}
 
-      <div className="mt-5 flex gap-2">
+      <div className="mt-6 space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setShowPlayers((v) => !v)}
+          className="w-full rounded-xl bg-gold py-3 text-sm font-bold uppercase tracking-wide text-gold-foreground"
+        >
+          View All Joinings
+        </button>
         <button
           type="button"
           onClick={join}
           disabled={busy || alreadyJoined || t.status !== "upcoming"}
-          className="flex-1 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50"
+          className="w-full rounded-xl bg-success py-3.5 font-display text-base font-bold uppercase tracking-wide text-success-foreground disabled:opacity-50"
         >
           {alreadyJoined
-            ? "Already joined"
+            ? "Already Joined ✓"
             : t.status !== "upcoming"
-              ? "Registration closed"
+              ? "Registration Closed"
               : busy
                 ? "Joining…"
-                : `Join for ${formatINR(Number(t.entry_fee))}`}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowPlayers((v) => !v)}
-          className="rounded-xl border border-border bg-surface px-4 py-3 text-sm font-semibold"
-        >
-          Players
+                : "Join Match"}
         </button>
       </div>
 
@@ -253,11 +292,40 @@ function TournamentDetail() {
   );
 }
 
-function Stat({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
+function InfoChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card-elevated rounded-xl border border-border py-3">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className={`font-bold ${gold ? "text-gold" : ""}`}>{value}</p>
+    <div className="rounded-lg border border-border bg-surface px-3 py-2 text-center">
+      <p className="text-xs text-muted-foreground">{label}:</p>
+      <p className="font-display text-base font-bold uppercase">{value}</p>
+    </div>
+  );
+}
+
+function Countdown({ startsAt, status }: { startsAt: string; status: string }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const diff = new Date(startsAt).getTime() - now;
+  let text: string;
+  if (status === "live") text = "Match LIVE hai!";
+  else if (status === "completed") text = "Match completed";
+  else if (diff <= 0) text = "Starting…";
+  else {
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    text = `${d}d ${h}h ${m}m ${s}s`;
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-surface py-3 text-center">
+      <p className="font-display text-lg font-bold">
+        Time Left: <span className="text-primary">{text}</span>
+      </p>
     </div>
   );
 }
