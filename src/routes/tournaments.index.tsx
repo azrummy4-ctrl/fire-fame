@@ -20,9 +20,9 @@ export const Route = createFileRoute("/tournaments/")({
 });
 
 const tabs = [
+  { key: "live", label: "Ongoing" },
   { key: "upcoming", label: "Upcoming" },
-  { key: "live", label: "Live" },
-  { key: "completed", label: "Completed" },
+  { key: "completed", label: "Resulted" },
 ] as const;
 
 function TournamentsPage() {
