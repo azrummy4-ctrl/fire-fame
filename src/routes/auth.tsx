@@ -23,7 +23,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [ign, setIgn] = useState("");
@@ -42,7 +42,13 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "login") {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setSent(true);
+      } else if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back!");
@@ -95,13 +101,13 @@ function AuthPage() {
       </Link>
 
       <h1 className="text-center font-display text-2xl font-bold">
-        {mode === "login" ? "Sign in to play" : "Create your player account"}
+        {mode === "login" ? "Sign in to play" : mode === "register" ? "Create your player account" : "Reset your password"}
       </h1>
       <p className="mt-1 text-center text-xs text-muted-foreground">
         Tournaments join karne ke liye Free Fire UID aur in-game name zaroori hai.
       </p>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-1">
+      <div className={`mt-5 grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-1 ${mode === "forgot" ? "hidden" : ""}`}>
         {(["login", "register"] as const).map((m) => (
           <button
             key={m}
@@ -117,13 +123,34 @@ function AuthPage() {
       </div>
 
       {sent ? (
-        <p className="card-elevated mt-5 rounded-xl border border-border p-5 text-center text-sm">
-          Account ban gaya hai <b>{email}</b> ke liye. Ab <b>Login</b> tab se sign in karein.
-        </p>
+        <div className="card-elevated mt-5 rounded-xl border border-border p-5 text-center text-sm">
+          {mode === "forgot" ? (
+            <p>
+              Password reset link <b>{email}</b> pe bhej diya hai. Email me link click karke naya
+              password set karein.
+            </p>
+          ) : (
+            <p>
+              Account ban gaya hai <b>{email}</b> ke liye. Ab <b>Login</b> tab se sign in karein.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSent(false);
+              setMode("login");
+            }}
+            className="mt-3 font-bold text-primary"
+          >
+            ← Wapas login pe jao
+          </button>
+        </div>
       ) : (
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
           <Field label="Email" value={email} onChange={setEmail} type="email" required />
-          <Field label="Password" value={password} onChange={setPassword} type="password" required />
+          {mode !== "forgot" && (
+            <Field label="Password" value={password} onChange={setPassword} type="password" required />
+          )}
           {mode === "register" && (
             <>
               <Field label="In-game name (IGN)" value={ign} onChange={setIgn} required />
@@ -136,8 +163,32 @@ function AuthPage() {
             disabled={busy}
             className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-60"
           >
-            {busy ? "Please wait…" : mode === "login" ? "Login" : "Create account"}
+            {busy
+              ? "Please wait…"
+              : mode === "login"
+                ? "Login"
+                : mode === "register"
+                  ? "Create account"
+                  : "Send reset link"}
           </button>
+          {mode === "login" && (
+            <button
+              type="button"
+              onClick={() => setMode("forgot")}
+              className="w-full text-center text-xs font-semibold text-primary"
+            >
+              Forgot password?
+            </button>
+          )}
+          {mode === "forgot" && (
+            <button
+              type="button"
+              onClick={() => setMode("login")}
+              className="w-full text-center text-xs font-semibold text-muted-foreground"
+            >
+              ← Wapas login pe jao
+            </button>
+          )}
         </form>
       )}
 
