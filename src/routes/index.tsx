@@ -103,7 +103,19 @@ function Home() {
               <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
             ))
           : games.map((t) => (
-              <TournamentTile key={t.id} tournament={t} joined={joinedByCategory[t.category] ?? 0} />
+              <div key={t.id} className="relative">
+                <TournamentTile tournament={t} joined={joinedByCategory[t.category] ?? 0} />
+                {isAdmin && (
+                  <Link
+                    to="/admin/tournaments"
+                    search={{ category: t.category }}
+                    aria-label={`${t.category} me naya tournament add karein`}
+                    className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg"
+                  >
+                    <Plus className="size-5" />
+                  </Link>
+                )}
+              </div>
             ))}
         {isAdmin && !isLoading && (
           <Link
