@@ -65,6 +65,14 @@ function BannerPicker({ value, onChange }: { value: string; onChange: (url: stri
   );
 }
 
+const DEFAULT_RULES = [
+  "Emulator not allowed — smartphones only",
+  "No teaming with other players",
+  "No aimbot, hacks or mods — permanent ban",
+  "Screenshot / recording proof required",
+  "No refund for missed matches",
+];
+
 const empty = {
   name: "",
   category: "BR FULL MAP",
@@ -76,6 +84,7 @@ const empty = {
   max_players: "48",
   starts_at: "",
   banner_url: "",
+  rules: DEFAULT_RULES.join("\n"),
 };
 
 function AdminTournaments() {
@@ -106,7 +115,7 @@ function AdminTournaments() {
       per_kill: Number(form.per_kill),
       max_players: Number(form.max_players),
       starts_at: new Date(form.starts_at).toISOString(),
-      rules: ["Emulator not allowed", "No teaming", "Screenshot proof required"],
+      rules: form.rules.split("\n").map((r) => r.trim()).filter(Boolean),
       prize_split: [
         { place: "1st", amount: Number(form.prize_pool) * 0.5 },
         { place: "2nd", amount: Number(form.prize_pool) * 0.3 },
@@ -138,6 +147,7 @@ function AdminTournaments() {
           <F label="Max players" type="number" value={form.max_players} onChange={(v) => setForm({ ...form, max_players: v })} />
         </div>
         <F label="Starts at" type="datetime-local" value={form.starts_at} onChange={(v) => setForm({ ...form, starts_at: v })} />
+        <RulesBox value={form.rules} onChange={(v) => setForm({ ...form, rules: v })} />
         <button className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground">
           Create
         </button>
@@ -161,7 +171,7 @@ function AdminTournaments() {
               <span className="text-xs text-primary">{openId === t.id ? "Close" : "Manage"}</span>
             </button>
             {openId === t.id && (
-              <div className="mt-3">
+              <div className="mt-3 space-y-3">
                 <BannerPicker
                   value={t.banner_url?.startsWith("http") ? t.banner_url : ""}
                   onChange={async (url) => {
@@ -170,6 +180,7 @@ function AdminTournaments() {
                     else qc.invalidateQueries();
                   }}
                 />
+                <RulesEditor tournamentId={t.id} initialRules={t.rules ?? []} />
               </div>
             )}
             {openId === t.id && <Manage tournamentId={t.id} roomPublished={t.room_published} resultsPublished={t.results_published} />}
@@ -309,6 +320,56 @@ function Manage({
           {resultsPublished ? "Results published" : "Publish results & credit prizes"}
         </button>
       </div>
+    </div>
+  );
+}
+
+function RulesBox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <label className="block">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Rules (har line me ek rule)
+      </span>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={6}
+        placeholder={"Emulator not allowed\nNo teaming\nScreenshot proof required"}
+        className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+      />
+    </label>
+  );
+}
+
+function RulesEditor({ tournamentId, initialRules }: { tournamentId: string; initialRules: string[] }) {
+  const qc = useQueryClient();
+  const [text, setText] = useState(initialRules.join("\n"));
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    const rules = text.split("\n").map((r) => r.trim()).filter(Boolean);
+    const { error } = await supabase.from("tournaments").update({ rules }).eq("id", tournamentId);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Rules save ho gaye");
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="space-y-2">
+      <RulesBox value={text} onChange={setText} />
+      <button
+        type="button"
+        disabled={saving}
+        onClick={save}
+        className="w-full rounded-lg bg-primary py-2 text-xs font-bold text-primary-foreground disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save rules"}
+      </button>
     </div>
   );
 }
