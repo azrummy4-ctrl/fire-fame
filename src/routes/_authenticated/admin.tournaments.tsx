@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/admin/tournaments")({
       { name: "description", content: "Create tournaments, publish room IDs, enter results and distribute prizes." },
       { property: "og:title", content: "Manage Tournaments | FireZone Admin" },
       { property: "og:description", content: "Tournament creation, room publishing and result entry." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   validateSearch: (s: Record<string, unknown>): { category?: string | undefined } => ({

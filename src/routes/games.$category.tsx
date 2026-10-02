@@ -17,6 +17,8 @@ export const Route = createFileRoute("/games/$category")({
         },
         { property: "og:title", content: `${name} Contests — FireZone` },
         { property: "og:description", content: `Browse ${name} tournaments and join matches.` },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },

@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_authenticated/notifications")({
       { name: "description", content: "Tournament announcements, room releases, results and wallet updates." },
       { property: "og:title", content: "Notifications | FireZone" },
       { property: "og:description", content: "Announcements, room releases and wallet updates." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: NotificationsPage,

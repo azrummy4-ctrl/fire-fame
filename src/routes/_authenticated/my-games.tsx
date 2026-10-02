@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_authenticated/my-games")({
       { name: "description", content: "Track your joined tournaments, room details and match results." },
       { property: "og:title", content: "My Games | FireZone" },
       { property: "og:description", content: "Your joined tournaments and results in one place." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MyGames,
