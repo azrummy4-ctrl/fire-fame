@@ -101,13 +101,13 @@ function AuthPage() {
       </Link>
 
       <h1 className="text-center font-display text-2xl font-bold">
-        {mode === "login" ? "Sign in to play" : "Create your player account"}
+        {mode === "login" ? "Sign in to play" : mode === "register" ? "Create your player account" : "Reset your password"}
       </h1>
       <p className="mt-1 text-center text-xs text-muted-foreground">
         Tournaments join karne ke liye Free Fire UID aur in-game name zaroori hai.
       </p>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-1">
+      <div className={`mt-5 grid grid-cols-2 gap-2 rounded-xl bg-surface-2 p-1 ${mode === "forgot" ? "hidden" : ""}`}>
         {(["login", "register"] as const).map((m) => (
           <button
             key={m}
