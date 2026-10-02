@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { TournamentRow } from "@/components/TournamentCard";
+import { TournamentTile } from "@/components/TournamentCard";
 import { useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
@@ -87,13 +87,13 @@ function Home() {
           See all
         </Link>
       </div>
-      <div className="mt-3 space-y-4">
+      <div className="mt-3 grid grid-cols-2 gap-3">
         {isLoading
-          ? Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="h-72 animate-pulse rounded-xl border border-border bg-surface" />
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-36 animate-pulse rounded-xl border border-border bg-surface" />
             ))
           : (tournaments ?? []).map((t) => (
-              <TournamentRow key={t.id} tournament={t} joined={counts?.[t.id] ?? 0} />
+              <TournamentTile key={t.id} tournament={t} joined={counts?.[t.id] ?? 0} />
             ))}
       </div>
       {!isLoading && (tournaments ?? []).length === 0 && (
