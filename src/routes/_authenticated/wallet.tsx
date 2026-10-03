@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useSession, useWallet } from "@/lib/api";
+import { createDepositOrder, verifyDepositPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
   head: () => ({
@@ -26,6 +28,40 @@ function WalletPage() {
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
   const [sheet, setSheet] = useState<null | "add" | "withdraw">(null);
+  const search = useSearch({ strict: false }) as { deposit_order?: string };
+  const verifyFn = useServerFn(verifyDepositPayment);
+  const verifyingRef = useRef(false);
+
+  // ZapUpi se wapas aane par payment verify karo
+  useEffect(() => {
+    const orderId = search.deposit_order;
+    if (!orderId || verifyingRef.current) return;
+    verifyingRef.current = true;
+
+    let attempts = 0;
+    const poll = async () => {
+      attempts += 1;
+      try {
+        const res = await verifyFn({ data: { orderId } });
+        if (res.status === "completed") {
+          toast.success("Payment successful! Wallet me paise add ho gaye.");
+          qc.invalidateQueries();
+          window.history.replaceState({}, "", "/wallet");
+          return;
+        }
+        if (res.status === "failed") {
+          toast.error("Payment fail ho gaya. Paise kate ho to support se contact karein.");
+          window.history.replaceState({}, "", "/wallet");
+          return;
+        }
+        if (attempts < 6) setTimeout(poll, 4000);
+        else toast.info("Payment abhi verify ho raha hai. Thodi der me balance check karein.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Verification failed");
+      }
+    };
+    void poll();
+  }, [search.deposit_order, verifyFn, qc]);
 
   const { data: settings } = useQuery({
     queryKey: ["settings", "payments"],
