@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useSession, useWallet } from "@/lib/api";
+import { createDepositOrder, verifyDepositPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
   head: () => ({
@@ -26,6 +28,40 @@ function WalletPage() {
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
   const [sheet, setSheet] = useState<null | "add" | "withdraw">(null);
+  const search = useSearch({ strict: false }) as { deposit_order?: string };
+  const verifyFn = useServerFn(verifyDepositPayment);
+  const verifyingRef = useRef(false);
+
+  // ZapUpi se wapas aane par payment verify karo
+  useEffect(() => {
+    const orderId = search.deposit_order;
+    if (!orderId || verifyingRef.current) return;
+    verifyingRef.current = true;
+
+    let attempts = 0;
+    const poll = async () => {
+      attempts += 1;
+      try {
+        const res = await verifyFn({ data: { orderId } });
+        if (res.status === "completed") {
+          toast.success("Payment successful! Wallet me paise add ho gaye.");
+          qc.invalidateQueries();
+          window.history.replaceState({}, "", "/wallet");
+          return;
+        }
+        if (res.status === "failed") {
+          toast.error("Payment fail ho gaya. Paise kate ho to support se contact karein.");
+          window.history.replaceState({}, "", "/wallet");
+          return;
+        }
+        if (attempts < 6) setTimeout(poll, 4000);
+        else toast.info("Payment abhi verify ho raha hai. Thodi der me balance check karein.");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Verification failed");
+      }
+    };
+    void poll();
+  }, [search.deposit_order, verifyFn, qc]);
 
   const { data: settings } = useQuery({
     queryKey: ["settings", "payments"],
@@ -136,6 +172,24 @@ function AddMoney({ upi, onDone }: { upi: string; onDone: () => void }) {
   const [amount, setAmount] = useState("100");
   const [ref, setRef] = useState("");
   const [busy, setBusy] = useState(false);
+  const [payBusy, setPayBusy] = useState(false);
+  const createOrder = useServerFn(createDepositOrder);
+
+  async function payOnline() {
+    const amt = Number(amount);
+    if (!amt || amt < 10) {
+      toast.error("Minimum deposit ₹10 hai.");
+      return;
+    }
+    setPayBusy(true);
+    try {
+      const res = await createOrder({ data: { amount: amt } });
+      window.location.href = res.paymentUrl;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Payment start nahi ho paya.");
+      setPayBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -154,21 +208,36 @@ function AddMoney({ upi, onDone }: { upi: string; onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
-      <p className="text-xs text-muted-foreground">
-        UPI par payment bhejein: <b className="text-foreground">{upi || "not configured"}</b>, phir yahan amount
-        aur UTR / transaction reference daalein. Live gateway (Razorpay/Cashfree) connect hone tak ye manual
-        verification flow chalega.
-      </p>
+    <div className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
       <Input label="Amount (₹)" value={amount} onChange={setAmount} type="number" />
-      <Input label="UPI UTR / reference" value={ref} onChange={setRef} />
       <button
-        disabled={busy}
-        className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60"
+        type="button"
+        onClick={payOnline}
+        disabled={payBusy}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-success py-2.5 text-sm font-bold text-background disabled:opacity-60"
       >
-        {busy ? "Submitting…" : "Submit deposit"}
+        {payBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+        {payBusy ? "Payment khol raha hai…" : "Pay with UPI (auto verify)"}
       </button>
-    </form>
+
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className="h-px flex-1 bg-border" /> ya manual UPI <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <form onSubmit={submit} className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          UPI par payment bhejein: <b className="text-foreground">{upi || "not configured"}</b>, phir yahan amount
+          aur UTR / transaction reference daalein. Admin verify karke wallet me add karega.
+        </p>
+        <Input label="UPI UTR / reference" value={ref} onChange={setRef} />
+        <button
+          disabled={busy}
+          className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60"
+        >
+          {busy ? "Submitting…" : "Submit manual deposit"}
+        </button>
+      </form>
+    </div>
   );
 }
 
