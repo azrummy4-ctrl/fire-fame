@@ -1,10 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, Clock, Headphones, IndianRupee, Loader2, ShieldCheck, Sparkles, Volume2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { supabase } from "@/integrations/supabase/client";
 import { formatINR, useSession, useWallet } from "@/lib/api";
 import { createDepositOrder } from "@/lib/payments.functions";
 
