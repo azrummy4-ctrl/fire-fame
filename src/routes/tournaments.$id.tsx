@@ -143,28 +143,6 @@ function TournamentDetail() {
         </span>
       </div>
 
-      {/* Prize details */}
-      <section className="mt-5">
-        <h2 className="font-display text-lg font-bold text-primary">Prize Details</h2>
-        <div className="mt-2 rounded-lg border border-border bg-surface p-3">
-          <p className="font-display text-base font-bold uppercase text-gold">
-            Prize pool {formatINR(Number(t.prize_pool))}
-            {t.per_kill > 0 && ` + ${formatINR(Number(t.per_kill))} per kill`}
-          </p>
-          <ul className="mt-2 space-y-1.5">
-            {t.prize_split.map((p) => (
-              <li
-                key={p.place}
-                className="flex items-center justify-between border-b border-border/60 pb-1.5 text-sm last:border-0 last:pb-0"
-              >
-                <span className="font-semibold">{p.place}</span>
-                <span className="font-bold text-gold">{formatINR(Number(p.amount))}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
       {/* Rules and regulations */}
       <section className="mt-5">
         <h2 className="font-display text-lg font-bold text-primary">About this Match</h2>
