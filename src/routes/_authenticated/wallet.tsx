@@ -1,4 +1,4 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useSession, useWallet } from "@/lib/api";
-import { createDepositOrder, verifyDepositPayment } from "@/lib/payments.functions";
+import { verifyDepositPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
   head: () => ({
