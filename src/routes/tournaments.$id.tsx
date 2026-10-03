@@ -40,9 +40,16 @@ function TournamentDetail() {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [showPlayers, setShowPlayers] = useState(false);
+  const [showSlots, setShowSlots] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
   const alreadyJoined = !!participants?.some((p) => p.user_id === user?.id);
   const joined = participants?.length ?? 0;
+  const takenSlots = new Set(
+    (participants ?? [])
+      .map((p) => (p as { slot_number?: number | null }).slot_number)
+      .filter((n): n is number => typeof n === "number"),
+  );
 
   const { data: room } = useQuery({
     queryKey: ["room", id, user?.id],
@@ -59,14 +66,27 @@ function TournamentDetail() {
       navigate({ to: "/auth" });
       return;
     }
+    setShowSlots(true);
+  }
+
+  async function confirmJoin() {
+    if (selectedSlot == null) {
+      toast.error("Pehle ek slot select karo");
+      return;
+    }
     setBusy(true);
-    const { error } = await supabase.rpc("join_tournament", { _tournament_id: id });
+    const { error } = await supabase.rpc("join_tournament", {
+      _tournament_id: id,
+      _slot: selectedSlot,
+    });
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Tournament joined! Entry fee wallet se deduct ho gayi.");
+    toast.success(`Slot ${selectedSlot} booked! Entry fee wallet se deduct ho gayi.`);
+    setShowSlots(false);
+    setSelectedSlot(null);
     qc.invalidateQueries();
   }
 
@@ -238,7 +258,11 @@ function TournamentDetail() {
               className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-xs"
             >
               <span className="font-semibold">{p.ign}</span>
-              <span className="text-muted-foreground">UID {p.ff_uid}</span>
+              <span className="text-muted-foreground">
+                {(p as { slot_number?: number | null }).slot_number != null
+                  ? `Slot ${(p as { slot_number?: number | null }).slot_number}`
+                  : `UID ${p.ff_uid}`}
+              </span>
             </li>
           ))}
           {(participants ?? []).length === 0 && (
@@ -253,6 +277,71 @@ function TournamentDetail() {
       <Link to="/tournaments" className="block text-center text-xs font-semibold text-primary">
         ← All tournaments
       </Link>
+
+      {/* Slot booking overlay */}
+      {showSlots && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-background">
+          <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col overflow-hidden px-4 pb-4 pt-4">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSlots(false);
+                  setSelectedSlot(null);
+                }}
+                className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-bold"
+              >
+                ←
+              </button>
+              <h2 className="font-display text-base font-bold uppercase leading-tight text-primary">
+                {t.name}
+              </h2>
+            </div>
+
+            <div className="mt-3 rounded-xl bg-success py-2.5 text-center font-display text-base font-bold uppercase tracking-wide text-success-foreground">
+              Select Match Position
+            </div>
+
+            <div className="mt-4 grid flex-1 auto-rows-min grid-cols-4 gap-x-2 gap-y-3 overflow-y-auto pb-2">
+              {Array.from({ length: t.max_players }, (_, i) => i + 1).map((n) => {
+                const taken = takenSlots.has(n);
+                const selected = selectedSlot === n;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={taken}
+                    onClick={() => setSelectedSlot(n)}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <span className="text-base font-semibold">{n}</span>
+                    <span
+                      className={`flex size-6 items-center justify-center rounded-md border-2 text-xs font-bold ${
+                        taken
+                          ? "border-border bg-surface-2 text-muted-foreground"
+                          : selected
+                            ? "border-success bg-success text-success-foreground"
+                            : "border-muted-foreground/50 bg-surface"
+                      }`}
+                    >
+                      {(taken || selected) && "✓"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={confirmJoin}
+              disabled={busy || selectedSlot == null}
+              className="mt-2 w-full rounded-2xl bg-success py-3.5 font-display text-base font-bold uppercase tracking-wide text-success-foreground shadow-[var(--shadow-card)] disabled:opacity-50"
+            >
+              {busy ? "Joining…" : selectedSlot != null ? `Join Now — Slot ${selectedSlot}` : "Join Now"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Floating Join button — bottom, above nav */}
       <div className="fixed inset-x-0 bottom-[68px] z-30 mx-auto w-full max-w-[480px] px-4 pb-2">
