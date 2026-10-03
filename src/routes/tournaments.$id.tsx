@@ -120,17 +120,15 @@ function TournamentDetail() {
         />
       </div>
 
-      {/* Room details — right below banner */}
-      <section className="mt-2 rounded-2xl border border-border bg-surface p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Room details</h2>
-          {!room && (
-            <span className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-1 text-[10px] font-bold text-gold">
-              <Lock className="size-3" /> LOCKED
+      {/* Room details — right below banner, only for joined players */}
+      {room && (
+        <section className="mt-2 rounded-2xl border border-border bg-surface p-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold">Room details</h2>
+            <span className="flex items-center gap-1 rounded-full bg-success/15 px-2 py-1 text-[10px] font-bold text-success">
+              UNLOCKED
             </span>
-          )}
-        </div>
-        {room ? (
+          </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <div className="rounded-xl bg-surface-2 px-3 py-2">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Room ID</p>
@@ -141,12 +139,8 @@ function TournamentDetail() {
               <p className="font-bold tracking-wider">{room.room_password}</p>
             </div>
           </div>
-        ) : (
-          <p className="mt-2 text-sm text-muted-foreground">
-            Room ID aur password sirf joined players ko dikhte hain, admin ke publish karne ke baad.
-          </p>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* Time left countdown */}
       <Countdown startsAt={t.starts_at} status={t.status} />
