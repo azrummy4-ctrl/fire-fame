@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAddMoneyRouteImport } from './routes/_authenticated/add-money'
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
@@ -47,6 +48,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAddMoneyRoute = AuthenticatedAddMoneyRouteImport.update({
+  id: '/add-money',
+  path: '/add-money',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEarnRoute = AuthenticatedEarnRouteImport.update({
   id: '/earn',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/add-money': typeof AuthenticatedAddMoneyRoute
   '/earn': typeof AuthenticatedEarnRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/more': typeof AuthenticatedMoreRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/add-money': typeof AuthenticatedAddMoneyRoute
   '/earn': typeof AuthenticatedEarnRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/more': typeof AuthenticatedMoreRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/add-money': typeof AuthenticatedAddMoneyRoute
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/add-money'
     | '/earn'
     | '/leaderboard'
     | '/more'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/add-money'
     | '/earn'
     | '/leaderboard'
     | '/more'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/add-money'
     | '/_authenticated/earn'
     | '/_authenticated/leaderboard'
     | '/_authenticated/more'
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/add-money': {
+      id: '/_authenticated/add-money'
+      path: '/add-money'
+      fullPath: '/add-money'
+      preLoaderRoute: typeof AuthenticatedAddMoneyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/earn': {
       id: '/_authenticated/earn'
@@ -404,6 +423,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAddMoneyRoute: typeof AuthenticatedAddMoneyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
@@ -418,6 +438,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAddMoneyRoute: AuthenticatedAddMoneyRoute,
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
