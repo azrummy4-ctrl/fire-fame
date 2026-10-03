@@ -26,10 +26,7 @@ const QUICK_AMOUNTS = [10, 20, 50, 100, 200, 500];
 function AddMoneyPage() {
   const { user } = useSession();
   const { data: wallet } = useWallet();
-  const navigate = useNavigate();
   const [amount, setAmount] = useState("50");
-  const [ref, setRef] = useState("");
-  const [busy, setBusy] = useState(false);
   const [payBusy, setPayBusy] = useState(false);
   const createOrder = useServerFn(createDepositOrder);
 
