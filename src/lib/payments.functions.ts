@@ -3,44 +3,41 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const ZAPUPI_BASE = "https://api.zapupi.com/api";
+const ZAPUPI_BASE = "https://pay.zapupi.com/api";
 
 type ZapUpiCreateResponse = {
-  status?: boolean;
+  status?: string; // "success"
   message?: string;
-  result?: {
-    order_id?: string;
-    payment_url?: string;
-  };
+  order_id?: string;
+  payment_url?: string;
 };
 
 type ZapUpiStatusResponse = {
-  status?: boolean;
+  status?: string; // "success"
   message?: string;
-  result?: {
+  data?: {
     order_id?: string;
+    status?: string;
     txn_status?: string;
+    payment_status?: string;
     amount?: string | number;
     utr?: string;
   };
 };
 
-function zapupiKeys() {
-  const tokenKey = process.env["ZAPUPI_TOKEN_KEY"];
-  // Kuch ZapUpi accounts sirf ek key dete hain — wahi secret ki jagah use hoti hai
-  const secretKey = process.env["ZAPUPI_SECRET_KEY"] ?? tokenKey;
-  if (!tokenKey || !secretKey) {
+function zapupiKey() {
+  const key = process.env["ZAPUPI_TOKEN_KEY"];
+  if (!key) {
     throw new Error("Payment gateway abhi configured nahi hai. Admin se contact karein.");
   }
-  return { tokenKey, secretKey };
+  return key;
 }
 
 async function zapupiPost(path: string, fields: Record<string, string>) {
-  const body = new URLSearchParams(fields);
   const res = await fetch(`${ZAPUPI_BASE}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(fields),
   });
   if (!res.ok) throw new Error("Payment gateway se response nahi mila. Thodi der baad try karein.");
   return res.json();
