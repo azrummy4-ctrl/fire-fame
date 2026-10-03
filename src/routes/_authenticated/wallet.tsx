@@ -33,35 +33,54 @@ function WalletPage() {
   const verifyingRef = useRef(false);
 
   // ZapUpi se wapas aane par payment verify karo
+  // Wallet khulte hi koi bhi pending UPI deposit ho to bhi khud verify karo
   useEffect(() => {
-    const orderId = search.deposit_order;
-    if (!orderId || verifyingRef.current) return;
+    if (!user || verifyingRef.current) return;
     verifyingRef.current = true;
 
-    let attempts = 0;
-    const poll = async () => {
-      attempts += 1;
-      try {
-        const res = await verifyFn({ data: { orderId } });
-        if (res.status === "completed") {
-          toast.success("Payment successful! Wallet me paise add ho gaye.");
-          qc.invalidateQueries();
-          window.history.replaceState({}, "", "/wallet");
-          return;
-        }
-        if (res.status === "failed") {
-          toast.error("Payment fail ho gaya. Paise kate ho to support se contact karein.");
-          window.history.replaceState({}, "", "/wallet");
-          return;
-        }
-        if (attempts < 6) setTimeout(poll, 4000);
-        else toast.info("Payment abhi verify ho raha hai. Thodi der me balance check karein.");
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Verification failed");
+    const run = async () => {
+      const orderIds = new Set<string>();
+      if (search.deposit_order) orderIds.add(search.deposit_order);
+      const { data: pend } = await supabase
+        .from("deposits")
+        .select("provider_ref")
+        .eq("user_id", user.id)
+        .eq("provider", "zapupi")
+        .eq("status", "pending")
+        .limit(5);
+      pend?.forEach((d) => d.provider_ref && orderIds.add(d.provider_ref));
+
+      for (const orderId of orderIds) {
+        const fromRedirect = orderId === search.deposit_order;
+        let attempts = 0;
+        const poll = async () => {
+          attempts += 1;
+          try {
+            const res = await verifyFn({ data: { orderId } });
+            if (res.status === "completed") {
+              toast.success("Payment successful! Wallet me paise add ho gaye.");
+              qc.invalidateQueries();
+              if (fromRedirect) window.history.replaceState({}, "", "/wallet");
+              return;
+            }
+            if (res.status === "failed") {
+              if (fromRedirect) {
+                toast.error("Payment fail ho gaya. Paise kate ho to support se contact karein.");
+                window.history.replaceState({}, "", "/wallet");
+              }
+              return;
+            }
+            if (attempts < 15) setTimeout(poll, 4000);
+            else if (fromRedirect) toast.info("Payment abhi verify ho raha hai. Thodi der me balance check karein.");
+          } catch (e) {
+            if (fromRedirect) toast.error(e instanceof Error ? e.message : "Verification failed");
+          }
+        };
+        void poll();
       }
     };
-    void poll();
-  }, [search.deposit_order, verifyFn, qc]);
+    void run();
+  }, [user, search.deposit_order, verifyFn, qc]);
 
   const { data: settings } = useQuery({
     queryKey: ["settings", "payments"],
