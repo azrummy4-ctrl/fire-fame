@@ -172,6 +172,24 @@ function AddMoney({ upi, onDone }: { upi: string; onDone: () => void }) {
   const [amount, setAmount] = useState("100");
   const [ref, setRef] = useState("");
   const [busy, setBusy] = useState(false);
+  const [payBusy, setPayBusy] = useState(false);
+  const createOrder = useServerFn(createDepositOrder);
+
+  async function payOnline() {
+    const amt = Number(amount);
+    if (!amt || amt < 10) {
+      toast.error("Minimum deposit ₹10 hai.");
+      return;
+    }
+    setPayBusy(true);
+    try {
+      const res = await createOrder({ data: { amount: amt } });
+      window.location.href = res.paymentUrl;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Payment start nahi ho paya.");
+      setPayBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
