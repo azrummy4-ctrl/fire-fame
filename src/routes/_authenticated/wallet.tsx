@@ -208,21 +208,36 @@ function AddMoney({ upi, onDone }: { upi: string; onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
-      <p className="text-xs text-muted-foreground">
-        UPI par payment bhejein: <b className="text-foreground">{upi || "not configured"}</b>, phir yahan amount
-        aur UTR / transaction reference daalein. Live gateway (Razorpay/Cashfree) connect hone tak ye manual
-        verification flow chalega.
-      </p>
+    <div className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
       <Input label="Amount (₹)" value={amount} onChange={setAmount} type="number" />
-      <Input label="UPI UTR / reference" value={ref} onChange={setRef} />
       <button
-        disabled={busy}
-        className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60"
+        type="button"
+        onClick={payOnline}
+        disabled={payBusy}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-success py-2.5 text-sm font-bold text-background disabled:opacity-60"
       >
-        {busy ? "Submitting…" : "Submit deposit"}
+        {payBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+        {payBusy ? "Payment khol raha hai…" : "Pay with UPI (auto verify)"}
       </button>
-    </form>
+
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className="h-px flex-1 bg-border" /> ya manual UPI <span className="h-px flex-1 bg-border" />
+      </div>
+
+      <form onSubmit={submit} className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          UPI par payment bhejein: <b className="text-foreground">{upi || "not configured"}</b>, phir yahan amount
+          aur UTR / transaction reference daalein. Admin verify karke wallet me add karega.
+        </p>
+        <Input label="UPI UTR / reference" value={ref} onChange={setRef} />
+        <button
+          disabled={busy}
+          className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-60"
+        >
+          {busy ? "Submitting…" : "Submit manual deposit"}
+        </button>
+      </form>
+    </div>
   );
 }
 
