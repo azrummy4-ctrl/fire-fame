@@ -1,14 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Coins, Home, Trophy, Gamepad2, Wallet, User, ShieldCheck } from "lucide-react";
+import { Bell, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { formatINR, useIsAdmin, useSession, useWallet } from "@/lib/api";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/tournaments", label: "Tournaments", icon: Trophy },
-  { to: "/my-games", label: "My Games", icon: Gamepad2 },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { to: "/earn", label: "Earn", icon: Gift },
   { to: "/wallet", label: "Wallet", icon: Wallet },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/more", label: "More", icon: Menu },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
