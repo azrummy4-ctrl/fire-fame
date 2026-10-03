@@ -116,6 +116,7 @@ export type Database = {
           placement: number | null
           placement_points: number
           prize_amount: number
+          slot_number: number | null
           total_points: number
           tournament_id: string
           user_id: string
@@ -131,6 +132,7 @@ export type Database = {
           placement?: number | null
           placement_points?: number
           prize_amount?: number
+          slot_number?: number | null
           total_points?: number
           tournament_id: string
           user_id: string
@@ -146,6 +148,7 @@ export type Database = {
           placement?: number | null
           placement_points?: number
           prize_amount?: number
+          slot_number?: number | null
           total_points?: number
           tournament_id?: string
           user_id?: string
@@ -506,30 +509,57 @@ export type Database = {
         }
         Returns: boolean
       }
-      join_tournament: {
-        Args: { _tournament_id: string }
-        Returns: {
-          bonus_points: number
-          ff_uid: string
-          id: string
-          ign: string
-          joined_at: string
-          kills: number
-          paid_amount: number
-          placement: number | null
-          placement_points: number
-          prize_amount: number
-          total_points: number
-          tournament_id: string
-          user_id: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "participants"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      join_tournament:
+        | {
+            Args: { _tournament_id: string }
+            Returns: {
+              bonus_points: number
+              ff_uid: string
+              id: string
+              ign: string
+              joined_at: string
+              kills: number
+              paid_amount: number
+              placement: number | null
+              placement_points: number
+              prize_amount: number
+              slot_number: number | null
+              total_points: number
+              tournament_id: string
+              user_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "participants"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { _slot?: number; _tournament_id: string }
+            Returns: {
+              bonus_points: number
+              ff_uid: string
+              id: string
+              ign: string
+              joined_at: string
+              kills: number
+              paid_amount: number
+              placement: number | null
+              placement_points: number
+              prize_amount: number
+              slot_number: number | null
+              total_points: number
+              tournament_id: string
+              user_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "participants"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       request_withdrawal: {
         Args: { _amount: number; _upi: string }
         Returns: {
