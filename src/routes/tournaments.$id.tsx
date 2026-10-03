@@ -61,14 +61,27 @@ function TournamentDetail() {
       navigate({ to: "/auth" });
       return;
     }
+    setShowSlots(true);
+  }
+
+  async function confirmJoin() {
+    if (selectedSlot == null) {
+      toast.error("Pehle ek slot select karo");
+      return;
+    }
     setBusy(true);
-    const { error } = await supabase.rpc("join_tournament", { _tournament_id: id });
+    const { error } = await supabase.rpc("join_tournament", {
+      _tournament_id: id,
+      _slot: selectedSlot,
+    });
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success("Tournament joined! Entry fee wallet se deduct ho gayi.");
+    toast.success(`Slot ${selectedSlot} booked! Entry fee wallet se deduct ho gayi.`);
+    setShowSlots(false);
+    setSelectedSlot(null);
     qc.invalidateQueries();
   }
 
