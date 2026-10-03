@@ -40,6 +40,8 @@ function TournamentDetail() {
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [showPlayers, setShowPlayers] = useState(false);
+  const [showSlots, setShowSlots] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
   const alreadyJoined = !!participants?.some((p) => p.user_id === user?.id);
   const joined = participants?.length ?? 0;
