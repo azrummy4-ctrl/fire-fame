@@ -122,13 +122,12 @@ function WalletPage() {
           {formatINR(Number(wallet?.balance ?? 0))}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setSheet(sheet === "add" ? null : "add")}
+          <Link
+            to="/add-money"
             className="flex items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground"
           >
             <ArrowDownLeft className="size-4" /> Add Money
-          </button>
+          </Link>
           <button
             type="button"
             disabled={!payoutsOn}
@@ -145,7 +144,6 @@ function WalletPage() {
         )}
       </div>
 
-      {sheet === "add" && <AddMoney upi={settings?.upi_payee ?? ""} onDone={() => { setSheet(null); qc.invalidateQueries(); }} />}
       {sheet === "withdraw" && (
         <Withdraw
           min={settings?.min_withdrawal ?? 100}
