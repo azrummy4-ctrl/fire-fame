@@ -51,26 +51,6 @@ function AddMoneyPage() {
     }
   }
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!amt || amt < 10) {
-      toast.error("Minimum deposit ₹10 hai.");
-      return;
-    }
-    setBusy(true);
-    const { error } = await supabase.rpc("create_deposit", {
-      _amount: amt,
-      _provider_ref: ref.trim(),
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Deposit request bhej diya. Admin verify karke wallet me add karega.");
-    navigate({ to: "/wallet" });
-  }
-
   return (
     <AppShell>
       <div className="flex items-center gap-2">
