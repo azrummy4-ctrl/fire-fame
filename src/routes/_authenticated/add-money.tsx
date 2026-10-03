@@ -1,10 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, Clock, Headphones, IndianRupee, Loader2, ShieldCheck, Sparkles, Volume2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { supabase } from "@/integrations/supabase/client";
 import { formatINR, useSession, useWallet } from "@/lib/api";
 import { createDepositOrder } from "@/lib/payments.functions";
 
@@ -27,10 +26,7 @@ const QUICK_AMOUNTS = [10, 20, 50, 100, 200, 500];
 function AddMoneyPage() {
   const { user } = useSession();
   const { data: wallet } = useWallet();
-  const navigate = useNavigate();
   const [amount, setAmount] = useState("50");
-  const [ref, setRef] = useState("");
-  const [busy, setBusy] = useState(false);
   const [payBusy, setPayBusy] = useState(false);
   const createOrder = useServerFn(createDepositOrder);
 
@@ -49,26 +45,6 @@ function AddMoneyPage() {
       toast.error(e instanceof Error ? e.message : "Payment start nahi ho paya.");
       setPayBusy(false);
     }
-  }
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!amt || amt < 10) {
-      toast.error("Minimum deposit ₹10 hai.");
-      return;
-    }
-    setBusy(true);
-    const { error } = await supabase.rpc("create_deposit", {
-      _amount: amt,
-      _provider_ref: ref.trim(),
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Deposit request bhej diya. Admin verify karke wallet me add karega.");
-    navigate({ to: "/wallet" });
   }
 
   return (
@@ -153,34 +129,6 @@ function AddMoneyPage() {
       <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="size-3.5 text-success" /> 100% Secure Payment · UPI
       </p>
-
-      {/* Manual UPI fallback */}
-      <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> ya manual UPI <span className="h-px flex-1 bg-border" />
-      </div>
-      <form onSubmit={submit} className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
-        <p className="text-xs text-muted-foreground">
-          UPI par payment bhejein, phir amount aur UTR / transaction reference daalein. Admin verify karke wallet me
-          add karega.
-        </p>
-        <label className="block">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            UPI UTR / reference
-          </span>
-          <input
-            value={ref}
-            required
-            onChange={(e) => setRef(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary"
-          />
-        </label>
-        <button
-          disabled={busy}
-          className="w-full rounded-xl bg-surface-2 py-2.5 text-sm font-bold outline-none disabled:opacity-60"
-        >
-          {busy ? "Submitting…" : "Submit manual deposit"}
-        </button>
-      </form>
 
       {/* Secure banner */}
       <div className="mt-4 flex items-center justify-between rounded-2xl border border-success/30 bg-success/10 px-4 py-3">
