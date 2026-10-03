@@ -45,6 +45,11 @@ function TournamentDetail() {
 
   const alreadyJoined = !!participants?.some((p) => p.user_id === user?.id);
   const joined = participants?.length ?? 0;
+  const takenSlots = new Set(
+    (participants ?? [])
+      .map((p) => (p as { slot_number?: number | null }).slot_number)
+      .filter((n): n is number => typeof n === "number"),
+  );
 
   const { data: room } = useQuery({
     queryKey: ["room", id, user?.id],
