@@ -70,7 +70,7 @@ function WalletPage() {
               }
               return;
             }
-            if (attempts < 15) setTimeout(poll, 4000);
+            if (attempts < 40) setTimeout(poll, 2000);
             else if (fromRedirect) toast.info("Payment abhi verify ho raha hai. Thodi der me balance check karein.");
           } catch (e) {
             if (fromRedirect) toast.error(e instanceof Error ? e.message : "Verification failed");
