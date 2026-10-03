@@ -258,7 +258,11 @@ function TournamentDetail() {
               className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-xs"
             >
               <span className="font-semibold">{p.ign}</span>
-              <span className="text-muted-foreground">UID {p.ff_uid}</span>
+              <span className="text-muted-foreground">
+                {(p as { slot_number?: number | null }).slot_number != null
+                  ? `Slot ${(p as { slot_number?: number | null }).slot_number}`
+                  : `UID ${p.ff_uid}`}
+              </span>
             </li>
           ))}
           {(participants ?? []).length === 0 && (
