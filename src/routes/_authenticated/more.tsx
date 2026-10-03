@@ -21,12 +21,12 @@ export const Route = createFileRoute("/_authenticated/more")({
   component: MorePage,
 });
 
-const rows = [
+const rows: ReadonlyArray<{ label: string; icon: typeof Gift; to?: string }> = [
   { label: "Referral & rewards", icon: Gift, to: "/earn" },
   { label: "Support", icon: LifeBuoy },
   { label: "Terms, Privacy & Refund policy", icon: ScrollText },
   { label: "Responsible gaming", icon: ShieldCheck },
-] as const;
+];
 
 function MorePage() {
   const { user } = useSession();
