@@ -154,34 +154,6 @@ function AddMoneyPage() {
         <ShieldCheck className="size-3.5 text-success" /> 100% Secure Payment · UPI
       </p>
 
-      {/* Manual UPI fallback */}
-      <div className="mt-4 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-        <span className="h-px flex-1 bg-border" /> ya manual UPI <span className="h-px flex-1 bg-border" />
-      </div>
-      <form onSubmit={submit} className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
-        <p className="text-xs text-muted-foreground">
-          UPI par payment bhejein, phir amount aur UTR / transaction reference daalein. Admin verify karke wallet me
-          add karega.
-        </p>
-        <label className="block">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            UPI UTR / reference
-          </span>
-          <input
-            value={ref}
-            required
-            onChange={(e) => setRef(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary"
-          />
-        </label>
-        <button
-          disabled={busy}
-          className="w-full rounded-xl bg-surface-2 py-2.5 text-sm font-bold outline-none disabled:opacity-60"
-        >
-          {busy ? "Submitting…" : "Submit manual deposit"}
-        </button>
-      </form>
-
       {/* Secure banner */}
       <div className="mt-4 flex items-center justify-between rounded-2xl border border-success/30 bg-success/10 px-4 py-3">
         <div className="flex items-center gap-2">
