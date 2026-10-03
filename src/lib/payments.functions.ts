@@ -54,7 +54,7 @@ export const createDepositOrder = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { tokenKey, secretKey } = zapupiKeys();
+    const zapKey = zapupiKey();
 
     // Ek time par sirf ek pending gateway deposit
     const { data: existing } = await supabase
@@ -74,18 +74,17 @@ export const createDepositOrder = createServerFn({ method: "POST" })
     const redirectUrl = `${origin}/wallet?deposit_order=${orderId}`;
 
     const createRes = (await zapupiPost("/create-order", {
-      token_key: tokenKey,
-      secret_key: secretKey,
+      zap_key: zapKey,
       amount: String(data.amount),
       order_id: orderId,
       remark: "FireZone wallet deposit",
-      customer_mobile: "9999999999",
-      redirect_url: redirectUrl,
-      udf1: userId,
+      success_url: redirectUrl,
+      failed_url: redirectUrl,
+      timeout_url: redirectUrl,
     })) as ZapUpiCreateResponse;
 
-    const paymentUrl = createRes?.result?.payment_url;
-    if (!createRes?.status || !paymentUrl) {
+    const paymentUrl = createRes?.payment_url;
+    if (createRes?.status !== "success" || !paymentUrl) {
       throw new Error(createRes?.message || "Payment order create nahi ho paya. Dobara try karein.");
     }
 
@@ -108,7 +107,7 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ orderId: z.string().min(6).max(64) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { tokenKey, secretKey } = zapupiKeys();
+    const zapKey = zapupiKey();
 
     const { data: deposit } = await supabase
       .from("deposits")
@@ -121,16 +120,18 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
     if (deposit.status !== "pending") return { status: deposit.status as "failed" };
 
     const statusRes = (await zapupiPost("/order-status", {
-      token_key: tokenKey,
-      secret_key: secretKey,
+      zap_key: zapKey,
       order_id: data.orderId,
     })) as ZapUpiStatusResponse;
 
-    const txnStatus = String(statusRes?.result?.txn_status ?? "").toUpperCase();
+    const txnData = statusRes?.data ?? {};
+    const txnStatus = String(
+      txnData.txn_status ?? txnData.payment_status ?? txnData.status ?? "",
+    ).toUpperCase();
 
     if (txnStatus === "SUCCESS") {
       // Amount tamper guard: gateway amount must match our record
-      const paidAmount = Number(statusRes?.result?.amount ?? deposit.amount);
+      const paidAmount = Number(txnData.amount ?? deposit.amount);
       if (Math.abs(paidAmount - Number(deposit.amount)) > 0.01) {
         throw new Error("Payment amount mismatch. Support se contact karein.");
       }
