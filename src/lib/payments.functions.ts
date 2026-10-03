@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, getRequest } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -71,10 +71,8 @@ export const createDepositOrder = createServerFn({ method: "POST" })
 
     const orderId = `FZ${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
-    const origin =
-      process.env["APP_ORIGIN"] ??
-      (process.env["VITE_SUPABASE_URL"] ? undefined : undefined);
-    const redirectUrl = `${origin ?? ""}/wallet?deposit_order=${orderId}`;
+    const origin = new URL(getRequest().url).origin;
+    const redirectUrl = `${origin}/wallet?deposit_order=${orderId}`;
 
     const createRes = (await zapupiPost("/create-order", {
       token_key: tokenKey,
@@ -92,7 +90,9 @@ export const createDepositOrder = createServerFn({ method: "POST" })
       throw new Error(createRes?.message || "Payment order create nahi ho paya. Dobara try karein.");
     }
 
-    const { error: depErr } = await supabase.from("deposits").insert({
+    // Users have no direct INSERT on deposits — insert via admin client
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: depErr } = await supabaseAdmin.from("deposits").insert({
       user_id: userId,
       amount: data.amount,
       provider: "zapupi",
