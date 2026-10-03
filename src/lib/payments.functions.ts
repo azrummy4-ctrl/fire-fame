@@ -27,7 +27,8 @@ type ZapUpiStatusResponse = {
 
 function zapupiKeys() {
   const tokenKey = process.env["ZAPUPI_TOKEN_KEY"];
-  const secretKey = process.env["ZAPUPI_SECRET_KEY"];
+  // Kuch ZapUpi accounts sirf ek key dete hain — wahi secret ki jagah use hoti hai
+  const secretKey = process.env["ZAPUPI_SECRET_KEY"] ?? tokenKey;
   if (!tokenKey || !secretKey) {
     throw new Error("Payment gateway abhi configured nahi hai. Admin se contact karein.");
   }
