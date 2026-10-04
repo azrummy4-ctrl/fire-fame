@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, Clock, Headphones, IndianRupee, Loader2, ShieldCheck, Sparkles, Volume2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { formatINR, useSession, useWallet } from "@/lib/api";
-import { createDepositOrder } from "@/lib/payments.functions";
+import { createDepositOrder, verifyDepositPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/add-money")({
   head: () => ({
@@ -29,6 +30,34 @@ function AddMoneyPage() {
   const [amount, setAmount] = useState("50");
   const [payBusy, setPayBusy] = useState(false);
   const createOrder = useServerFn(createDepositOrder);
+  const verify = useServerFn(verifyDepositPayment);
+  const navigate = useNavigate();
+  const [pay, setPay] = useState<{ orderId: string; url: string } | null>(null);
+
+  // Payment window khula rahe tab tak har 2 sec status check — success/fail hote hi turant wallet
+  useEffect(() => {
+    if (!pay) return;
+    let stop = false;
+    const tick = async () => {
+      if (stop) return;
+      try {
+        const r = await verify({ data: { orderId: pay.orderId } });
+        if (!stop && r.status !== "pending") {
+          stop = true;
+          navigate({ to: "/wallet", search: { deposit_order: pay.orderId } as never });
+          return;
+        }
+      } catch {
+        /* ignore, retry */
+      }
+      if (!stop) setTimeout(tick, 2000);
+    };
+    const t = setTimeout(tick, 2000);
+    return () => {
+      stop = true;
+      clearTimeout(t);
+    };
+  }, [pay, verify, navigate]);
 
   const amt = Number(amount) || 0;
 
@@ -41,11 +70,35 @@ function AddMoneyPage() {
     try {
       // Client origin bhejo taaki payment ke baad isi origin ke /wallet par wapas aaye
       const res = await createOrder({ data: { amount: amt, origin: window.location.origin } });
-      window.location.href = res.paymentUrl;
+      setPay({ orderId: res.orderId, url: res.paymentUrl });
+      setPayBusy(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Payment start nahi ho paya.");
       setPayBusy(false);
     }
+  }
+
+  if (pay) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col bg-background">
+        <div className="flex items-center justify-between border-b border-border px-3 py-2">
+          <span className="flex items-center gap-2 text-sm font-semibold">
+            <Loader2 className="size-4 animate-spin text-primary" /> Payment complete karo…
+          </span>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/wallet", search: { deposit_order: pay.orderId } as never })}
+            className="text-xs font-semibold text-primary"
+          >
+            Wallet pe jao
+          </button>
+        </div>
+        <iframe src={pay.url} title="Payment" className="w-full flex-1 border-0 bg-white" allow="payment" />
+        <a href={pay.url} className="border-t border-border py-2 text-center text-xs text-muted-foreground">
+          Page nahi khul raha? Yahan tap karo
+        </a>
+      </div>
+    );
   }
 
   return (
