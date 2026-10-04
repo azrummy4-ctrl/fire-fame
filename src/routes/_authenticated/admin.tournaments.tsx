@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, formatINR } from "@/lib/api";
+import { formatDateTime, formatINR, homeGameCatalog } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/admin/tournaments")({
   head: () => ({
