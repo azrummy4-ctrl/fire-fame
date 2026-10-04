@@ -370,8 +370,10 @@ function CategoryPicker({
   onChange: (v: string) => void;
   existing: string[];
 }) {
-  // Home page ki saari categories + pehle se bani categories, bina duplicate.
-  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])];
+  // Home page ki saari categories + pehle se bani categories, bina duplicate (hidden categories hata kar).
+  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])].filter(
+    (c) => !hiddenCategories.has(c.trim().toUpperCase())
+  );
   const isKnown = options.some((o) => o.toLowerCase() === value.trim().toLowerCase());
   const [custom, setCustom] = useState(!isKnown && value.trim() !== "");
 

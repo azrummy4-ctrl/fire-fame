@@ -39,7 +39,9 @@ function Home() {
 
   // Keep all reference game modes visible even before an admin creates their first contest.
   const tournamentGames = (tournaments ?? []).filter(
-    (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
+    (t, i, arr) =>
+      !hiddenCategories.has(t.category.trim().toUpperCase()) &&
+      arr.findIndex((x) => x.category === t.category) === i
   );
   const games = [
     ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),
