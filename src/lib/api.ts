@@ -55,8 +55,16 @@ export const homeGameCatalog = [
 // Ye categories Home page aur Host/Admin panel se chhupayi gayi hain (purane tournaments DB me rehte hain).
 export const hiddenCategories = new Set(["CLASH SQUAD", "LONE WOLF", "SOLO"]);
 
-export function bannerFor(key: string | null | undefined) {
-  if (!key) return brFullMap;
+export function categoryBannerKey(category: string | null | undefined) {
+  const normalized = category?.trim().toUpperCase();
+  return homeGameCatalog.find((game) => game.category === normalized)?.banner_url ?? null;
+}
+
+export function bannerFor(key: string | null | undefined, category?: string | null) {
+  if (!key) {
+    const categoryKey = categoryBannerKey(category);
+    return categoryKey ? banners[categoryKey] : brFullMap;
+  }
   if (key.startsWith("http")) return key;
   return banners[key] ?? brFullMap;
 }

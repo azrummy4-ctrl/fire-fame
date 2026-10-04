@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, formatINR, hiddenCategories, homeGameCatalog } from "@/lib/api";
+import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeGameCatalog } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
@@ -40,13 +40,13 @@ export async function uploadBanner(file: File): Promise<string> {
   return data.signedUrl;
 }
 
-function BannerPicker({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+function BannerPicker({ value, category, onChange }: { value: string; category?: string; onChange: (url: string) => void }) {
   const [busy, setBusy] = useState(false);
   return (
     <label className="block cursor-pointer">
       <span className="text-[11px] font-semibold text-muted-foreground">Banner image</span>
       <div className="mt-1 grid h-32 place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-surface-2 text-xs text-muted-foreground">
-        {busy ? "Uploading..." : value ? <img src={value} alt="Banner preview" className="h-full w-full object-cover" /> : "Tap to upload image"}
+        {busy ? "Uploading..." : value ? <img src={bannerFor(value, category)} alt="Banner preview" className="h-full w-full object-cover" /> : "Tap to upload image"}
       </div>
       <input
         type="file"
@@ -80,12 +80,17 @@ const empty = {
   per_kill: "10",
   max_players: "48",
   starts_at: "",
-  banner_url: "",
+  banner_url: categoryBannerKey("BR FULL MAP") ?? "",
   rules: rulesFor("BR FULL MAP").join("\n"),
 };
 
 function freshForm(category: string) {
-  return { ...empty, category, rules: rulesFor(category).join("\n") };
+  return {
+    ...empty,
+    category,
+    banner_url: categoryBannerKey(category) ?? "",
+    rules: rulesFor(category).join("\n"),
+  };
 }
 
 export function AdminTournaments({ host = false }: { host?: boolean }) {
@@ -125,7 +130,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
       created_by: u.user?.id ?? null,
       name: form.name,
       category: form.category.trim().toUpperCase(),
-      banner_url: form.banner_url || null,
+      banner_url: form.banner_url || categoryBannerKey(form.category),
       mode: form.mode,
       map: form.map,
       entry_fee: Number(form.entry_fee),
@@ -154,11 +159,16 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
     <Shell>
       <form onSubmit={create} className="space-y-3 rounded-2xl border border-border bg-surface p-4">
         <h2 className="font-display text-lg font-bold">Create tournament</h2>
-        <BannerPicker value={form.banner_url} onChange={(v) => setForm({ ...form, banner_url: v })} />
+        <BannerPicker value={form.banner_url} category={form.category} onChange={(v) => setForm({ ...form, banner_url: v })} />
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
         <CategoryPicker
           value={form.category}
-          onChange={(v) => setForm({ ...form, category: v, rules: rulesFor(v).join("\n") })}
+          onChange={(v) => setForm({
+            ...form,
+            category: v,
+            banner_url: categoryBannerKey(v) ?? "",
+            rules: rulesFor(v).join("\n"),
+          })}
           existing={allCategories ?? []}
         />
         <div className="grid grid-cols-2 gap-2">
