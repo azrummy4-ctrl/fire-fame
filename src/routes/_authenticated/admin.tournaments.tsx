@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, homeGameCatalog } from "@/lib/api";
+import { tournamentModes } from "@/lib/tournament-mode";
 
 export const Route = createFileRoute("/_authenticated/admin/tournaments")({
   head: () => ({
@@ -154,7 +155,16 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
           existing={(list ?? []).map((t) => t.category)}
         />
         <div className="grid grid-cols-2 gap-2">
-          <F label="Mode" value={form.mode} onChange={(v) => setForm({ ...form, mode: v })} />
+          <label className="block">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Mode</span>
+            <select
+              value={form.mode}
+              onChange={(e) => setForm({ ...form, mode: e.target.value })}
+              className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+            >
+              {tournamentModes.map((mode) => <option key={mode} value={mode}>{mode}</option>)}
+            </select>
+          </label>
           <F label="Map" value={form.map} onChange={(v) => setForm({ ...form, map: v })} />
           <F label="Entry fee" type="number" value={form.entry_fee} onChange={(v) => setForm({ ...form, entry_fee: v })} />
           <F label="Prize pool" type="number" value={form.prize_pool} onChange={(v) => setForm({ ...form, prize_pool: v })} />
