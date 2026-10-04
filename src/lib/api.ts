@@ -28,6 +28,7 @@ const banners: Record<string, string> = {
   "mode-lw-1v1-2v2": lwDuel,
   "mode-br-survival-2": brSurvival2,
   "mode-cs-onetap": csOnetap,
+  "mode-cs-1v1-2v2": cs1v1,
   "mode-lw-lose": lwLose,
   "mode-br-rush-full-map": brRush,
   "mode-only-ump": onlyUmp,
