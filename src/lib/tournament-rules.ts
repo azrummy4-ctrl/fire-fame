@@ -54,10 +54,18 @@ export const CLASH_SQUAD_RULES = [
   "⚖️ Rights: FIRE ZONE reserves the right to modify match prizes, rules & regulations at its discretion.",
 ];
 
+// Categories that use the Clash Squad rule set (CS-style modes).
+const CLASH_SQUAD_CATEGORIES = new Set([
+  "CLASH SQUAD",
+  "CS ONETAP",
+  "CS 4V4",
+  "ONLY UMP",
+]);
+
 // Which auto-fill rule set applies for a category.
 export function rulesFor(category: string): string[] {
   const c = category.trim().toUpperCase();
   if (c === "BR FULL MAP") return BR_FULL_MAP_RULES;
-  if (c === "CLASH SQUAD") return CLASH_SQUAD_RULES;
+  if (CLASH_SQUAD_CATEGORIES.has(c)) return CLASH_SQUAD_RULES;
   return DEFAULT_RULES;
 }
