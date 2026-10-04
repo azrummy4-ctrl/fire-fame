@@ -39,10 +39,11 @@ test("BR FULL MAP keeps its own rule set", () => {
   expect(rules).not.toBe(CLASH_SQUAD_RULES);
 });
 
-test("BR SURVIVAL, BR SURVIVAL 2 and BR RUSH FULL MAP get the BR Full Map rule set", () => {
+test("BR SURVIVAL, BR SURVIVAL 2, BR RUSH FULL MAP and SOLO get the BR Full Map rule set", () => {
   expect(rulesFor("BR SURVIVAL")).toBe(BR_FULL_MAP_RULES);
   expect(rulesFor("BR SURVIVAL 2")).toBe(BR_FULL_MAP_RULES);
   expect(rulesFor("BR RUSH FULL MAP")).toBe(BR_FULL_MAP_RULES);
+  expect(rulesFor("SOLO")).toBe(BR_FULL_MAP_RULES);
 });
 
 test("LW LOSE auto-fills its own FIREZONE rule set", () => {
