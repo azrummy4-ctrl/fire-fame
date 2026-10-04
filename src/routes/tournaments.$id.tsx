@@ -142,7 +142,7 @@ function TournamentDetail() {
       {/* Banner */}
       <div className="overflow-hidden rounded-2xl border border-border">
         <img
-          src={bannerFor(t.banner_url)}
+          src={bannerFor(t.banner_url, t.category)}
           alt={`${t.name} banner`}
           width={1088}
           height={608}

@@ -30,7 +30,7 @@ export function TournamentTile({
     >
       <div className="relative overflow-hidden">
         <img
-          src={bannerFor(tournament.banner_url)}
+          src={bannerFor(tournament.banner_url, tournament.category)}
           alt={`${tournament.category} artwork`}
           loading="lazy"
           width={512}
@@ -84,7 +84,7 @@ export function TournamentRow({ tournament, joined = 0 }: { tournament: Tourname
     <article className="card-elevated overflow-hidden rounded-2xl border border-border">
       <div className="relative">
         <img
-          src={bannerFor(tournament.banner_url)}
+          src={bannerFor(tournament.banner_url, tournament.category)}
           alt={`${tournament.name} banner`}
           loading="lazy"
           width={1088}
