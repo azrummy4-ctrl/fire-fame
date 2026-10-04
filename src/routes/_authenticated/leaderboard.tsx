@@ -1,9 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Crown, Medal, Trophy } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatINR, useSession } from "@/lib/api";
+
+type Period = "weekly" | "monthly" | "overall";
+
+const PERIODS: { key: Period; label: string }[] = [
+  { key: "weekly", label: "Weekly" },
+  { key: "monthly", label: "Monthly" },
+  { key: "overall", label: "Overall" },
+];
+
+function cutoffFor(period: Period): string | null {
+  if (period === "overall") return null;
+  const days = period === "weekly" ? 7 : 30;
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
   head: () => ({
@@ -43,14 +58,18 @@ function WinningsPill({ amount }: { amount: number }) {
 
 function LeaderboardPage() {
   const { user } = useSession();
+  const [period, setPeriod] = useState<Period>("overall");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["leaderboard-winnings"],
+    queryKey: ["leaderboard-winnings", period],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const cutoff = cutoffFor(period);
+      let query = supabase
         .from("participants")
         .select("user_id, ign, prize_amount")
         .gt("prize_amount", 0);
+      if (cutoff) query = query.gte("joined_at", cutoff);
+      const { data, error } = await query;
       if (error) throw error;
       const totals = new Map<string, Player>();
       for (const row of data ?? []) {
