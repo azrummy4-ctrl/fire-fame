@@ -4,3 +4,4 @@
 - [x] Add the full Home game-mode catalogue shown in the latest reference.
 - [x] Keep each game card linked to its own contests window and admin add shortcut.
 - [x] Offer Solo, Duo, and Squad as hosting mode choices.
+- [x] Open a separate withdrawal page from Wallet with UPI requests and payout history.

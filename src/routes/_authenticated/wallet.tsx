@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowDownLeft, ArrowUpRight, Gamepad2, Loader2, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useSession, useWallet } from "@/lib/api";
 import { verifyDepositPayment } from "@/lib/payments.functions";
@@ -27,7 +28,6 @@ function WalletPage() {
   const { user } = useSession();
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
-  const [sheet, setSheet] = useState<null | "add" | "withdraw">(null);
   const [celebrate, setCelebrate] = useState<{ amount: number } | null>(null);
   const search = useSearch({ strict: false }) as { deposit_order?: string };
   const verifyFn = useServerFn(verifyDepositPayment);
@@ -90,12 +90,7 @@ function WalletPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("settings").select("value").eq("key", "payments").maybeSingle();
       if (error) throw error;
-      return (data?.value ?? {}) as {
-        enabled?: boolean;
-        min_withdrawal?: number;
-        max_withdrawal?: number;
-        upi_payee?: string;
-      };
+      return (data?.value ?? {}) as { enabled?: boolean };
     },
   });
 
@@ -131,14 +126,15 @@ function WalletPage() {
           >
             <ArrowDownLeft className="size-4" /> Add Money
           </Link>
-          <button
-            type="button"
-            disabled={!payoutsOn}
-            onClick={() => setSheet(sheet === "withdraw" ? null : "withdraw")}
-            className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 py-2.5 text-sm font-bold disabled:opacity-50"
-          >
-            <ArrowUpRight className="size-4" /> Withdraw
-          </button>
+          {payoutsOn ? (
+            <Button asChild variant="outline" className="h-auto rounded-xl bg-surface-2 py-2.5 font-bold">
+              <Link to="/withdraw"><ArrowUpRight className="size-4" /> Withdraw</Link>
+            </Button>
+          ) : (
+            <Button disabled variant="outline" className="h-auto rounded-xl bg-surface-2 py-2.5 font-bold">
+              <ArrowUpRight className="size-4" /> Withdraw
+            </Button>
+          )}
         </div>
         {!payoutsOn && (
           <p className="mt-2 text-center text-[11px] text-muted-foreground">
@@ -146,17 +142,6 @@ function WalletPage() {
           </p>
         )}
       </div>
-
-      {sheet === "withdraw" && (
-        <Withdraw
-          min={settings?.min_withdrawal ?? 100}
-          max={settings?.max_withdrawal ?? 10000}
-          onDone={() => {
-            setSheet(null);
-            qc.invalidateQueries();
-          }}
-        />
-      )}
 
       <h2 className="mt-6 font-display text-lg font-bold">Transactions</h2>
       {(txns ?? []).length === 0 ? (
@@ -202,68 +187,5 @@ function WalletPage() {
         </div>
       )}
     </AppShell>
-  );
-}
-
-function Withdraw({ min, max, onDone }: { min: number; max: number; onDone: () => void }) {
-  const [amount, setAmount] = useState(String(min));
-  const [upi, setUpi] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.rpc("request_withdrawal", {
-      _amount: Number(amount),
-      _upi: upi.trim(),
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Withdrawal request submitted. Admin review ke baad payout hoga.");
-    onDone();
-  }
-
-  return (
-    <form onSubmit={submit} className="mt-3 space-y-3 rounded-2xl border border-border bg-surface p-4">
-      <p className="text-xs text-muted-foreground">
-        Min {formatINR(min)} · Max {formatINR(max)} · ek time par sirf ek pending request.
-      </p>
-      <Input label="Amount (₹)" value={amount} onChange={setAmount} type="number" />
-      <Input label="UPI ID" value={upi} onChange={setUpi} />
-      <button
-        disabled={busy}
-        className="w-full rounded-xl bg-gold py-2.5 text-sm font-bold text-gold-foreground disabled:opacity-60"
-      >
-        {busy ? "Submitting…" : "Request withdrawal"}
-      </button>
-    </form>
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChange,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <input
-        type={type}
-        value={value}
-        required
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary"
-      />
-    </label>
   );
 }
