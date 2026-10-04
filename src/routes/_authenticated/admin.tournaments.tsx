@@ -69,11 +69,12 @@ function BannerPicker({ value, onChange }: { value: string; onChange: (url: stri
   );
 }
 
-  "Emulator not allowed — smartphones only",
-  "No teaming with other players",
-  "No aimbot, hacks or mods — permanent ban",
-  "Screenshot / recording proof required",
-  "No refund for missed matches",
+const DEFAULT_RULES = [
+  "📱 Emulator not allowed — smartphones only",
+  "🤝 No teaming with other players",
+  "🤖 No aimbot, hacks or mods — permanent ban",
+  "🎥 Screenshot / recording proof required",
+  "💸 No refund for missed matches",
 ];
 
 const BR_FULL_MAP_RULES = [
