@@ -11,6 +11,7 @@ import brSurvival from "@/assets/mode-br-survival.jpg";
 import lwDuel from "@/assets/mode-lw-1v1-2v2.jpg";
 import brSurvival2 from "@/assets/mode-br-survival-2.jpg";
 import csOnetap from "@/assets/mode-cs-onetap.jpg";
+import cs1v1 from "@/assets/mode-cs-1v1-2v2.jpg";
 import lwLose from "@/assets/mode-lw-lose.jpg";
 import brRush from "@/assets/mode-br-rush-full-map.jpg";
 import onlyUmp from "@/assets/mode-only-ump.jpg";
