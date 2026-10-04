@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAddMoneyRouteImport } from './routes/_authenticated/add-money'
 import { Route as AuthenticatedEarnRouteImport } from './routes/_authenticated/earn'
+import { Route as AuthenticatedHostRouteImport } from './routes/_authenticated/host'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedMoreRouteImport } from './routes/_authenticated/more'
 import { Route as AuthenticatedMyGamesRouteImport } from './routes/_authenticated/my-games'
@@ -57,6 +58,11 @@ const AuthenticatedAddMoneyRoute = AuthenticatedAddMoneyRouteImport.update({
 const AuthenticatedEarnRoute = AuthenticatedEarnRouteImport.update({
   id: '/earn',
   path: '/earn',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHostRoute = AuthenticatedHostRouteImport.update({
+  id: '/host',
+  path: '/host',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLeaderboardRoute =
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/add-money': typeof AuthenticatedAddMoneyRoute
   '/earn': typeof AuthenticatedEarnRoute
+  '/host': typeof AuthenticatedHostRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/more': typeof AuthenticatedMoreRoute
   '/my-games': typeof AuthenticatedMyGamesRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/add-money': typeof AuthenticatedAddMoneyRoute
   '/earn': typeof AuthenticatedEarnRoute
+  '/host': typeof AuthenticatedHostRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/more': typeof AuthenticatedMoreRoute
   '/my-games': typeof AuthenticatedMyGamesRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/add-money': typeof AuthenticatedAddMoneyRoute
   '/_authenticated/earn': typeof AuthenticatedEarnRoute
+  '/_authenticated/host': typeof AuthenticatedHostRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/more': typeof AuthenticatedMoreRoute
   '/_authenticated/my-games': typeof AuthenticatedMyGamesRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/add-money'
     | '/earn'
+    | '/host'
     | '/leaderboard'
     | '/more'
     | '/my-games'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/add-money'
     | '/earn'
+    | '/host'
     | '/leaderboard'
     | '/more'
     | '/my-games'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/add-money'
     | '/_authenticated/earn'
+    | '/_authenticated/host'
     | '/_authenticated/leaderboard'
     | '/_authenticated/more'
     | '/_authenticated/my-games'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/earn'
       fullPath: '/earn'
       preLoaderRoute: typeof AuthenticatedEarnRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/host': {
+      id: '/_authenticated/host'
+      path: '/host'
+      fullPath: '/host'
+      preLoaderRoute: typeof AuthenticatedHostRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/leaderboard': {
@@ -425,6 +444,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAddMoneyRoute: typeof AuthenticatedAddMoneyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
+  AuthenticatedHostRoute: typeof AuthenticatedHostRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMoreRoute: typeof AuthenticatedMoreRoute
   AuthenticatedMyGamesRoute: typeof AuthenticatedMyGamesRoute
@@ -440,6 +460,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAddMoneyRoute: AuthenticatedAddMoneyRoute,
   AuthenticatedEarnRoute: AuthenticatedEarnRoute,
+  AuthenticatedHostRoute: AuthenticatedHostRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMoreRoute: AuthenticatedMoreRoute,
   AuthenticatedMyGamesRoute: AuthenticatedMyGamesRoute,

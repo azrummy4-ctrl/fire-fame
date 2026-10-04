@@ -143,6 +143,24 @@ export function useWallet() {
   });
 }
 
+export function useIsHost() {
+  const { user } = useSession();
+  return useQuery({
+    queryKey: ["is-host", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user!.id)
+        .eq("role", "host")
+        .maybeSingle();
+      if (error) throw error;
+      return !!data;
+    },
+  });
+}
+
 export function useIsAdmin() {
   const { user } = useSession();
   return useQuery({

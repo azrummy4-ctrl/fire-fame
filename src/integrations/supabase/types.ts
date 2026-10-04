@@ -222,6 +222,7 @@ export type Database = {
           banner_url: string | null
           category: string
           created_at: string
+          created_by: string | null
           entry_fee: number
           id: string
           map: string
@@ -244,6 +245,7 @@ export type Database = {
           banner_url?: string | null
           category?: string
           created_at?: string
+          created_by?: string | null
           entry_fee?: number
           id?: string
           map?: string
@@ -266,6 +268,7 @@ export type Database = {
           banner_url?: string | null
           category?: string
           created_at?: string
+          created_by?: string | null
           entry_fee?: number
           id?: string
           map?: string
@@ -413,6 +416,7 @@ export type Database = {
           banner_url: string | null
           category: string
           created_at: string
+          created_by: string | null
           entry_fee: number
           id: string
           map: string
@@ -437,6 +441,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_set_host: {
+        Args: { _enable: boolean; _user_id: string }
+        Returns: undefined
       }
       admin_settle_deposit: {
         Args: { _decision: string; _id: string }
@@ -476,6 +484,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      can_manage_tournament: { Args: { _tid: string }; Returns: boolean }
       create_deposit: {
         Args: { _amount: number; _provider_ref: string }
         Returns: {
@@ -591,7 +600,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "host"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -719,7 +728,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "host"],
     },
   },
 } as const
