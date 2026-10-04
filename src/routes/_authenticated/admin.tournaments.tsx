@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, formatINR } from "@/lib/api";
+import { formatDateTime, formatINR, homeGameCatalog } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/admin/tournaments")({
   head: () => ({
@@ -148,7 +148,11 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         <h2 className="font-display text-lg font-bold">Create tournament</h2>
         <BannerPicker value={form.banner_url} onChange={(v) => setForm({ ...form, banner_url: v })} />
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-        <F label="Game / Category (e.g. BR FULL MAP)" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+        <CategoryPicker
+          value={form.category}
+          onChange={(v) => setForm({ ...form, category: v })}
+          existing={(list ?? []).map((t) => t.category)}
+        />
         <div className="grid grid-cols-2 gap-2">
           <F label="Mode" value={form.mode} onChange={(v) => setForm({ ...form, mode: v })} />
           <F label="Map" value={form.map} onChange={(v) => setForm({ ...form, map: v })} />
@@ -336,6 +340,61 @@ function Manage({
           {resultsPublished ? "Results published" : "Publish results & credit prizes"}
         </button>
       </div>
+    </div>
+  );
+}
+
+function CategoryPicker({
+  value,
+  onChange,
+  existing,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  existing: string[];
+}) {
+  // Home page ki saari categories + pehle se bani categories, bina duplicate.
+  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])];
+  const isKnown = options.some((o) => o.toLowerCase() === value.trim().toLowerCase());
+  const [custom, setCustom] = useState(!isKnown && value.trim() !== "");
+
+  return (
+    <div>
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Game / Category
+      </span>
+      <select
+        value={custom ? "__custom__" : value}
+        onChange={(e) => {
+          if (e.target.value === "__custom__") {
+            setCustom(true);
+            onChange("");
+          } else {
+            setCustom(false);
+            onChange(e.target.value);
+          }
+        }}
+        className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+        <option value="__custom__">+ Nayi category likhein…</option>
+      </select>
+      {custom && (
+        <input
+          value={value}
+          required
+          placeholder="Nayi category ka naam (e.g. DUO CLASH)"
+          onChange={(e) => onChange(e.target.value)}
+          className="mt-2 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      )}
+      <p className="mt-1 text-[10px] text-muted-foreground">
+        Jo category chunoge, tournament Home page pe usi game card ke andar dikhega.
+      </p>
     </div>
   );
 }
