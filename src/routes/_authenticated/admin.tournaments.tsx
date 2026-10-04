@@ -69,7 +69,6 @@ function BannerPicker({ value, onChange }: { value: string; onChange: (url: stri
   );
 }
 
-const DEFAULT_RULES = [
   "Emulator not allowed — smartphones only",
   "No teaming with other players",
   "No aimbot, hacks or mods — permanent ban",
@@ -78,25 +77,25 @@ const DEFAULT_RULES = [
 ];
 
 const BR_FULL_MAP_RULES = [
-  "Level Requirement: Only players with Level 40+ IDs are eligible to participate.",
-  "Headshot Rate: CS career headshot rate must not exceed 70%.",
-  "Device Requirements: The match must be played exclusively on a smartphone or tablet. Emulators are strictly prohibited.",
-  "Use simple text when registering (example - RONITH, don't use any kind of symbol).",
-  "Prohibited Behavior: To ensure fair gameplay, the following actions are strictly prohibited:",
-  "Using Unauthorized Tools: Employing tools such as aimbots, no-recoil applications, or any game-modifying software.",
-  "Teaming Up with Opponents: Collaborating with opponents to gain an unfair advantage during the gameplay.",
-  "Adding Unregistered Players to the Custom Room: Inviting unregistered players and eliminating them during the gameplay.",
-  "Using Prohibited Guns: Employing Double Vector guns during the gameplay.",
-  "Using Prohibited Character: Employing Ryden Character during the gameplay.",
-  "Mandatory Gameplay Recording: The gameplay must be recorded using the in-game recording tools available in Free Fire MAX or a screen recorder. Failure to comply will lead to penalties.",
-  "Mandatory Screen Recording for the Custom Room: Players must record their screens while joining the custom room.",
-  "The use of multiple accounts by a single user is strictly prohibited. Any player found to be using multiple IDs will be permanently banned from our platform.",
-  "Blacklisted Game-ID's are not allowed to play and immediate ban will be issued if we got any report from Garena.",
-  "Match Result: The result will be generated within 1 to 1.5 hours after the scheduled match time.",
-  "Refund Policy: Refunds will not be provided for missed matches. However, if server-related issues occur, refunds may be considered on a case-by-case basis.",
-  "Match Registration Restriction: Once you join a match, your registration cannot be canceled.",
-  "Rights: The platform reserves the right to modify match prizes, rules & regulations at its discretion.",
-  "Horse: horse is completely banned — if anyone uses horse, prize will not be given to him.",
+  "🎖️ Level Requirement: Only players with Level 40+ IDs are eligible to participate.",
+  "🎯 Headshot Rate: CS career headshot rate must not exceed 70%.",
+  "📱 Device Requirements: The match must be played exclusively on a smartphone or tablet. Emulators are strictly prohibited.",
+  "✍️ Use simple text when registering (example - RONITH, don't use any kind of symbol).",
+  "🚫 Prohibited Behavior: To ensure fair gameplay, the following actions are strictly prohibited:",
+  "🤖 Using Unauthorized Tools: Employing tools such as aimbots, no-recoil applications, or any game-modifying software.",
+  "🤝 Teaming Up with Opponents: Collaborating with opponents to gain an unfair advantage during the gameplay.",
+  "👥 Adding Unregistered Players to the Custom Room: Inviting unregistered players and eliminating them during the gameplay.",
+  "🔫 Using Prohibited Guns: Employing Double Vector guns during the gameplay.",
+  "🎭 Using Prohibited Character: Employing Ryden Character during the gameplay.",
+  "🎥 Mandatory Gameplay Recording: The gameplay must be recorded using the in-game recording tools available in Free Fire MAX or a screen recorder. Failure to comply will lead to penalties.",
+  "📹 Mandatory Screen Recording for the Custom Room: Players must record their screens while joining the custom room.",
+  "🙅 The use of multiple accounts by a single user is strictly prohibited. Any player found to be using multiple IDs will be permanently banned from our platform.",
+  "⛔ Blacklisted Game-ID's are not allowed to play and immediate ban will be issued if we got any report from Garena.",
+  "⏱️ Match Result: The result will be generated within 1 to 1.5 hours after the scheduled match time.",
+  "💸 Refund Policy: Refunds will not be provided for missed matches. However, if server-related issues occur, refunds may be considered on a case-by-case basis.",
+  "📝 Match Registration Restriction: Once you join a match, your registration cannot be canceled.",
+  "⚖️ Rights: The platform reserves the right to modify match prizes, rules & regulations at its discretion.",
+  "🐴 Horse: horse is completely banned — if anyone uses horse, prize will not be given to him.",
 ];
 
 const empty = {
