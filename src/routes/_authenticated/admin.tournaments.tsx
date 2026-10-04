@@ -344,6 +344,61 @@ function Manage({
   );
 }
 
+function CategoryPicker({
+  value,
+  onChange,
+  existing,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  existing: string[];
+}) {
+  // Home page ki saari categories + pehle se bani categories, bina duplicate.
+  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])];
+  const isKnown = options.some((o) => o.toLowerCase() === value.trim().toLowerCase());
+  const [custom, setCustom] = useState(!isKnown && value.trim() !== "");
+
+  return (
+    <div>
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Game / Category
+      </span>
+      <select
+        value={custom ? "__custom__" : value}
+        onChange={(e) => {
+          if (e.target.value === "__custom__") {
+            setCustom(true);
+            onChange("");
+          } else {
+            setCustom(false);
+            onChange(e.target.value);
+          }
+        }}
+        className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+        <option value="__custom__">+ Nayi category likhein…</option>
+      </select>
+      {custom && (
+        <input
+          value={value}
+          required
+          placeholder="Nayi category ka naam (e.g. DUO CLASH)"
+          onChange={(e) => onChange(e.target.value)}
+          className="mt-2 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      )}
+      <p className="mt-1 text-[10px] text-muted-foreground">
+        Jo category chunoge, tournament Home page pe usi game card ke andar dikhega.
+      </p>
+    </div>
+  );
+}
+
 function RulesBox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <label className="block">
