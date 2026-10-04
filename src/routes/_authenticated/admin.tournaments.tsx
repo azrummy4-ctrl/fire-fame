@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
+import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR } from "@/lib/api";
 
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin/tournaments")({
   validateSearch: (s: Record<string, unknown>): { category?: string | undefined } => ({
     category: typeof s['category'] === "string" ? s['category'] : undefined,
   }),
-  component: AdminTournaments,
+  component: () => <AdminTournaments />,
 });
 
 export async function uploadBanner(file: File): Promise<string> {
@@ -89,16 +90,21 @@ const empty = {
   rules: DEFAULT_RULES.join("\n"),
 };
 
-function AdminTournaments() {
+export function AdminTournaments({ host = false }: { host?: boolean }) {
   const qc = useQueryClient();
-  const search = Route.useSearch();
+  const search = useSearch({ strict: false }) as { category?: string };
   const [form, setForm] = useState({ ...empty, category: search.category ?? empty.category });
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: list } = useQuery({
-    queryKey: ["admin", "tournaments"],
+    queryKey: ["admin", "tournaments", host],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tournaments").select("*").order("starts_at");
+      let q = supabase.from("tournaments").select("*").order("starts_at");
+      if (host) {
+        const { data: u } = await supabase.auth.getUser();
+        q = q.eq("created_by", u.user?.id ?? "");
+      }
+      const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
     },
@@ -106,7 +112,9 @@ function AdminTournaments() {
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
+    const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("tournaments").insert({
+      created_by: u.user?.id ?? null,
       name: form.name,
       category: form.category.trim().toUpperCase(),
       banner_url: form.banner_url || null,
@@ -133,8 +141,9 @@ function AdminTournaments() {
     qc.invalidateQueries();
   }
 
+  const Shell = host ? HostShell : AdminShell;
   return (
-    <AdminShell>
+    <Shell>
       <form onSubmit={create} className="space-y-3 rounded-2xl border border-border bg-surface p-4">
         <h2 className="font-display text-lg font-bold">Create tournament</h2>
         <BannerPicker value={form.banner_url} onChange={(v) => setForm({ ...form, banner_url: v })} />
@@ -185,19 +194,24 @@ function AdminTournaments() {
                 <RulesEditor tournamentId={t.id} initialRules={t.rules ?? []} />
               </div>
             )}
-            {openId === t.id && <Manage tournamentId={t.id} roomPublished={t.room_published} resultsPublished={t.results_published} />}
+            {openId === t.id && <Manage host={host} tournamentId={t.id} roomPublished={t.room_published} resultsPublished={t.results_published} />}
           </li>
         ))}
+        {(list ?? []).length === 0 && (
+          <li className="rounded-2xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">Abhi koi tournament nahi.</li>
+        )}
       </ul>
-    </AdminShell>
+    </Shell>
   );
 }
 
 function Manage({
+  host,
   tournamentId,
   roomPublished,
   resultsPublished,
 }: {
+  host: boolean;
   tournamentId: string;
   roomPublished: boolean;
   resultsPublished: boolean;
@@ -301,9 +315,9 @@ function Manage({
               <p className="text-xs font-bold">
                 {p.ign} <span className="text-muted-foreground">· {p.ff_uid}</span>
               </p>
-              <button type="button" onClick={() => removePlayer(p.id)} className="text-[10px] font-bold text-live">
+              {!host && <button type="button" onClick={() => removePlayer(p.id)} className="text-[10px] font-bold text-live">
                 REMOVE
-              </button>
+              </button>}
             </div>
             <div className="mt-2 grid grid-cols-4 gap-1">
               <Num label="Kills" value={p.kills} onSave={(v) => saveScore(p.id, { kills: v })} />
