@@ -37,6 +37,8 @@ const banners: Record<string, string> = {
 };
 
 export const homeGameCatalog = [
+  { category: "BR FULL MAP", banner_url: "br-full-map" },
+  { category: "CS 1V1/2V2", banner_url: "mode-cs-1v1-2v2" },
   { category: "BR SURVIVAL", banner_url: "mode-br-survival" },
   { category: "LW 1V1 / 2V2", banner_url: "mode-lw-1v1-2v2" },
   { category: "BR SURVIVAL 2", banner_url: "mode-br-survival-2" },
