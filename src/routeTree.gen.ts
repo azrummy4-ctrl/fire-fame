@@ -22,6 +22,7 @@ import { Route as AuthenticatedMyGamesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
+import { Route as AuthenticatedWithdrawRouteImport } from './routes/_authenticated/withdraw'
 import { Route as GamesCategoryRouteImport } from './routes/games.$category'
 import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
@@ -99,6 +100,11 @@ const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWithdrawRoute = AuthenticatedWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const GamesCategoryRoute = GamesCategoryRouteImport.update({
   id: '/games/$category',
   path: '/games/$category',
@@ -138,15 +144,15 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
 } as any)
 const AuthenticatedWithdrawIndexRoute =
   AuthenticatedWithdrawIndexRouteImport.update({
-    id: '/withdraw/',
-    path: '/withdraw/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWithdrawRoute,
   } as any)
 const AuthenticatedWithdrawMethodRoute =
   AuthenticatedWithdrawMethodRouteImport.update({
-    id: '/withdraw/$method',
-    path: '/withdraw/$method',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$method',
+    path: '/$method',
+    getParentRoute: () => AuthenticatedWithdrawRoute,
   } as any)
 const ApiPublicWebhooksZapupiRoute = ApiPublicWebhooksZapupiRouteImport.update({
   id: '/api/public/webhooks/zapupi',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/withdraw': typeof AuthenticatedWithdrawRouteWithChildren
   '/games/$category': typeof GamesCategoryRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -217,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/_authenticated/withdraw': typeof AuthenticatedWithdrawRouteWithChildren
   '/games/$category': typeof GamesCategoryRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
@@ -243,6 +251,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/wallet'
+    | '/withdraw'
     | '/games/$category'
     | '/tournaments/$id'
     | '/tournaments/'
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/wallet'
+    | '/_authenticated/withdraw'
     | '/games/$category'
     | '/tournaments/$id'
     | '/tournaments/'
@@ -408,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWalletRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/withdraw': {
+      id: '/_authenticated/withdraw'
+      path: '/withdraw'
+      fullPath: '/withdraw'
+      preLoaderRoute: typeof AuthenticatedWithdrawRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/games/$category': {
       id: '/games/$category'
       path: '/games/$category'
@@ -459,17 +476,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/withdraw/': {
       id: '/_authenticated/withdraw/'
-      path: '/withdraw'
+      path: '/'
       fullPath: '/withdraw/'
       preLoaderRoute: typeof AuthenticatedWithdrawIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedWithdrawRoute
     }
     '/_authenticated/withdraw/$method': {
       id: '/_authenticated/withdraw/$method'
-      path: '/withdraw/$method'
+      path: '/$method'
       fullPath: '/withdraw/$method'
       preLoaderRoute: typeof AuthenticatedWithdrawMethodRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedWithdrawRoute
     }
     '/api/public/webhooks/zapupi': {
       id: '/api/public/webhooks/zapupi'
@@ -481,6 +498,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedWithdrawRouteChildren {
+  AuthenticatedWithdrawMethodRoute: typeof AuthenticatedWithdrawMethodRoute
+  AuthenticatedWithdrawIndexRoute: typeof AuthenticatedWithdrawIndexRoute
+}
+
+const AuthenticatedWithdrawRouteChildren: AuthenticatedWithdrawRouteChildren = {
+  AuthenticatedWithdrawMethodRoute: AuthenticatedWithdrawMethodRoute,
+  AuthenticatedWithdrawIndexRoute: AuthenticatedWithdrawIndexRoute,
+}
+
+const AuthenticatedWithdrawRouteWithChildren =
+  AuthenticatedWithdrawRoute._addFileChildren(
+    AuthenticatedWithdrawRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAddMoneyRoute: typeof AuthenticatedAddMoneyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
@@ -491,12 +523,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedWithdrawRoute: typeof AuthenticatedWithdrawRouteWithChildren
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
-  AuthenticatedWithdrawMethodRoute: typeof AuthenticatedWithdrawMethodRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedWithdrawIndexRoute: typeof AuthenticatedWithdrawIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -509,12 +540,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedWithdrawRoute: AuthenticatedWithdrawRouteWithChildren,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
-  AuthenticatedWithdrawMethodRoute: AuthenticatedWithdrawMethodRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-  AuthenticatedWithdrawIndexRoute: AuthenticatedWithdrawIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
