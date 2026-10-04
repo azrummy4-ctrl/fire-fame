@@ -30,8 +30,15 @@ test("BR FULL MAP keeps its own rule set", () => {
   expect(rules).not.toBe(CLASH_SQUAD_RULES);
 });
 
+test("BR SURVIVAL, BR SURVIVAL 2 and BR RUSH FULL MAP get the BR Full Map rule set", () => {
+  expect(rulesFor("BR SURVIVAL")).toBe(BR_FULL_MAP_RULES);
+  expect(rulesFor("BR SURVIVAL 2")).toBe(BR_FULL_MAP_RULES);
+  expect(rulesFor("BR RUSH FULL MAP")).toBe(BR_FULL_MAP_RULES);
+});
+
 test("remaining categories keep the default rule set", () => {
+  expect(rulesFor("LONE WOLF")).not.toBe(BR_FULL_MAP_RULES);
   expect(rulesFor("LONE WOLF")).not.toBe(CLASH_SQUAD_RULES);
   expect(rulesFor("LW LOSE").join("\n")).toContain("Emulator not allowed");
-  expect(rulesFor("BR SURVIVAL").join("\n")).toContain("Emulator not allowed");
+  expect(rulesFor("BR SURVIVAL").join("\n")).toContain("horse is completely banned");
 });
