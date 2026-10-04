@@ -32,7 +32,7 @@ export const BR_FULL_MAP_RULES = [
   "🐴 Horse: horse is completely banned — if anyone uses horse, prize will not be given to him.",
 ];
 
-export const CS_1V1_2V2_RULES = [
+export const CLASH_SQUAD_RULES = [
   "🎖️ Level Requirement: Only players with Level 40+ IDs are eligible to participate.",
   "🎯 Headshot Rate: CS career headshot rate must not exceed 70%.",
   "📱 Device Requirements: The match must be played exclusively on a smartphone or tablet. Emulators are strictly prohibited.",
@@ -58,6 +58,6 @@ export const CS_1V1_2V2_RULES = [
 export function rulesFor(category: string): string[] {
   const c = category.trim().toUpperCase();
   if (c === "BR FULL MAP") return BR_FULL_MAP_RULES;
-  if (c.includes("1V1") || c.includes("2V2")) return CS_1V1_2V2_RULES;
+  if (c === "CLASH SQUAD") return CLASH_SQUAD_RULES;
   return DEFAULT_RULES;
 }
