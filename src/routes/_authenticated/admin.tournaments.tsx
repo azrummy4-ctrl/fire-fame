@@ -190,7 +190,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
               rules: v.trim().toUpperCase() === "BR FULL MAP" ? BR_FULL_MAP_RULES.join("\n") : form.rules,
             })
           }
-          existing={(list ?? []).map((t) => t.category)}
+          existing={allCategories ?? []}
         />
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
