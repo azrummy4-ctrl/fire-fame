@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "cap:sync": "vite build && node scripts/capacitor-index.mjs && cap sync android",
+    "cap:open": "cap open android"
   },
   "overrides": {
     "rolldown": "1.2.1"
