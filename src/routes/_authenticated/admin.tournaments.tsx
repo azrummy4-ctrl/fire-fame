@@ -173,7 +173,13 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
         <CategoryPicker
           value={form.category}
-          onChange={(v) => setForm({ ...form, category: v })}
+          onChange={(v) =>
+            setForm({
+              ...form,
+              category: v,
+              rules: v.trim().toUpperCase() === "BR FULL MAP" ? BR_FULL_MAP_RULES.join("\n") : form.rules,
+            })
+          }
           existing={(list ?? []).map((t) => t.category)}
         />
         <div className="grid grid-cols-2 gap-2">
