@@ -193,11 +193,11 @@ function TournamentDetail() {
             Rules and Regulations
           </h3>
           <div className="mx-auto mt-2 h-0.5 w-24 bg-border" />
-          <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+          <ul className="mt-3 space-y-3 text-[15px] leading-relaxed text-muted-foreground">
             {t.rules.map((rule) => (
               <li key={rule} className="flex gap-2">
                 <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-foreground" />
-                {rule}
+                <span>{ruleWithEmoji(rule)}</span>
               </li>
             ))}
           </ul>
