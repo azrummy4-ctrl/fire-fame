@@ -26,9 +26,9 @@ function WithdrawPage() {
   const { user } = useSession();
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
+  const [method, setMethod] = useState<"upi" | "google_play" | null>(null);
+  const [selected, setSelected] = useState<number | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [amount, setAmount] = useState("");
   const [upi, setUpi] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -61,23 +61,19 @@ function WithdrawPage() {
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const value = Number(amount);
-    if (!Number.isFinite(value) || value < min || value > max || value > balance) {
-      toast.error(`₹${min}–₹${max} ke beech amount chunein, wallet balance se zyada nahi.`);
-      return;
-    }
+    if (!method || !selected) return;
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("request_withdrawal", { _amount: value, _upi: upi.trim() });
+      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, _upi: method === "upi" ? upi.trim() : undefined });
       if (error) throw error;
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["wallet"] }),
         qc.invalidateQueries({ queryKey: ["withdrawals", user?.id] }),
         qc.invalidateQueries({ queryKey: ["transactions", user?.id] }),
       ]);
-      setShowForm(false);
+      setMethod(null);
+      setSelected(null);
       setShowHistory(true);
-      setAmount("");
       setUpi("");
       toast.success("Withdrawal request bhej di. Admin review ke baad payment hoga.");
     } catch (error) {
@@ -112,43 +108,61 @@ function WithdrawPage() {
         <span className="text-xs font-bold uppercase text-muted-foreground">India</span>
       </div>
 
-      <div className="mt-4 flex h-40 w-full flex-col items-start justify-between rounded-lg border border-border bg-surface px-5 py-5 opacity-60 sm:h-44" aria-label="Google Play Redeem Code unavailable">
-        <span className="grid size-14 place-items-center rounded-lg bg-surface-2 text-2xl font-bold text-foreground">▶</span>
-        <span className="flex w-full items-end justify-between gap-2 text-lg font-semibold">
-          Google Play Redeem Code <span className="shrink-0 text-xs font-normal text-muted-foreground">Unavailable</span>
-        </span>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {([
+          { id: "google_play", label: "Google Play Redeem Code", icon: "▶", cls: "bg-primary/15 text-primary" },
+          { id: "upi", label: "UPI Transfer", icon: "UPI", cls: "bg-success/15 text-success italic" },
+        ] as const).map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => { setMethod(m.id); setSelected(null); }}
+            disabled={settings?.enabled === false || pending}
+            className={`flex h-36 flex-col items-start justify-between rounded-lg border bg-surface p-4 text-left transition hover:bg-surface-2 disabled:opacity-50 ${method === m.id ? "border-primary" : "border-border"}`}
+          >
+            <span className={`grid size-12 place-items-center rounded-lg text-xl font-bold ${m.cls}`}>{m.icon}</span>
+            <span className="flex w-full items-end justify-between gap-1 text-sm font-semibold">{m.label}<ChevronRight className="size-4 shrink-0 text-muted-foreground" /></span>
+          </button>
+        ))}
       </div>
-
-      <Button
-        variant="outline"
-        onClick={() => setShowForm((current) => !current)}
-        disabled={settings?.enabled === false || pending}
-        className="mt-3 flex h-40 w-full flex-col items-start justify-between rounded-lg border-primary/50 bg-surface px-5 py-5 text-left hover:bg-surface-2 sm:h-44"
-      >
-        <span className="grid size-14 place-items-center rounded-lg bg-success/15 text-2xl font-bold italic text-success">UPI</span>
-        <span className="flex w-full items-end justify-between text-lg font-semibold">
-          UPI Transfer <ChevronRight className="size-5 text-muted-foreground" />
-        </span>
-      </Button>
 
       {settings?.enabled === false && <p className="mt-3 text-sm text-muted-foreground">Aapke region mein withdrawal abhi available nahi hai.</p>}
       {pending && <p className="mt-3 text-sm text-gold">Aapki ek withdrawal request review mein hai. Status History mein dekhein.</p>}
 
-      {showForm && settings?.enabled !== false && !pending && (
-        <form onSubmit={submit} className="mt-5 space-y-4 border-t border-border pt-5">
-          <div className="flex items-center gap-2 text-primary"><ArrowUpRight className="size-5" /><h2 className="font-display text-xl font-bold">UPI withdrawal</h2></div>
-          <p className="text-sm text-muted-foreground">Minimum {formatINR(min)} · Maximum {formatINR(max)} · ek waqt mein ek request.</p>
-          <label className="block text-sm font-medium">Amount (₹)
-            <input type="number" min={min} max={Math.min(max, balance)} step="0.01" required value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="Amount" className="mt-2 w-full rounded-md border border-border bg-surface px-4 py-3 outline-none focus:border-primary" />
-          </label>
-          <label className="block text-sm font-medium">UPI ID
-            <input type="text" required value={upi} onChange={(event) => setUpi(event.target.value)} placeholder="name@bank" autoComplete="off" className="mt-2 w-full rounded-md border border-border bg-surface px-4 py-3 outline-none focus:border-primary" />
-          </label>
-          <Button type="submit" disabled={busy || balance < min} className="h-12 w-full font-bold">
-            {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />} Request withdrawal
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">Request submit hone par amount hold hota hai; reject hone par wallet mein wapas aata hai.</p>
-        </form>
+      {method && settings?.enabled !== false && !pending && (
+        <section className="mt-6 border-t border-border pt-5">
+          <h2 className="font-display text-xl font-bold">Redeem Vouchers · {method === "upi" ? "UPI" : "Google Play"}</h2>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {REDEEM_AMOUNTS.map((value) => {
+              const locked = balance < value || value < min;
+              return (
+                <div key={value} className={`rounded-lg border bg-surface p-4 text-center ${selected === value ? "border-primary" : "border-border"}`}>
+                  <p className="font-display text-2xl font-bold">{formatINR(value)}</p>
+                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground"><Coins className="size-4 text-gold" />{Math.floor(Math.min(balance, value))} of {value}</p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-primary" style={{ width: `${redeemProgress(balance, value)}%` }} /></div>
+                  <Button size="sm" disabled={locked} onClick={() => setSelected(value)} className="mt-3 w-full rounded-full" aria-label={locked ? `${value} locked` : `Redeem ${value}`}>
+                    {locked ? <Lock /> : "Redeem"}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+
+          {selected && (
+            <form onSubmit={submit} className="mt-5 space-y-4">
+              {method === "upi" ? (
+                <label className="block text-sm font-medium">UPI ID
+                  <input type="text" required value={upi} onChange={(e) => setUpi(e.target.value)} placeholder="name@bank" autoComplete="off" className="mt-2 w-full rounded-md border border-border bg-surface px-4 py-3 outline-none focus:border-primary" />
+                </label>
+              ) : (
+                <p className="text-sm text-muted-foreground">Admin approve karne ke baad Google Play redeem code History mein dikhega.</p>
+              )}
+              <Button type="submit" disabled={busy} className="h-12 w-full font-bold">
+                {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />} Redeem {formatINR(selected)}
+              </Button>
+            </form>
+          )}
+        </section>
       )}
 
       {showHistory && (
