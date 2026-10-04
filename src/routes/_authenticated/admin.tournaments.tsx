@@ -97,7 +97,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: list } = useQuery({
-    queryKey: ["admin", "tournaments", host], // eslint-disable-line
+    queryKey: ["admin", "tournaments", host],
     queryFn: async () => {
       let q = supabase.from("tournaments").select("*").order("starts_at");
       if (host) {
