@@ -58,6 +58,7 @@ function WalletPage() {
           attempts += 1;
           try {
             const res = await verifyFn({ data: { orderId } });
+            console.log("VERIFY_RES", JSON.stringify(res));
             if (res.status === "completed") {
               toast.success("Payment successful! Wallet me paise add ho gaye.");
               setCelebrate({ amount: res.amount });
