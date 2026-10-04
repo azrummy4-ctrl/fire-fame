@@ -145,6 +145,12 @@ const LW_LOSE_CATEGORIES = new Set([
   "LW LOSE",
 ]);
 
+// Categories that use the LW HEADSHOT / LONE WOLF rule set.
+const LW_HEADSHOT_CATEGORIES = new Set([
+  "LW HEADSHOT",
+  "LONE WOLF",
+]);
+
 // Which auto-fill rule set applies for a category.
 export function rulesFor(category: string): string[] {
   const c = category.trim().toUpperCase().replace(/\s*\/\s*/, "/");
@@ -152,5 +158,6 @@ export function rulesFor(category: string): string[] {
   if (CLASH_SQUAD_CATEGORIES.has(c)) return CLASH_SQUAD_RULES;
   if (LW_CATEGORIES.has(c)) return LW_RULES;
   if (LW_LOSE_CATEGORIES.has(c)) return LW_LOSE_RULES;
+  if (LW_HEADSHOT_CATEGORIES.has(c)) return LW_HEADSHOT_RULES;
   return DEFAULT_RULES;
 }
