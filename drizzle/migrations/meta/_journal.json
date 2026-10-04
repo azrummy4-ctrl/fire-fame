@@ -29,6 +29,13 @@
       "when": 1791084845104,
       "tag": "0003_host_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791154742625,
+      "tag": "0004_allow_admin_payment_settings_updates",
+      "breakpoints": true
     }
   ]
 }

@@ -5,3 +5,4 @@
 - [x] Keep each game card linked to its own contests window and admin add shortcut.
 - [x] Offer Solo, Duo, and Squad as hosting mode choices.
 - [x] Open a separate withdrawal page from Wallet with UPI requests and payout history.
+- [x] Let admins set the minimum withdrawal amount from Payments, enforced for payout requests.
