@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useSession, useWallet } from "@/lib/api";
 
-export const Route = createFileRoute("/_authenticated/withdraw")({
+export const Route = createFileRoute("/_authenticated/withdraw/")({
   head: () => ({
     meta: [
       { title: "Withdraw — UPI Payout | FireZone" },
