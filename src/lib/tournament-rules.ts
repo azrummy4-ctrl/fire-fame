@@ -132,6 +132,7 @@ const BR_FULL_MAP_CATEGORIES = new Set([
   "BR SURVIVAL",
   "BR SURVIVAL 2",
   "BR RUSH FULL MAP",
+  "SOLO",
 ]);
 
 // Categories that use the Lone Wolf 1V1/2V2 rule set.
