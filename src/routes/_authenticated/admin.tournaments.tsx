@@ -148,7 +148,11 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         <h2 className="font-display text-lg font-bold">Create tournament</h2>
         <BannerPicker value={form.banner_url} onChange={(v) => setForm({ ...form, banner_url: v })} />
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-        <F label="Game / Category (e.g. BR FULL MAP)" value={form.category} onChange={(v) => setForm({ ...form, category: v })} />
+        <CategoryPicker
+          value={form.category}
+          onChange={(v) => setForm({ ...form, category: v })}
+          existing={(list ?? []).map((t) => t.category)}
+        />
         <div className="grid grid-cols-2 gap-2">
           <F label="Mode" value={form.mode} onChange={(v) => setForm({ ...form, mode: v })} />
           <F label="Map" value={form.map} onChange={(v) => setForm({ ...form, map: v })} />
