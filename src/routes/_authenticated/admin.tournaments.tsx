@@ -133,6 +133,16 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
     },
   });
 
+  // Category dropdown ke liye sab tournaments ki categories (host ko bhi saari dikheni chahiye)
+  const { data: allCategories } = useQuery({
+    queryKey: ["admin", "tournament-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tournaments").select("category");
+      if (error) throw error;
+      return (data ?? []).map((t) => t.category);
+    },
+  });
+
   async function create(e: React.FormEvent) {
     e.preventDefault();
     const { data: u } = await supabase.auth.getUser();
