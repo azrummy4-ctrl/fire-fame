@@ -136,19 +136,23 @@ export type Tournament = {
   results_published: boolean;
 };
 
+// Cache the session across components so page switches don't reset it and refetch data.
+let cachedSession: Session | null = null;
+let sessionKnown = false;
+
 export function useSession() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(cachedSession);
+  const [loading, setLoading] = useState(!sessionKnown);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const update = (s: Session | null) => {
+      cachedSession = s;
+      sessionKnown = true;
       setSession(s);
       setLoading(false);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => update(s));
+    if (!sessionKnown) supabase.auth.getSession().then(({ data }) => update(data.session));
     return () => sub.subscription.unsubscribe();
   }, []);
 
