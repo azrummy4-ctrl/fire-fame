@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep the Home game-mode catalogue independent from tournament rows so admins can add the first contest for an empty mode.
+- Keep tournament team-size options in a shared module so host and admin forms use the same allowed choices.

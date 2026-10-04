@@ -1,0 +1,1 @@
+export const tournamentModes = ["Solo", "Duo", "Squad"] as const;
