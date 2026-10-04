@@ -57,17 +57,49 @@ export const createDepositOrder = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const zapKey = zapupiKey();
 
-    // Ek time par sirf ek pending gateway deposit
+    // Ek time par sirf ek pending gateway deposit.
+    // Agar purana pending hai to pehle gateway se status check karo —
+    // failed/cancelled/expired ho to use failed mark karke naya order allow karo,
+    // taaki failed payment ke baad user turant dobara pay kar sake.
     const { data: existing } = await supabase
       .from("deposits")
-      .select("id, provider_ref")
+      .select("id, provider_ref, created_at")
       .eq("user_id", userId)
       .eq("provider", "zapupi")
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (existing) throw new Error("Aapka ek deposit pehle se pending hai. Use complete ya expire hone dein.");
+    if (existing?.provider_ref) {
+      let settled = false;
+      try {
+        const st = (await zapupiPost("/order-status", {
+          zap_key: zapKey,
+          order_id: existing.provider_ref,
+        })) as ZapUpiStatusResponse;
+        const d = st?.data ?? {};
+        const txnStatus = String(d.txn_status ?? d.payment_status ?? d.status ?? "").toUpperCase();
+        if (txnStatus === "SUCCESS") {
+          throw new Error("Aapka pichhla payment success ho chuka hai. Wallet check karein.");
+        }
+        if (txnStatus === "FAILED" || txnStatus === "CANCELLED" || txnStatus === "EXPIRED") {
+          settled = true;
+        }
+      } catch (e) {
+        if (e instanceof Error && e.message.includes("pichhla payment")) throw e;
+        // Gateway unreachable — 10 min se purana pending order expire maan lo
+      }
+      const ageMs = Date.now() - new Date(existing.created_at).getTime();
+      if (!settled && ageMs < 10 * 60 * 1000) {
+        throw new Error("Aapka ek deposit pehle se pending hai. Use complete ya expire hone dein.");
+      }
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
+        .from("deposits")
+        .update({ status: "failed", updated_at: new Date().toISOString() })
+        .eq("id", existing.id)
+        .eq("status", "pending");
+    }
 
     const orderId = `FZ${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
