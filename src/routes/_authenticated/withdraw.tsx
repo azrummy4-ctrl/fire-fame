@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, ChevronRight, Coins, History, Loader2, Lock, ShieldCheck } from "lucide-react";
-import { REDEEM_AMOUNTS, redeemProgress } from "@/lib/redeem";
-import { toast } from "sonner";
+import { ArrowLeft, ChevronRight, Coins, History } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,12 +24,7 @@ export const Route = createFileRoute("/_authenticated/withdraw")({
 function WithdrawPage() {
   const { user } = useSession();
   const { data: wallet } = useWallet();
-  const qc = useQueryClient();
-  const [method, setMethod] = useState<"upi" | "google_play" | null>(null);
-  const [selected, setSelected] = useState<number | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [upi, setUpi] = useState("");
-  const [busy, setBusy] = useState(false);
 
   const { data: settings } = useQuery({
     queryKey: ["settings", "payments"],
@@ -55,34 +48,9 @@ function WithdrawPage() {
     },
   });
 
-  const min = settings?.min_withdrawal ?? 100;
-  const max = settings?.max_withdrawal ?? 10000;
   const balance = Number(wallet?.balance ?? 0);
   const pending = requests?.some((request) => request.status === "pending") ?? false;
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!method || !selected) return;
-    setBusy(true);
-    try {
-      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
-      if (error) throw error;
-      await Promise.all([
-        qc.invalidateQueries({ queryKey: ["wallet"] }),
-        qc.invalidateQueries({ queryKey: ["withdrawals", user?.id] }),
-        qc.invalidateQueries({ queryKey: ["transactions", user?.id] }),
-      ]);
-      setMethod(null);
-      setSelected(null);
-      setShowHistory(true);
-      setUpi("");
-      toast.success("Withdrawal request bhej di. Admin review ke baad payment hoga.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Withdrawal request nahi ho payi.");
-    } finally {
-      setBusy(false);
-    }
-  }
+  const disabled = settings?.enabled === false || pending;
 
   return (
     <AppShell>
@@ -114,57 +82,22 @@ function WithdrawPage() {
           { id: "google_play", label: "Google Play Redeem Code", icon: "▶", cls: "bg-primary/15 text-primary" },
           { id: "upi", label: "UPI Transfer", icon: "UPI", cls: "bg-success/15 text-success italic" },
         ] as const).map((m) => (
-          <button
+          <Link
             key={m.id}
-            type="button"
-            onClick={() => { setMethod(m.id); setSelected(null); }}
-            disabled={settings?.enabled === false || pending}
-            className={`flex h-36 flex-col items-start justify-between rounded-lg border bg-surface p-4 text-left transition hover:bg-surface-2 disabled:opacity-50 ${method === m.id ? "border-primary" : "border-border"}`}
+            to="/withdraw/$method"
+            params={{ method: m.id }}
+            aria-disabled={disabled}
+            onClick={disabled ? (event) => event.preventDefault() : undefined}
+            className={`flex h-36 flex-col items-start justify-between rounded-lg border border-border bg-surface p-4 text-left transition hover:bg-surface-2 ${disabled ? "pointer-events-none opacity-50" : ""}`}
           >
             <span className={`grid size-12 place-items-center rounded-lg text-xl font-bold ${m.cls}`}>{m.icon}</span>
             <span className="flex w-full items-end justify-between gap-1 text-sm font-semibold">{m.label}<ChevronRight className="size-4 shrink-0 text-muted-foreground" /></span>
-          </button>
+          </Link>
         ))}
       </div>
 
       {settings?.enabled === false && <p className="mt-3 text-sm text-muted-foreground">Aapke region mein withdrawal abhi available nahi hai.</p>}
       {pending && <p className="mt-3 text-sm text-gold">Aapki ek withdrawal request review mein hai. Status History mein dekhein.</p>}
-
-      {method && settings?.enabled !== false && !pending && (
-        <section className="mt-6 border-t border-border pt-5">
-          <h2 className="font-display text-xl font-bold">Redeem Vouchers · {method === "upi" ? "UPI" : "Google Play"}</h2>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {REDEEM_AMOUNTS.map((value) => {
-              const locked = balance < value || value < min;
-              return (
-                <div key={value} className={`rounded-lg border bg-surface p-4 text-center ${selected === value ? "border-primary" : "border-border"}`}>
-                  <p className="font-display text-2xl font-bold">{formatINR(value)}</p>
-                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground"><Coins className="size-4 text-gold" />{Math.floor(Math.min(balance, value))} of {value}</p>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-primary" style={{ width: `${redeemProgress(balance, value)}%` }} /></div>
-                  <Button size="sm" disabled={locked} onClick={() => setSelected(value)} className="mt-3 w-full rounded-full" aria-label={locked ? `${value} locked` : `Redeem ${value}`}>
-                    {locked ? <Lock /> : "Redeem"}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-
-          {selected && (
-            <form onSubmit={submit} className="mt-5 space-y-4">
-              {method === "upi" ? (
-                <label className="block text-sm font-medium">UPI ID
-                  <input type="text" required value={upi} onChange={(e) => setUpi(e.target.value)} placeholder="name@bank" autoComplete="off" className="mt-2 w-full rounded-md border border-border bg-surface px-4 py-3 outline-none focus:border-primary" />
-                </label>
-              ) : (
-                <p className="text-sm text-muted-foreground">Admin approve karne ke baad Google Play redeem code History mein dikhega.</p>
-              )}
-              <Button type="submit" disabled={busy} className="h-12 w-full font-bold">
-                {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />} Redeem {formatINR(selected)}
-              </Button>
-            </form>
-          )}
-        </section>
-      )}
 
       {showHistory && (
         <section className="mt-7 border-t border-border pt-5" aria-label="Withdrawal history">
