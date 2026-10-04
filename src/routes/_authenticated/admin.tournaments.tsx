@@ -229,6 +229,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
                     else qc.invalidateQueries();
                   }}
                 />
+                <BooyahEditor tournamentId={t.id} prizeSplit={(t.prize_split as { place: string; amount: number }[]) ?? []} />
                 <RulesEditor tournamentId={t.id} initialRules={t.rules ?? []} />
               </div>
             )}
@@ -449,6 +450,52 @@ function RulesBox({ value, onChange }: { value: string; onChange: (v: string) =>
         className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
       />
     </label>
+  );
+}
+
+function BooyahEditor({ tournamentId, prizeSplit }: { tournamentId: string; prizeSplit: { place: string; amount: number }[] }) {
+  const qc = useQueryClient();
+  const first = prizeSplit.find((p) => p.place === "1st") ?? prizeSplit[0];
+  const [v, setV] = useState(String(first?.amount ?? 0));
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    const amount = Math.max(0, Number(v) || 0);
+    const rest = prizeSplit.filter((p) => p !== first);
+    const split = [{ place: "1st", amount }, ...rest];
+    const { error } = await supabase.from("tournaments").update({ prize_split: split }).eq("id", tournamentId);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Booyah prize save ho gaya");
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="block">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Booyah prize (1st place coins)
+        </span>
+        <input
+          type="number"
+          value={v}
+          onChange={(e) => setV(e.target.value)}
+          className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      </label>
+      <button
+        type="button"
+        disabled={saving}
+        onClick={save}
+        className="w-full rounded-lg bg-gold py-2 text-xs font-bold text-gold-foreground disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save Booyah prize"}
+      </button>
+    </div>
   );
 }
 
