@@ -1,8 +1,16 @@
 import { expect, test } from "vitest";
-import { BR_FULL_MAP_RULES, CLASH_SQUAD_RULES, rulesFor } from "./tournament-rules";
+import { BR_FULL_MAP_RULES, CLASH_SQUAD_RULES, LW_RULES, rulesFor } from "./tournament-rules";
 
-test("CLASH SQUAD category auto-fills the clash squad rule set", () => {
-  expect(rulesFor("CLASH SQUAD")).toBe(CLASH_SQUAD_RULES);
+test("LW 1V1/2V2 category auto-fills the Lone Wolf rule set", () => {
+  expect(rulesFor("LW 1V1/2V2")).toBe(LW_RULES);
+  expect(rulesFor("LW 1V1 / 2V2")).toBe(LW_RULES);
+});
+
+test("Lone Wolf rules ban A124 and require 30-minute results", () => {
+  const joined = LW_RULES.join("\n");
+  expect(joined).toContain("A124 is strictly prohibited and banned from LW 1V1 and LW 2V2");
+  expect(joined).toContain("under 30 minutes after the scheduled match time");
+  expect(joined).toContain("5-10 minutes before the scheduled match time");
 });
 
 test("clash squad rules ban Orion, A124, Ryden, throwables, zone packing and height", () => {
@@ -20,8 +28,9 @@ test("CS ONETAP, ONLY UMP and CS 4V4 also get the clash squad rule set", () => {
   expect(rulesFor("CS 4V4")).toBe(CLASH_SQUAD_RULES);
 });
 
-test("LW 1V1/2V2 does NOT get the clash squad rule set", () => {
+test("LW 1V1/2V2 does NOT get the clash squad or BR rule set", () => {
   expect(rulesFor("LW 1V1/2V2")).not.toBe(CLASH_SQUAD_RULES);
+  expect(rulesFor("LW 1V1/2V2")).not.toBe(BR_FULL_MAP_RULES);
 });
 
 test("BR FULL MAP keeps its own rule set", () => {
