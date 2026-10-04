@@ -28,6 +28,7 @@ function WalletPage() {
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
   const [sheet, setSheet] = useState<null | "add" | "withdraw">(null);
+  const [celebrate, setCelebrate] = useState<{ amount: number } | null>(null);
   const search = useSearch({ strict: false }) as { deposit_order?: string };
   const verifyFn = useServerFn(verifyDepositPayment);
   const verifyingRef = useRef(false);
@@ -59,6 +60,8 @@ function WalletPage() {
             const res = await verifyFn({ data: { orderId } });
             if (res.status === "completed") {
               toast.success("Payment successful! Wallet me paise add ho gaye.");
+              setCelebrate({ amount: res.amount });
+              setTimeout(() => setCelebrate(null), 3000);
               qc.invalidateQueries();
               if (fromRedirect) window.history.replaceState({}, "", "/wallet");
               return;
