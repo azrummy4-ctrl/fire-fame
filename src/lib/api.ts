@@ -18,6 +18,18 @@ import onlyUmp from "@/assets/mode-only-ump.jpg";
 import freeMatch from "@/assets/mode-free-match.jpg";
 import cs4v4 from "@/assets/mode-cs-4v4.jpg";
 import lwHeadshot from "@/assets/mode-lw-headshot.jpg";
+import homeBrFullMap from "@/assets/home-br-full-map.jpg";
+import homeCs1v1 from "@/assets/home-cs-1v1-2v2.jpg";
+import homeBrSurvival from "@/assets/home-br-survival.jpg";
+import homeLwDuel from "@/assets/home-lw-1v1-2v2.jpg";
+import homeBrSurvival2 from "@/assets/home-br-survival-2.jpg";
+import homeCsOnetap from "@/assets/home-cs-onetap.jpg";
+import homeLwLose from "@/assets/home-lw-lose.jpg";
+import homeBrRush from "@/assets/home-br-rush-full-map.jpg";
+import homeOnlyUmp from "@/assets/home-only-ump.jpg";
+import homeFreeMatch from "@/assets/home-free-match.jpg";
+import homeCs4v4 from "@/assets/home-cs-4v4.jpg";
+import homeLwHeadshot from "@/assets/home-lw-headshot.jpg";
 
 const banners: Record<string, string> = {
   "br-full-map": brFullMap,
@@ -35,6 +47,21 @@ const banners: Record<string, string> = {
   "mode-free-match": freeMatch,
   "mode-cs-4v4": cs4v4,
   "mode-lw-headshot": lwHeadshot,
+};
+
+const homeBanners: Record<string, string> = {
+  "BR FULL MAP": homeBrFullMap,
+  "CS 1V1/2V2": homeCs1v1,
+  "BR SURVIVAL": homeBrSurvival,
+  "LW 1V1 / 2V2": homeLwDuel,
+  "BR SURVIVAL 2": homeBrSurvival2,
+  "CS ONETAP": homeCsOnetap,
+  "LW LOSE": homeLwLose,
+  "BR RUSH FULL MAP": homeBrRush,
+  "ONLY UMP": homeOnlyUmp,
+  "FREE MATCH": homeFreeMatch,
+  "CS 4V4": homeCs4v4,
+  "LW HEADSHOT": homeLwHeadshot,
 };
 
 export const homeGameCatalog = [
@@ -67,6 +94,10 @@ export function bannerFor(key: string | null | undefined, category?: string | nu
   }
   if (key.startsWith("http")) return key;
   return banners[key] ?? brFullMap;
+}
+
+export function homeBannerFor(category: string) {
+  return homeBanners[category.trim().toUpperCase()] ?? brFullMap;
 }
 
 export function formatINR(value: number) {
