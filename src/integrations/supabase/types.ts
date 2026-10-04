@@ -370,6 +370,7 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          method: string
           status: string
           updated_at: string
           upi_id: string
@@ -380,6 +381,7 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          method?: string
           status?: string
           updated_at?: string
           upi_id: string
@@ -390,6 +392,7 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          method?: string
           status?: string
           updated_at?: string
           upi_id?: string
@@ -472,6 +475,7 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          method: string
           status: string
           updated_at: string
           upi_id: string
@@ -569,6 +573,26 @@ export type Database = {
               isSetofReturn: false
             }
           }
+      request_redeem: {
+        Args: { _amount: number; _method: string; _upi?: string }
+        Returns: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          method: string
+          status: string
+          updated_at: string
+          upi_id: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "withdrawals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       request_withdrawal: {
         Args: { _amount: number; _upi: string }
         Returns: {
@@ -576,6 +600,7 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          method: string
           status: string
           updated_at: string
           upi_id: string
