@@ -39,7 +39,8 @@ function AddMoneyPage() {
     }
     setPayBusy(true);
     try {
-      const res = await createOrder({ data: { amount: amt } });
+      // Client origin bhejo taaki payment ke baad isi origin ke /wallet par wapas aaye
+      const res = await createOrder({ data: { amount: amt, origin: window.location.origin } });
       window.location.href = res.paymentUrl;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Payment start nahi ho paya.");
