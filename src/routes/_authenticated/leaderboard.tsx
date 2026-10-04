@@ -102,6 +102,23 @@ function LeaderboardPage() {
       </div>
       <p className="mt-1 text-xs text-muted-foreground">Top 25 players by total winnings</p>
 
+      <div className="mt-3 grid grid-cols-3 gap-1 rounded-full border border-border bg-surface p-1">
+        {PERIODS.map((p) => (
+          <button
+            key={p.key}
+            type="button"
+            onClick={() => setPeriod(p.key)}
+            className={`rounded-full py-2 font-display text-xs font-bold uppercase tracking-wider transition-colors ${
+              period === p.key
+                ? "border border-primary bg-primary/15 text-primary"
+                : "text-muted-foreground"
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
       {isLoading && (
         <div className="mt-4 space-y-2">
           {[0, 1, 2, 3, 4].map((i) => (
