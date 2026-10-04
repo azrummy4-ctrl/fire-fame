@@ -158,7 +158,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
         <CategoryPicker
           value={form.category}
-          onChange={(v) => setForm({ ...form, category: v, rules: rulesFor(v) })}
+          onChange={(v) => setForm({ ...form, category: v, rules: rulesFor(v).join("\n") })}
           existing={allCategories ?? []}
         />
         <div className="grid grid-cols-2 gap-2">
