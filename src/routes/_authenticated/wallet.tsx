@@ -2,7 +2,7 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowDownLeft, ArrowUpRight, Loader2 } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Gamepad2, Loader2, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,7 @@ function WalletPage() {
   const { data: wallet } = useWallet();
   const qc = useQueryClient();
   const [sheet, setSheet] = useState<null | "add" | "withdraw">(null);
+  const [celebrate, setCelebrate] = useState<{ amount: number } | null>(null);
   const search = useSearch({ strict: false }) as { deposit_order?: string };
   const verifyFn = useServerFn(verifyDepositPayment);
   const verifyingRef = useRef(false);
@@ -59,6 +60,8 @@ function WalletPage() {
             const res = await verifyFn({ data: { orderId } });
             if (res.status === "completed") {
               toast.success("Payment successful! Wallet me paise add ho gaye.");
+              setCelebrate({ amount: res.amount });
+              setTimeout(() => setCelebrate(null), 3000);
               qc.invalidateQueries();
               if (fromRedirect) window.history.replaceState({}, "", "/wallet");
               return;
@@ -180,6 +183,23 @@ function WalletPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {celebrate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm">
+          <div className="card-elevated w-full max-w-xs rounded-3xl border border-success/40 bg-surface p-6 text-center shadow-[0_0_60px_-10px] shadow-success/40">
+            <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-success/15">
+              <PartyPopper className="size-10 text-success" />
+            </div>
+            <p className="mt-4 font-display text-2xl font-bold text-success">Congratulations!</p>
+            <p className="mt-1 font-display text-lg font-bold tracking-wide">DEPOSIT SUCCESS</p>
+            <p className="mt-1 text-sm text-muted-foreground">{formatINR(celebrate.amount)} wallet me add ho gaye</p>
+            <div className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary/15 py-2.5">
+              <Gamepad2 className="size-5 text-primary" />
+              <span className="font-display text-base font-bold tracking-widest text-primary">PLAY AND EARN</span>
+            </div>
+          </div>
+        </div>
       )}
     </AppShell>
   );

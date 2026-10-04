@@ -153,7 +153,7 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
       .eq("provider", "zapupi")
       .maybeSingle();
     if (!deposit || deposit.user_id !== userId) throw new Error("Deposit nahi mila.");
-    if (deposit.status === "completed") return { status: "completed" as const };
+    if (deposit.status === "completed") return { status: "completed" as const, amount: Number(deposit.amount) };
     if (deposit.status !== "pending") return { status: deposit.status as "failed" };
 
     const statusRes = (await zapupiPost("/order-status", {
@@ -185,7 +185,7 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
         .select("id")
         .maybeSingle();
       if (upErr) throw new Error("Deposit update failed.");
-      if (!updated) return { status: "completed" as const }; // already settled concurrently
+      if (!updated) return { status: "completed" as const, amount: Number(deposit.amount) }; // already settled concurrently
 
       const { error: walletErr } = await supabaseAdmin.rpc("wallet_apply", {
         _user_id: userId,
@@ -196,7 +196,7 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
       });
       if (walletErr) throw new Error("Wallet credit failed. Support se contact karein.");
 
-      return { status: "completed" as const };
+      return { status: "completed" as const, amount: Number(deposit.amount) };
     }
 
     if (txnStatus === "FAILED" || txnStatus === "CANCELLED" || txnStatus === "EXPIRED") {
