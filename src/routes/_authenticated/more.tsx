@@ -5,7 +5,7 @@ import { Copy, Gift, LifeBuoy, LogOut, ScrollText, ShieldCheck } from "lucide-re
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin, useProfile, useSession } from "@/lib/api";
+import { useIsAdmin, useIsHost, useProfile, useSession } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/more")({
   head: () => ({
@@ -32,6 +32,7 @@ function MorePage() {
   const { user } = useSession();
   const { data: profile } = useProfile();
   const { data: isAdmin } = useIsAdmin();
+  const { data: isHost } = useIsHost();
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [ign, setIgn] = useState("");
@@ -135,6 +136,14 @@ function MorePage() {
           className="mt-4 block rounded-xl bg-gold py-3 text-center text-sm font-bold text-gold-foreground"
         >
           Open Admin Panel
+        </a>
+      )}
+      {(isHost || isAdmin) && (
+        <a
+          href="/host"
+          className="mt-3 block rounded-xl bg-primary py-3 text-center text-sm font-bold text-primary-foreground"
+        >
+          Open Host Dashboard
         </a>
       )}
 

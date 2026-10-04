@@ -32,6 +32,25 @@ function AdminUsers() {
     },
   });
 
+  const { data: hosts } = useQuery({
+    queryKey: ["admin", "hosts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("user_id").eq("role", "host");
+      if (error) throw error;
+      return new Set((data ?? []).map((r) => r.user_id));
+    },
+  });
+
+  async function toggleHost(id: string, enable: boolean) {
+    const { error } = await supabase.rpc("admin_set_host", { _user_id: id, _enable: enable });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(enable ? "Host permission de di" : "Host permission hata di");
+    qc.invalidateQueries({ queryKey: ["admin", "hosts"] });
+  }
+
   const filtered = (users ?? []).filter(
     (u) =>
       !q ||
@@ -67,6 +86,7 @@ function AdminUsers() {
                   UID {u.ff_uid ?? "—"} · {u.phone ?? "no phone"}
                 </p>
               </div>
+              {hosts?.has(u.id) && <span className="mr-1 rounded-full bg-primary/20 px-2 py-1 text-[10px] font-bold text-primary">HOST</span>}
               <span className="rounded-full bg-surface-2 px-2 py-1 text-[10px] font-bold uppercase">{u.status}</span>
             </div>
             <div className="mt-2 grid grid-cols-3 gap-2">
@@ -81,6 +101,12 @@ function AdminUsers() {
                 </button>
               ))}
             </div>
+            <button
+              onClick={() => toggleHost(u.id, !hosts?.has(u.id))}
+              className={`mt-2 w-full rounded-lg py-1.5 text-[11px] font-bold ${hosts?.has(u.id) ? "bg-surface-2 text-live" : "bg-primary text-primary-foreground"}`}
+            >
+              {hosts?.has(u.id) ? "Remove Host permission" : "Make Host (tournament + results)"}
+            </button>
           </li>
         ))}
         {filtered.length === 0 && (
