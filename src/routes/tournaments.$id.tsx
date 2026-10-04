@@ -30,6 +30,37 @@ export const Route = createFileRoute("/tournaments/$id")({
   component: TournamentDetail,
 });
 
+// Purane tournaments ke rules me emoji nahi hota — keyword se auto lagta hai.
+const RULE_EMOJI_MAP: [RegExp, string][] = [
+  [/level requirement/i, "🎖️"],
+  [/headshot/i, "🎯"],
+  [/emulator|device|smartphone/i, "📱"],
+  [/registering|simple text/i, "✍️"],
+  [/unauthorized tools|aimbot|hack|mod|recoil/i, "🤖"],
+  [/teaming/i, "🤝"],
+  [/unregistered/i, "👥"],
+  [/gun|vector/i, "🔫"],
+  [/character|ryden/i, "🎭"],
+  [/screen recording/i, "📹"],
+  [/record/i, "🎥"],
+  [/multiple account/i, "🙅"],
+  [/blacklist/i, "⛔"],
+  [/result/i, "⏱️"],
+  [/refund/i, "💸"],
+  [/registration|cancel/i, "📝"],
+  [/rights/i, "⚖️"],
+  [/horse/i, "🐴"],
+  [/prohibited/i, "🚫"],
+  [/team|player/i, "👥"],
+];
+
+function ruleWithEmoji(rule: string): string {
+  // Pehla character agar emoji hai (non-ASCII), to rule me pehle se emoji hai.
+  if (rule.length > 0 && rule.codePointAt(0)! > 0x2000) return rule;
+  const hit = RULE_EMOJI_MAP.find(([re]) => re.test(rule));
+  return hit ? `${hit[1]} ${rule}` : `⚡ ${rule}`;
+}
+
 function TournamentDetail() {
   const { id } = Route.useParams();
   const { data: t, isLoading } = useTournament(id);
