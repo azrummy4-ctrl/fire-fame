@@ -65,7 +65,7 @@ function WithdrawPage() {
     if (!method || !selected) return;
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, _upi: method === "upi" ? upi.trim() : undefined });
+      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
       if (error) throw error;
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["wallet"] }),

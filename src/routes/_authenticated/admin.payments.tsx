@@ -102,7 +102,7 @@ function AdminPayments() {
       if (!code) return;
       note = code;
     }
-    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision, _note: note });
+    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision, ...(note ? { _note: note } : {}) });
     if (error) {
       toast.error(error.message);
       return;
