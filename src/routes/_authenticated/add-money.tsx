@@ -87,9 +87,6 @@ function AddMoneyPage() {
           </span>
         </div>
         <iframe src={pay.url} title="Payment" className="w-full flex-1 border-0 bg-white" allow="payment" />
-        <a href={pay.url} className="border-t border-border py-2 text-center text-xs text-muted-foreground">
-          Page nahi khul raha? Yahan tap karo
-        </a>
       </div>
     );
   }
