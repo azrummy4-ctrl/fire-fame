@@ -77,6 +77,7 @@ const empty = {
   map: "Bermuda",
   entry_fee: "20",
   prize_pool: "1000",
+  booyah: "500",
   per_kill: "10",
   max_players: "48",
   starts_at: "",
@@ -139,11 +140,16 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
       max_players: Number(form.max_players),
       starts_at: new Date(form.starts_at).toISOString(),
       rules: form.rules.split("\n").map((r) => r.trim()).filter(Boolean),
-      prize_split: [
-        { place: "1st", amount: Number(form.prize_pool) * 0.5 },
-        { place: "2nd", amount: Number(form.prize_pool) * 0.3 },
-        { place: "3rd", amount: Number(form.prize_pool) * 0.2 },
-      ],
+      prize_split: (() => {
+        const pool = Number(form.prize_pool);
+        const booyah = Math.min(Math.max(0, Number(form.booyah) || 0), pool);
+        const rest = pool - booyah;
+        return [
+          { place: "1st", amount: booyah },
+          { place: "2nd", amount: Math.round(rest * 0.6 * 100) / 100 },
+          { place: "3rd", amount: Math.round(rest * 0.4 * 100) / 100 },
+        ];
+      })(),
     });
     if (error) {
       toast.error(error.message);
@@ -185,6 +191,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
           <F label="Map" value={form.map} onChange={(v) => setForm({ ...form, map: v })} />
           <F label="Entry fee" type="number" value={form.entry_fee} onChange={(v) => setForm({ ...form, entry_fee: v })} />
           <F label="Prize pool" type="number" value={form.prize_pool} onChange={(v) => setForm({ ...form, prize_pool: v })} />
+          <F label="Booyah prize (1st)" type="number" value={form.booyah} onChange={(v) => setForm({ ...form, booyah: v })} />
           <F label="Per kill" type="number" value={form.per_kill} onChange={(v) => setForm({ ...form, per_kill: v })} />
           <F label="Max players" type="number" value={form.max_players} onChange={(v) => setForm({ ...form, max_players: v })} />
         </div>
@@ -222,6 +229,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
                     else qc.invalidateQueries();
                   }}
                 />
+                <BooyahEditor tournamentId={t.id} prizeSplit={(t.prize_split as { place: string; amount: number }[]) ?? []} />
                 <RulesEditor tournamentId={t.id} initialRules={t.rules ?? []} />
               </div>
             )}
@@ -442,6 +450,52 @@ function RulesBox({ value, onChange }: { value: string; onChange: (v: string) =>
         className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
       />
     </label>
+  );
+}
+
+function BooyahEditor({ tournamentId, prizeSplit }: { tournamentId: string; prizeSplit: { place: string; amount: number }[] }) {
+  const qc = useQueryClient();
+  const first = prizeSplit.find((p) => p.place === "1st") ?? prizeSplit[0];
+  const [v, setV] = useState(String(first?.amount ?? 0));
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    const amount = Math.max(0, Number(v) || 0);
+    const rest = prizeSplit.filter((p) => p !== first);
+    const split = [{ place: "1st", amount }, ...rest];
+    const { error } = await supabase.from("tournaments").update({ prize_split: split }).eq("id", tournamentId);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Booyah prize save ho gaya");
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="space-y-2">
+      <label className="block">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Booyah prize (1st place coins)
+        </span>
+        <input
+          type="number"
+          value={v}
+          onChange={(e) => setV(e.target.value)}
+          className="mt-1 w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      </label>
+      <button
+        type="button"
+        disabled={saving}
+        onClick={save}
+        className="w-full rounded-lg bg-gold py-2 text-xs font-bold text-gold-foreground disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save Booyah prize"}
+      </button>
+    </div>
   );
 }
 
