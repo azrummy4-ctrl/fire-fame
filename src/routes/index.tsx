@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({

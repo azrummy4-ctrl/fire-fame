@@ -52,6 +52,9 @@ export const homeGameCatalog = [
   { category: "LW HEADSHOT", banner_url: "mode-lw-headshot" },
 ] as const;
 
+// Ye categories Home page aur Host/Admin panel se chhupayi gayi hain (purane tournaments DB me rehte hain).
+export const hiddenCategories = new Set(["CLASH SQUAD", "LONE WOLF", "SOLO"]);
+
 export function bannerFor(key: string | null | undefined) {
   if (!key) return brFullMap;
   if (key.startsWith("http")) return key;
