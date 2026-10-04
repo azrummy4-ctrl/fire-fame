@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, ArrowUpRight, ChevronRight, Coins, History, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ChevronRight, Coins, History, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { REDEEM_AMOUNTS, redeemProgress } from "@/lib/redeem";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ function WithdrawPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("withdrawals")
-        .select("id, amount, upi_id, status, created_at")
+        .select("id, amount, upi_id, status, created_at, method, admin_note")
         .eq("user_id", user?.id ?? "")
         .order("created_at", { ascending: false }).limit(30);
       if (error) throw error;
@@ -173,7 +174,7 @@ function WithdrawPage() {
           <ul className="mt-3 space-y-2">
             {requests?.map((request) => (
               <li key={request.id} className="flex items-center justify-between gap-3 border-b border-border py-3">
-                <div className="min-w-0"><p className="font-semibold">{formatINR(Number(request.amount))}</p><p className="truncate text-xs text-muted-foreground">{request.upi_id} · {formatDateTime(request.created_at)}</p></div>
+                <div className="min-w-0"><p className="font-semibold">{formatINR(Number(request.amount))}</p><p className="truncate text-xs text-muted-foreground">{request.upi_id} · {formatDateTime(request.created_at)}</p>{request.method === "google_play" && request.status === "completed" && request.admin_note && <p className="mt-1 select-all font-mono text-sm font-bold text-success">Code: {request.admin_note}</p>}</div>
                 <span className="shrink-0 text-xs font-bold uppercase text-primary">{request.status}</span>
               </li>
             ))}
