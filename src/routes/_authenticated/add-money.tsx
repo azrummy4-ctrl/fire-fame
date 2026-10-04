@@ -85,13 +85,6 @@ function AddMoneyPage() {
           <span className="flex items-center gap-2 text-sm font-semibold">
             <Loader2 className="size-4 animate-spin text-primary" /> Payment complete karo…
           </span>
-          <button
-            type="button"
-            onClick={() => navigate({ to: "/wallet", search: { deposit_order: pay.orderId } as never })}
-            className="text-xs font-semibold text-primary"
-          >
-            Wallet pe jao
-          </button>
         </div>
         <iframe src={pay.url} title="Payment" className="w-full flex-1 border-0 bg-white" allow="payment" />
         <a href={pay.url} className="border-t border-border py-2 text-center text-xs text-muted-foreground">
