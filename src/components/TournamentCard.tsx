@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { bannerFor, formatDateTime, formatINR, type Tournament } from "@/lib/api";
+import { bannerFor, formatDateTime, formatINR, homeBannerFor, type Tournament } from "@/lib/api";
 
 const statusLabel: Record<string, string> = {
   live: "LIVE",
@@ -30,18 +30,13 @@ export function TournamentTile({
     >
       <div className="relative overflow-hidden">
         <img
-          src={bannerFor(tournament.banner_url, tournament.category)}
+          src={homeBannerFor(tournament.category)}
           alt={`${tournament.category} artwork`}
           loading="lazy"
           width={512}
           height={288}
           className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none"
         />
-        {tournament.banner_url?.startsWith("mode-") && (
-          <span className="absolute bottom-1 right-1 max-w-[66%] bg-surface/80 px-1 text-right font-display text-base font-extrabold uppercase leading-none text-foreground drop-shadow-md">
-            {tournament.category}
-          </span>
-        )}
       </div>
       <div className="flex items-center justify-between gap-2 bg-surface/95 px-2 py-2">
         <span className="truncate text-sm font-medium uppercase">{tournament.category}</span>
