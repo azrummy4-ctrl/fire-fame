@@ -62,10 +62,17 @@ const CLASH_SQUAD_CATEGORIES = new Set([
   "ONLY UMP",
 ]);
 
+// Categories that use the BR Full Map rule set (battle-royale modes).
+const BR_FULL_MAP_CATEGORIES = new Set([
+  "BR SURVIVAL",
+  "BR SURVIVAL 2",
+  "BR RUSH FULL MAP",
+]);
+
 // Which auto-fill rule set applies for a category.
 export function rulesFor(category: string): string[] {
   const c = category.trim().toUpperCase();
-  if (c === "BR FULL MAP") return BR_FULL_MAP_RULES;
+  if (c === "BR FULL MAP" || BR_FULL_MAP_CATEGORIES.has(c)) return BR_FULL_MAP_RULES;
   if (CLASH_SQUAD_CATEGORIES.has(c)) return CLASH_SQUAD_RULES;
   return DEFAULT_RULES;
 }
