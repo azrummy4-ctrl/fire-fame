@@ -11,4 +11,4 @@
 
 - Keep the Home game-mode catalogue independent from tournament rows so admins can add the first contest for an empty mode.
 - Keep tournament team-size options in a shared module so host and admin forms use the same allowed choices.
-- Derive default tournament artwork from the shared Home category catalogue so Home, host, and tournament screens stay aligned.
+- Keep clean Home category artwork separate from poster-style tournament artwork so each surface preserves its intended presentation.
