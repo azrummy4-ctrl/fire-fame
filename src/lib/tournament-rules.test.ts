@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { CLASH_SQUAD_RULES, rulesFor } from "./tournament-rules";
+import { BR_FULL_MAP_RULES, CLASH_SQUAD_RULES, rulesFor } from "./tournament-rules";
 
 test("CLASH SQUAD category auto-fills the clash squad rule set", () => {
   expect(rulesFor("CLASH SQUAD")).toBe(CLASH_SQUAD_RULES);
