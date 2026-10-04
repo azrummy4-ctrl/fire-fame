@@ -95,8 +95,14 @@ function AdminPayments() {
     qc.invalidateQueries();
   }
 
-  async function settleWithdrawal(id: string, decision: "completed" | "rejected") {
-    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision });
+  async function settleWithdrawal(id: string, decision: "completed" | "rejected", method?: string) {
+    let note: string | undefined;
+    if (decision === "completed" && method === "google_play") {
+      const code = window.prompt("Google Play redeem code daalein (user ko dikhega):")?.trim();
+      if (!code) return;
+      note = code;
+    }
+    const { error } = await supabase.rpc("admin_settle_withdrawal", { _id: id, _decision: decision, _note: note });
     if (error) {
       toast.error(error.message);
       return;
@@ -172,8 +178,8 @@ function AdminPayments() {
             </p>
             {w.status === "pending" && (
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <button onClick={() => settleWithdrawal(w.id, "completed")} className="rounded-lg bg-success py-2 text-xs font-bold text-background">
-                  Mark paid
+                <button onClick={() => settleWithdrawal(w.id, "completed", w.method)} className="rounded-lg bg-success py-2 text-xs font-bold text-background">
+                  {w.method === "google_play" ? "Send code" : "Mark paid"}
                 </button>
                 <button onClick={() => settleWithdrawal(w.id, "rejected")} className="rounded-lg bg-surface-2 py-2 text-xs font-bold text-live">
                   Reject & refund
