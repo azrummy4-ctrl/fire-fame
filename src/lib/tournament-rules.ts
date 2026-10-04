@@ -97,6 +97,28 @@ export const LW_LOSE_RULES = [
   "⚖️ Rights: FIREZONE reserves the right to modify match prizes, rules & regulations at its discretion.",
 ];
 
+// LW HEADSHOT / LONE WOLF rule set (FIREZONE branding + A124 ban).
+export const LW_HEADSHOT_RULES = [
+  "🎖️ Level Requirement: Only players with Level 40+ IDs are eligible to participate.",
+  "🎯 Headshot Rate: CS career headshot rate must not exceed 70%.",
+  "📱 Device Requirements: The match must be played exclusively on a smartphone or tablet.",
+  "📵 Emulators are strictly prohibited.",
+  "✍️ Register: Use simple text when registering (example - RONITH, don't use any kind of symbol).",
+  "🚪 Match Room ID & Password: The room details will be shared 5-10 minutes before the scheduled match time.",
+  "🚫 Prohibited Behavior: To ensure fair gameplay, the following actions are strictly prohibited:",
+  "🤖 Using Unauthorized Tools: Employing tools such as aimbots, no-recoil applications, or any game-modifying software.",
+  "🤝 Teaming Up with Opponents: Collaborating with opponents to gain an unfair advantage during the gameplay.",
+  "👥 Adding Unregistered Players: Inviting unregistered players to the custom room.",
+  "📦 Zone Packing: Using tactics such as deploying gloo walls to trap opponents outside the safe zone, thereby forcing them to take damage from shrinking zones or face unfair eliminations.",
+  "🎥 Mandatory Gameplay Recording: The gameplay must be recorded using the in-game recording tools available in Free Fire MAX or a screen recorder. Failure to comply will lead to penalties.",
+  "📹 Mandatory Screen Recording for the Custom Room: Players must record their screens while joining the custom room.",
+  "⏱️ Match Result: The result will be generated under 30 minutes after the scheduled match time.",
+  "💸 Refund Policy: Missed matches will be canceled, and refunds are provided only to attendees. However, if FIREZONE-related issues (e.g., server errors) occur, refunds may be considered on a case-by-case basis.",
+  "📝 Match Registration Restriction: Once you join a match, your registration cannot be canceled.",
+  "⚖️ Rights: FIREZONE reserves the right to modify match prizes, rules & regulations at its discretion.",
+  "🎭 A124 Is Strictly Prohibited: A124 is strictly prohibited and banned from LW 1V1 and LW 2V2 — no one can use it. If found, a penalty will be charged on him.",
+];
+
 // Categories that use the Clash Squad rule set (CS-style modes).
 const CLASH_SQUAD_CATEGORIES = new Set([
   "CLASH SQUAD",
@@ -123,6 +145,12 @@ const LW_LOSE_CATEGORIES = new Set([
   "LW LOSE",
 ]);
 
+// Categories that use the LW HEADSHOT / LONE WOLF rule set.
+const LW_HEADSHOT_CATEGORIES = new Set([
+  "LW HEADSHOT",
+  "LONE WOLF",
+]);
+
 // Which auto-fill rule set applies for a category.
 export function rulesFor(category: string): string[] {
   const c = category.trim().toUpperCase().replace(/\s*\/\s*/, "/");
@@ -130,5 +158,6 @@ export function rulesFor(category: string): string[] {
   if (CLASH_SQUAD_CATEGORIES.has(c)) return CLASH_SQUAD_RULES;
   if (LW_CATEGORIES.has(c)) return LW_RULES;
   if (LW_LOSE_CATEGORIES.has(c)) return LW_LOSE_RULES;
+  if (LW_HEADSHOT_CATEGORIES.has(c)) return LW_HEADSHOT_RULES;
   return DEFAULT_RULES;
 }
