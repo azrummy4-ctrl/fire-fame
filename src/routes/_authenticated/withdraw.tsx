@@ -112,11 +112,18 @@ function WithdrawPage() {
         <span className="text-xs font-bold uppercase text-muted-foreground">India</span>
       </div>
 
+      <div className="mt-4 flex h-40 w-full flex-col items-start justify-between rounded-lg border border-border bg-surface px-5 py-5 opacity-60 sm:h-44" aria-label="Google Play Redeem Code unavailable">
+        <span className="grid size-14 place-items-center rounded-lg bg-surface-2 text-2xl font-bold text-foreground">▶</span>
+        <span className="flex w-full items-end justify-between gap-2 text-lg font-semibold">
+          Google Play Redeem Code <span className="shrink-0 text-xs font-normal text-muted-foreground">Unavailable</span>
+        </span>
+      </div>
+
       <Button
         variant="outline"
         onClick={() => setShowForm((current) => !current)}
         disabled={settings?.enabled === false || pending}
-        className="mt-4 flex h-40 w-full flex-col items-start justify-between rounded-lg border-primary/50 bg-surface px-5 py-5 text-left hover:bg-surface-2 sm:h-44"
+        className="mt-3 flex h-40 w-full flex-col items-start justify-between rounded-lg border-primary/50 bg-surface px-5 py-5 text-left hover:bg-surface-2 sm:h-44"
       >
         <span className="grid size-14 place-items-center rounded-lg bg-success/15 text-2xl font-bold italic text-success">UPI</span>
         <span className="flex w-full items-end justify-between text-lg font-semibold">
