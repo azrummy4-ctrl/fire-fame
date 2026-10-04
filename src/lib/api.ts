@@ -11,6 +11,7 @@ import brSurvival from "@/assets/mode-br-survival.jpg";
 import lwDuel from "@/assets/mode-lw-1v1-2v2.jpg";
 import brSurvival2 from "@/assets/mode-br-survival-2.jpg";
 import csOnetap from "@/assets/mode-cs-onetap.jpg";
+import cs1v1 from "@/assets/mode-cs-1v1-2v2.jpg";
 import lwLose from "@/assets/mode-lw-lose.jpg";
 import brRush from "@/assets/mode-br-rush-full-map.jpg";
 import onlyUmp from "@/assets/mode-only-ump.jpg";
@@ -27,6 +28,7 @@ const banners: Record<string, string> = {
   "mode-lw-1v1-2v2": lwDuel,
   "mode-br-survival-2": brSurvival2,
   "mode-cs-onetap": csOnetap,
+  "mode-cs-1v1-2v2": cs1v1,
   "mode-lw-lose": lwLose,
   "mode-br-rush-full-map": brRush,
   "mode-only-ump": onlyUmp,
@@ -36,6 +38,8 @@ const banners: Record<string, string> = {
 };
 
 export const homeGameCatalog = [
+  { category: "BR FULL MAP", banner_url: "br-full-map" },
+  { category: "CS 1V1/2V2", banner_url: "mode-cs-1v1-2v2" },
   { category: "BR SURVIVAL", banner_url: "mode-br-survival" },
   { category: "LW 1V1 / 2V2", banner_url: "mode-lw-1v1-2v2" },
   { category: "BR SURVIVAL 2", banner_url: "mode-br-survival-2" },
