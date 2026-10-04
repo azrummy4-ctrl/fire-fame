@@ -113,10 +113,18 @@ const empty = {
   rules: DEFAULT_RULES.join("\n"),
 };
 
+function rulesFor(category: string) {
+  return (category.trim().toUpperCase() === "BR FULL MAP" ? BR_FULL_MAP_RULES : DEFAULT_RULES).join("\n");
+}
+
+function freshForm(category: string) {
+  return { ...empty, category, rules: rulesFor(category) };
+}
+
 export function AdminTournaments({ host = false }: { host?: boolean }) {
   const qc = useQueryClient();
   const search = useSearch({ strict: false }) as { category?: string };
-  const [form, setForm] = useState({ ...empty, category: search.category ?? empty.category });
+  const [form, setForm] = useState(() => freshForm(search.category ?? empty.category));
   const [openId, setOpenId] = useState<string | null>(null);
 
   const { data: list } = useQuery({
@@ -170,7 +178,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
       return;
     }
     toast.success("Tournament created");
-    setForm(empty);
+    setForm(freshForm(form.category));
     qc.invalidateQueries();
   }
 
@@ -183,13 +191,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         <F label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
         <CategoryPicker
           value={form.category}
-          onChange={(v) =>
-            setForm({
-              ...form,
-              category: v,
-              rules: v.trim().toUpperCase() === "BR FULL MAP" ? BR_FULL_MAP_RULES.join("\n") : form.rules,
-            })
-          }
+          onChange={(v) => setForm({ ...form, category: v, rules: rulesFor(v) })}
           existing={allCategories ?? []}
         />
         <div className="grid grid-cols-2 gap-2">
