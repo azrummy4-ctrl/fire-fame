@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
-import { homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -39,7 +39,9 @@ function Home() {
 
   // Keep all reference game modes visible even before an admin creates their first contest.
   const tournamentGames = (tournaments ?? []).filter(
-    (t, i, arr) => arr.findIndex((x) => x.category === t.category) === i
+    (t, i, arr) =>
+      !hiddenCategories.has(t.category.trim().toUpperCase()) &&
+      arr.findIndex((x) => x.category === t.category) === i
   );
   const games = [
     ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),

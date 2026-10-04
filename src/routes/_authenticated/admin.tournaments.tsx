@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, formatINR, homeGameCatalog } from "@/lib/api";
+import { formatDateTime, formatINR, hiddenCategories, homeGameCatalog } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
@@ -370,8 +370,10 @@ function CategoryPicker({
   onChange: (v: string) => void;
   existing: string[];
 }) {
-  // Home page ki saari categories + pehle se bani categories, bina duplicate.
-  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])];
+  // Home page ki saari categories + pehle se bani categories, bina duplicate (hidden categories hata kar).
+  const options = [...new Set([...homeGameCatalog.map((g) => g.category), ...existing])].filter(
+    (c) => !hiddenCategories.has(c.trim().toUpperCase())
+  );
   const isKnown = options.some((o) => o.toLowerCase() === value.trim().toLowerCase());
   const [custom, setCustom] = useState(!isKnown && value.trim() !== "");
 
