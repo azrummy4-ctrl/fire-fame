@@ -49,6 +49,7 @@ export const createDepositOrder = createServerFn({ method: "POST" })
     z
       .object({
         amount: z.number().int().min(10, "Minimum deposit ₹10 hai").max(50000, "Maximum deposit ₹50,000 hai"),
+        origin: z.string().url().refine((u) => /^https?:\/\//.test(u), "Invalid origin").optional(),
       })
       .parse(input),
   )
@@ -70,7 +71,11 @@ export const createDepositOrder = createServerFn({ method: "POST" })
 
     const orderId = `FZ${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
-    const origin = new URL(getRequest().url).origin;
+    // Client ka asli origin use karo (APK/WebView/preview me bhi sahi ho),
+    // warna gateway wapas galat URL par bhej dega aur wallet nahi khulega.
+    const clientOrigin = data.origin ? new URL(data.origin).origin : null;
+    const serverOrigin = new URL(getRequest().url).origin;
+    const origin = clientOrigin && /^https?:\/\//.test(clientOrigin) ? clientOrigin : serverOrigin;
     const redirectUrl = `${origin}/wallet?deposit_order=${orderId}`;
 
     const createRes = (await zapupiPost("/create-order", {
