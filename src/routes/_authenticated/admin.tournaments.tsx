@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, homeGameCatalog } from "@/lib/api";
+import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
 export const Route = createFileRoute("/_authenticated/admin/tournaments")({
