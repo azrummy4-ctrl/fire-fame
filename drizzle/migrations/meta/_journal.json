@@ -15,6 +15,13 @@
       "when": 1791063555284,
       "tag": "0001_add_slot_booking",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791084818504,
+      "tag": "0002_add_host_role",
+      "breakpoints": true
     }
   ]
 }
