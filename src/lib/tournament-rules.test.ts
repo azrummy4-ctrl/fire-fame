@@ -14,6 +14,12 @@ test("clash squad rules ban Orion, A124, Ryden, throwables, zone packing and hei
   expect(joined).toContain("5-10 minutes before the scheduled match time");
 });
 
+test("CS ONETAP, ONLY UMP and CS 4V4 also get the clash squad rule set", () => {
+  expect(rulesFor("CS ONETAP")).toBe(CLASH_SQUAD_RULES);
+  expect(rulesFor("ONLY UMP")).toBe(CLASH_SQUAD_RULES);
+  expect(rulesFor("CS 4V4")).toBe(CLASH_SQUAD_RULES);
+});
+
 test("LW 1V1/2V2 does NOT get the clash squad rule set", () => {
   expect(rulesFor("LW 1V1/2V2")).not.toBe(CLASH_SQUAD_RULES);
 });
@@ -24,7 +30,8 @@ test("BR FULL MAP keeps its own rule set", () => {
   expect(rules).not.toBe(CLASH_SQUAD_RULES);
 });
 
-test("other categories keep the default rule set", () => {
-  expect(rulesFor("CS ONETAP").join("\n")).toContain("Emulator not allowed");
+test("remaining categories keep the default rule set", () => {
   expect(rulesFor("LONE WOLF")).not.toBe(CLASH_SQUAD_RULES);
+  expect(rulesFor("LW LOSE").join("\n")).toContain("Emulator not allowed");
+  expect(rulesFor("BR SURVIVAL").join("\n")).toContain("Emulator not allowed");
 });
