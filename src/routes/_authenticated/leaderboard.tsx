@@ -126,13 +126,13 @@ function LeaderboardPage() {
             <div className="flex flex-col items-center gap-1.5">
               <Crown className="size-7 fill-gold text-gold" />
               <div className="relative">
-                <Avatar name={top3[0].ign} className="size-20 border-gold text-2xl text-gold" />
+                <Avatar name={top3[0]?.ign ?? "P"} className="size-20 border-gold text-2xl text-gold" />
                 <span className="absolute -bottom-2 left-1/2 grid size-6 -translate-x-1/2 place-items-center rounded-full bg-gold font-display text-xs font-bold text-gold-foreground ring-2 ring-background">
                   1
                 </span>
               </div>
-              <p className="mt-1.5 max-w-full truncate font-display text-base font-bold">{top3[0].ign}</p>
-              <WinningsPill amount={top3[0].winnings} />
+              <p className="mt-1.5 max-w-full truncate font-display text-base font-bold">{top3[0]?.ign}</p>
+              <WinningsPill amount={top3[0]?.winnings ?? 0} />
             </div>
             {/* #3 */}
             <div className="flex flex-col items-center gap-1.5 pt-10">
