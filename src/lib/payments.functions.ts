@@ -185,7 +185,7 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
         .select("id")
         .maybeSingle();
       if (upErr) throw new Error("Deposit update failed.");
-      if (!updated) return { status: "completed" as const }; // already settled concurrently
+      if (!updated) return { status: "completed" as const, amount: Number(deposit.amount) }; // already settled concurrently
 
       const { error: walletErr } = await supabaseAdmin.rpc("wallet_apply", {
         _user_id: userId,
