@@ -109,7 +109,7 @@ function WithdrawPage() {
 
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-xl font-semibold">Available Payment Methods</h2>
-        <span className="text-xl" role="img" aria-label="India">🇮🇳</span>
+        <span className="text-xs font-bold uppercase text-muted-foreground">India</span>
       </div>
 
       <Button
