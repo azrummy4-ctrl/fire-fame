@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FireFame</string>
+    <string name="title_activity_main">FireFame</string>
+    <string name="package_name">com.firefame.app</string>
+    <string name="custom_url_scheme">com.firefame.app</string>
+</resources>
