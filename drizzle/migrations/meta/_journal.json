@@ -64,6 +64,13 @@
       "when": 1791181799586,
       "tag": "0008_allow_deposit_bonus_ledger_type",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791181885834,
+      "tag": "0009_award_bonus_after_principal_wallet_credit",
+      "breakpoints": true
     }
   ]
 }
