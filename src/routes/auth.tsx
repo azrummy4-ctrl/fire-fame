@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/api";
+import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -80,9 +81,13 @@ function AuthPage() {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col justify-center px-5 py-10">
       <Link to="/" className="mb-6 flex items-center gap-2.5 self-center">
-        <span className="grid size-11 place-items-center rounded-full bg-primary font-display text-lg font-bold text-primary-foreground">
-          FZ
-        </span>
+        <img
+          src={firezoneLogo.url}
+          alt="FireZone logo"
+          width={44}
+          height={44}
+          className="size-11 rounded-full"
+        />
         <span className="font-display text-3xl font-bold tracking-wide">FireZone</span>
       </Link>
 
