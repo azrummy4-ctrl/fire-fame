@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeGameCatalog } from "@/lib/api";
+import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
@@ -99,6 +99,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
   const search = useSearch({ strict: false }) as { category?: string };
   const [form, setForm] = useState(() => freshForm(search.category ?? empty.category));
   const [openId, setOpenId] = useState<string | null>(null);
+  const [catFilter, setCatFilter] = useState("ALL");
 
   const { data: list } = useQuery({
     queryKey: ["admin", "tournaments", host],
@@ -202,9 +203,42 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
         </button>
       </form>
 
-      <h2 className="mt-6 font-display text-lg font-bold">All tournaments</h2>
+      <h2 className="mt-6 font-display text-lg font-bold">{host ? "Mere tournaments" : "All tournaments"}</h2>
+      {(() => {
+        const all = list ?? [];
+        const groups = new Map<string, typeof all>();
+        for (const t of all) {
+          const c = (t.category || "OTHER").trim().toUpperCase();
+          groups.set(c, [...(groups.get(c) ?? []), t]);
+        }
+        const cats = [...groups.keys()];
+        const shown = catFilter === "ALL" ? cats : cats.filter((c) => c === catFilter);
+        return (
+          <>
+            <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+              {["ALL", ...cats].map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCatFilter(c)}
+                  className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-bold ${catFilter === c ? "border-primary bg-primary text-primary-foreground" : "border-border bg-surface text-muted-foreground"}`}
+                >
+                  {c === "ALL" ? "All" : c} ({c === "ALL" ? all.length : groups.get(c)?.length})
+                </button>
+              ))}
+            </div>
+            {all.length === 0 && (
+              <p className="mt-2 rounded-2xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">Abhi koi tournament nahi.</p>
+            )}
+            {shown.map((cat) => (
+              <section key={cat} className="mt-4">
+                <div className="flex items-center gap-2">
+                  <img src={homeBannerFor(cat)} alt="" className="size-8 rounded-lg object-cover" />
+                  <h3 className="font-display text-sm font-bold tracking-wide">{cat}</h3>
+                  <span className="rounded-full bg-surface-2 px-2 text-[10px] font-bold text-muted-foreground">{groups.get(cat)?.length}</span>
+                </div>
       <ul className="mt-2 space-y-2">
-        {(list ?? []).map((t) => (
+        {(groups.get(cat) ?? []).map((t) => (
           <li key={t.id} className="rounded-2xl border border-border bg-surface p-3">
             <button
               type="button"
@@ -214,7 +248,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
               <div>
                 <p className="font-display text-base font-bold">{t.name}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {formatDateTime(t.starts_at)} · {t.status} · {formatINR(Number(t.entry_fee))} entry
+                  {t.mode} · {formatDateTime(t.starts_at)} · {t.status} · {formatINR(Number(t.entry_fee))} entry
                 </p>
               </div>
               <span className="text-xs text-primary">{openId === t.id ? "Close" : "Manage"}</span>
@@ -236,10 +270,12 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
             {openId === t.id && <Manage host={host} tournamentId={t.id} roomPublished={t.room_published} resultsPublished={t.results_published} />}
           </li>
         ))}
-        {(list ?? []).length === 0 && (
-          <li className="rounded-2xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">Abhi koi tournament nahi.</li>
-        )}
       </ul>
+              </section>
+            ))}
+          </>
+        );
+      })()}
     </Shell>
   );
 }
