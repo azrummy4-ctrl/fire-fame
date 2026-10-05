@@ -125,6 +125,15 @@ function EarnPage() {
             <Share2 className="size-4.5" />
           </button>
         </div>
+          <button
+            type="button"
+            onClick={shareApp}
+            disabled={!referralCode}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-success py-3 font-display text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            <Share2 className="size-4.5" />
+            Share Now
+          </button>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
