@@ -130,12 +130,10 @@ function ProfilePage() {
                 {label}
               </a>
             ) : (
-              <li
-                className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-semibold"
-              >
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-semibold">
                 <Icon className="size-4.5 text-primary" />
                 {label}
-              </li>
+              </div>
             )}
           </li>
         ))}
