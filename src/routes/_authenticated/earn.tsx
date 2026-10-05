@@ -50,6 +50,12 @@ function EarnPage() {
 
   async function shareApp() {
     const message = `Free Fire khelte ho? FireZone par tournament khelo aur coins jeeto! Mera referral code: ${referralCode}`;
+    // APK (WebView) bridge: Android app me native share sheet kholta hai
+    const bridge = (window as unknown as { AndroidShare?: { share: (t: string) => void } }).AndroidShare;
+    if (bridge?.share) {
+      bridge.share(`${message}\n${shareUrl || window.location.origin}`);
+      return;
+    }
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
