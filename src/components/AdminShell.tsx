@@ -5,7 +5,8 @@ import { useIsAdmin } from "@/lib/api";
 const tabs = [
   { to: "/admin", label: "Dashboard" },
   { to: "/admin/tournaments", label: "Tournaments" },
-  { to: "/admin/payments", label: "Payments" },
+  { to: "/admin/deposits", label: "Deposits" },
+  { to: "/admin/withdrawals", label: "Withdrawals" },
   { to: "/admin/users", label: "Users" },
 ] as const;
 

@@ -8,21 +8,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR } from "@/lib/api";
 import { validateMinimumWithdrawal } from "@/lib/withdrawal-settings";
 
-export const Route = createFileRoute("/_authenticated/admin/payments")({
+export const Route = createFileRoute("/_authenticated/admin/withdrawals")({
   head: () => ({
     meta: [
-      { title: "Deposits & Withdrawals | FireZone Admin" },
-      { name: "description", content: "Verify deposits and settle player withdrawal requests securely." },
-      { property: "og:title", content: "Payments | FireZone Admin" },
-      { property: "og:description", content: "Deposit verification and withdrawal settlement." },
+      { title: "Withdrawals | FireZone Admin" },
+      { name: "description", content: "Settle player withdrawal requests and manage withdrawal settings." },
+      { property: "og:title", content: "Withdrawals | FireZone Admin" },
+      { property: "og:description", content: "Withdrawal settlement and settings for admins." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: AdminPayments,
+  component: AdminWithdrawals,
 });
 
-function AdminPayments() {
+function AdminWithdrawals() {
   const qc = useQueryClient();
   const [minimum, setMinimum] = useState("");
   const [saving, setSaving] = useState(false);
@@ -67,16 +67,7 @@ function AdminPayments() {
     }
   }
 
-  const { data: deposits } = useQuery({
-    queryKey: ["admin", "deposits"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("deposits").select("*").order("created_at", { ascending: false }).limit(50);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  const { data: withdrawals } = useQuery({
+  const { data: withdrawals, isLoading } = useQuery({
     queryKey: ["admin", "withdrawals"],
     queryFn: async () => {
       const { data, error } = await supabase.from("withdrawals").select("*").order("created_at", { ascending: false }).limit(50);
@@ -84,16 +75,6 @@ function AdminPayments() {
       return data ?? [];
     },
   });
-
-  async function settleDeposit(id: string, decision: "completed" | "failed") {
-    const { error } = await supabase.rpc("admin_settle_deposit", { _id: id, _decision: decision });
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(`Deposit ${decision}`);
-    qc.invalidateQueries();
-  }
 
   async function settleWithdrawal(id: string, decision: "completed" | "rejected", method?: string) {
     let note: string | undefined;
@@ -110,6 +91,8 @@ function AdminPayments() {
     toast.success(`Withdrawal ${decision}`);
     qc.invalidateQueries();
   }
+
+  const pendingCount = (withdrawals ?? []).filter((w) => w.status === "pending").length;
 
   return (
     <AdminShell>
@@ -139,34 +122,12 @@ function AdminPayments() {
         </form>
         {paymentSettings && <p className="mt-2 text-xs text-muted-foreground">Maximum withdrawal: {formatINR(Number(paymentSettings.max_withdrawal))}</p>}
       </section>
-      <h2 className="font-display text-lg font-bold">Deposits</h2>
-      <ul className="mt-2 space-y-2">
-        {(deposits ?? []).map((d) => (
-          <li key={d.id} className="rounded-xl border border-border bg-surface p-3">
-            <div className="flex items-center justify-between">
-              <p className="font-bold">{formatINR(Number(d.amount))}</p>
-              <span className="text-[10px] font-bold uppercase text-muted-foreground">{d.status}</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              Ref {d.provider_ref} · {formatDateTime(d.created_at)}
-            </p>
-            {d.status === "pending" && (
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <button onClick={() => settleDeposit(d.id, "completed")} className="rounded-lg bg-success py-2 text-xs font-bold text-background">
-                  Approve
-                </button>
-                <button onClick={() => settleDeposit(d.id, "failed")} className="rounded-lg bg-surface-2 py-2 text-xs font-bold text-live">
-                  Reject
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
-        {(deposits ?? []).length === 0 && <Empty />}
-      </ul>
 
-      <h2 className="mt-6 font-display text-lg font-bold">Withdrawals</h2>
-      <ul className="mt-2 space-y-2">
+      <h2 className="font-display text-lg font-bold">Withdrawal requests</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {isLoading ? "Loading…" : pendingCount > 0 ? `${pendingCount} withdrawal pending hai.` : "Koi withdrawal pending nahi hai."}
+      </p>
+      <ul className="mt-3 space-y-2">
         {(withdrawals ?? []).map((w) => (
           <li key={w.id} className="rounded-xl border border-border bg-surface p-3">
             <div className="flex items-center justify-between">
@@ -174,7 +135,7 @@ function AdminPayments() {
               <span className="text-[10px] font-bold uppercase text-muted-foreground">{w.status}</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              {w.upi_id} · {formatDateTime(w.created_at)}
+              {w.method === "google_play" ? "Google Play" : w.upi_id} · {formatDateTime(w.created_at)}
             </p>
             {w.status === "pending" && (
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -188,16 +149,12 @@ function AdminPayments() {
             )}
           </li>
         ))}
-        {(withdrawals ?? []).length === 0 && <Empty />}
+        {(withdrawals ?? []).length === 0 && (
+          <li className="rounded-xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">
+            Kuch pending nahi.
+          </li>
+        )}
       </ul>
     </AdminShell>
-  );
-}
-
-function Empty() {
-  return (
-    <li className="rounded-xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">
-      Kuch pending nahi.
-    </li>
   );
 }
