@@ -21,12 +21,12 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
-const rows = [
+const rows: ReadonlyArray<{ label: string; icon: typeof Gift; href?: string }> = [
   { label: "Referral & rewards", icon: Gift },
-  { label: "Support", icon: LifeBuoy },
+  { label: "Support", icon: LifeBuoy, href: "https://t.me/XpiralSoftware" },
   { label: "Terms, Privacy & Refund policy", icon: ScrollText },
   { label: "Responsible gaming", icon: ShieldCheck },
-] as const;
+];
 
 function ProfilePage() {
   const { user } = useSession();
@@ -117,13 +117,24 @@ function ProfilePage() {
       )}
 
       <ul className="mt-5 space-y-2">
-        {rows.map(({ label, icon: Icon }) => (
-          <li
-            key={label}
-            className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-semibold"
-          >
-            <Icon className="size-4.5 text-primary" />
-            {label}
+        {rows.map(({ label, icon: Icon, href }) => (
+          <li key={label}>
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-semibold"
+              >
+                <Icon className="size-4.5 text-primary" />
+                {label}
+              </a>
+            ) : (
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface px-3 py-3 text-sm font-semibold">
+                <Icon className="size-4.5 text-primary" />
+                {label}
+              </div>
+            )}
           </li>
         ))}
       </ul>
