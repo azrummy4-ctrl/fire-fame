@@ -1,0 +1,2 @@
+ALTER TABLE public.transactions DROP CONSTRAINT transactions_type_check;
+ALTER TABLE public.transactions ADD CONSTRAINT transactions_type_check CHECK (type = ANY (ARRAY['deposit'::text, 'deposit_bonus'::text, 'entry_fee'::text, 'prize'::text, 'referral_reward'::text, 'withdrawal'::text, 'refund'::text, 'admin_adjustment'::text]));

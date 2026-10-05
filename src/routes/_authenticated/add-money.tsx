@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { formatINR, useSession, useWallet } from "@/lib/api";
 import { createDepositOrder, verifyDepositPayment } from "@/lib/payments.functions";
+import { depositBonus } from "@/lib/deposit-bonus";
 
 export const Route = createFileRoute("/_authenticated/add-money")({
   head: () => ({
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/add-money")({
   component: AddMoneyPage,
 });
 
-const QUICK_AMOUNTS = [10, 20, 50, 100, 200, 500];
+const QUICK_AMOUNTS = [10, 20, 50, 100, 200, 300, 500];
 
 function AddMoneyPage() {
   const { user } = useSession();
@@ -159,6 +160,10 @@ function AddMoneyPage() {
           />
         </span>
       </label>
+
+      {depositBonus(amt) > 0 && (
+        <p className="mt-2 text-sm font-semibold text-success">₹{amt} deposit par +{depositBonus(amt)} bonus coins · Total {amt + depositBonus(amt)} coins</p>
+      )}
 
       {/* Pay now */}
       <button

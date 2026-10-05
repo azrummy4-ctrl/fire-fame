@@ -6,3 +6,4 @@
 - [x] Offer Solo, Duo, and Squad as hosting mode choices.
 - [x] Open a separate withdrawal page from Wallet with UPI requests and payout history.
 - [x] Let admins set the minimum withdrawal amount from Payments, enforced for payout requests.
+- [x] Add an automatically sliding Home banner with the deposit offer and credit advertised bonuses on completed deposits.
