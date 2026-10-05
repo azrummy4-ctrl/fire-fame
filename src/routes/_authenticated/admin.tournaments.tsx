@@ -1,6 +1,6 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
@@ -294,6 +294,7 @@ function Manage({
   const qc = useQueryClient();
   const [roomId, setRoomId] = useState("");
   const [pass, setPass] = useState("");
+  const pendingSaves = useRef(new Set<Promise<void>>());
 
   const { data: players } = useQuery({
     queryKey: ["admin", "participants", tournamentId],
