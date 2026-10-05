@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Bell, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { formatINR, useIsAdmin, useSession, useWallet } from "@/lib/api";
+import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
@@ -21,12 +22,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">
       <header className="app-header-gradient sticky top-0 z-30 rounded-b-2xl px-4 pb-3 pt-4 shadow-[var(--shadow-card)]">
         <div className="flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="grid size-10 place-items-center rounded-full bg-primary font-display text-lg font-bold text-primary-foreground">
-              FZ
-            </span>
-            <span className="font-display text-2xl font-bold tracking-wide">FireZone</span>
-          </Link>
+            <Link to="/" className="flex items-center gap-2.5">
+              <img
+                src={firezoneLogo.url}
+                alt="FireZone logo"
+                width={40}
+                height={40}
+                className="size-10 rounded-full"
+              />
+              <span className="font-display text-2xl font-bold tracking-wide">FireZone</span>
+            </Link>
           <div className="flex items-center gap-2">
             {isAdmin && (
               <Link
