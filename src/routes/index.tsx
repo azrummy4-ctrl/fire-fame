@@ -57,14 +57,14 @@ function HomeBanners() {
         </div>
         <div aria-hidden={active !== 1} className={`absolute inset-0 overflow-hidden bg-surface-2 p-3 transition-opacity duration-500 motion-reduce:transition-none ${active === 1 ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-display text-xl font-bold leading-none text-foreground">FIREZONE <span className="text-gold">DEPOSIT BONUS</span></h2>
+            <h2 className="font-display text-lg font-bold leading-none text-foreground">FIREZONE <span className="text-gold">DEPOSIT BONUS</span></h2>
             <Link to="/add-money" tabIndex={active === 1 ? 0 : -1} className="shrink-0 rounded-md bg-success px-2.5 py-1.5 text-xs font-bold text-primary-foreground">Add Money</Link>
           </div>
-          <table className="mt-3 w-full table-fixed text-center text-sm font-bold tabular-nums">
-            <thead className="bg-background text-[11px] text-muted-foreground"><tr><th className="py-1">Deposit</th><th>Coins</th><th>Bonus</th><th>Total</th></tr></thead>
+          <table className="mt-2 w-full table-fixed text-center text-xs font-bold tabular-nums">
+            <thead className="bg-background text-[11px] text-muted-foreground"><tr><th className="py-0.5">Deposit</th><th>Coins</th><th>Bonus</th><th>Total</th></tr></thead>
             <tbody>{DEPOSIT_BONUSES.map(({ deposit, bonus }) => (
               <tr key={deposit} className="border-t border-border/50 odd:bg-surface even:bg-surface-2">
-                <td className="py-1">₹{deposit}</td><td>{deposit}</td><td className="text-gold">+{bonus}</td><td className="text-success">{deposit + bonus}</td>
+                <td className="py-0.5">₹{deposit}</td><td>{deposit}</td><td className="text-gold">+{bonus}</td><td className="text-success">{deposit + bonus}</td>
               </tr>
             ))}</tbody>
           </table>
