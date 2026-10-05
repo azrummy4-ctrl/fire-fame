@@ -322,16 +322,25 @@ function Manage({
     qc.invalidateQueries();
   }
 
-  async function saveScore(id: string, patch: Partial<{ kills: number; placement: number; placement_points: number; bonus_points: number; prize_amount: number }>) {
-    const { error } = await supabase.from("participants").update(patch).eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    qc.invalidateQueries({ queryKey: ["admin", "participants", tournamentId] });
+  function saveScore(id: string, patch: Partial<{ kills: number; placement: number; placement_points: number; bonus_points: number; prize_amount: number }>) {
+    const p = (async () => {
+      const { error } = await supabase.from("participants").update(patch).eq("id", id);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ["admin", "participants", tournamentId] });
+    })();
+    pendingSaves.current.add(p);
+    p.finally(() => pendingSaves.current.delete(p));
+    return p;
   }
 
   async function publishResults() {
+    // Pehle typed prize/kills save hone do, warna prize credit nahi hota.
+    (document.activeElement as HTMLElement | null)?.blur();
+    await new Promise((r) => setTimeout(r, 0));
+    await Promise.all([...pendingSaves.current]);
     const { error } = await supabase.rpc("admin_publish_results", { _tournament_id: tournamentId });
     if (error) {
       toast.error(error.message);
