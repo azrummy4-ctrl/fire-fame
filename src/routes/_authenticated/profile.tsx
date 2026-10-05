@@ -21,12 +21,12 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
-const rows = [
+const rows: ReadonlyArray<{ label: string; icon: typeof Gift; href?: string }> = [
   { label: "Referral & rewards", icon: Gift },
   { label: "Support", icon: LifeBuoy, href: "https://t.me/XpiralSoftware" },
   { label: "Terms, Privacy & Refund policy", icon: ScrollText },
   { label: "Responsible gaming", icon: ShieldCheck },
-] as const;
+];
 
 function ProfilePage() {
   const { user } = useSession();
