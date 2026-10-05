@@ -208,8 +208,18 @@ function AddMoneyPage() {
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" /> Payment is 100% secure.
           </li>
           <li className="flex items-start gap-2">
-            <Headphones className="mt-0.5 size-4 shrink-0 text-success" /> Contact support for any issues with
-            transactions.
+            <Headphones className="mt-0.5 size-4 shrink-0 text-success" />
+            <span>
+              <a
+                href="https://t.me/XpiralSoftware"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-primary underline underline-offset-2"
+              >
+                Contact support
+              </a>{" "}
+              for any issues with transactions.
+            </span>
           </li>
           <li className="flex items-start gap-2">
             <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" /> Minimum deposit ₹10 hai.
