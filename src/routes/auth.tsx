@@ -153,6 +153,7 @@ function AuthPage() {
               <Field label="In-game name (IGN)" value={ign} onChange={setIgn} required />
               <Field label="Free Fire UID" value={ffUid} onChange={setFfUid} required />
               <Field label="Mobile number (optional)" value={phone} onChange={setPhone} type="tel" />
+              <Field label="Referral code (optional)" value={refCode} onChange={setRefCode} />
             </>
           )}
           <button
