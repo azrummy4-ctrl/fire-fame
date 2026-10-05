@@ -3,9 +3,12 @@ import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-re
 import { AppShell } from "@/components/AppShell";
 import { TournamentTile } from "@/components/TournamentCard";
 import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { requireSession } from "@/lib/auth-gate";
 import promoBanner from "@/assets/promo-banner.jpg";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
+  beforeLoad: requireSession,
   head: () => ({
     meta: [
       { title: "FireZone — Daily Free Fire Tournaments & Prizes" },

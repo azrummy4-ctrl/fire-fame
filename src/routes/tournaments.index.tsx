@@ -3,8 +3,11 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentRow } from "@/components/TournamentCard";
 import { useSlotCounts, useTournaments } from "@/lib/api";
+import { requireSession } from "@/lib/auth-gate";
 
 export const Route = createFileRoute("/tournaments/")({
+  ssr: false,
+  beforeLoad: requireSession,
   head: () => ({
     meta: [
       { title: "Tournaments — Live, Upcoming & Completed | FireZone" },

@@ -12,8 +12,11 @@ import {
   useSession,
   useTournament,
 } from "@/lib/api";
+import { requireSession } from "@/lib/auth-gate";
 
 export const Route = createFileRoute("/tournaments/$id")({
+  ssr: false,
+  beforeLoad: requireSession,
   head: () => ({
     meta: [
       { title: "Tournament details | FireZone" },

@@ -4,8 +4,11 @@ import { ChevronLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentRow } from "@/components/TournamentCard";
 import { useSlotCounts, useTournaments } from "@/lib/api";
+import { requireSession } from "@/lib/auth-gate";
 
 export const Route = createFileRoute("/games/$category")({
+  ssr: false,
+  beforeLoad: requireSession,
   head: ({ params }) => {
     const name = decodeURIComponent(params.category);
     return {
