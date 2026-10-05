@@ -67,18 +67,20 @@ function WithdrawMethodPage() {
   const balance = Number(wallet?.balance ?? 0);
   const disabled = settings?.enabled === false || pending === true;
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!valid || !selected) return;
+  const upiValid = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/.test(upi.trim());
+
+  async function submit(amount: number) {
+    if (!valid || !amount) return;
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
+      const { error } = await supabase.rpc("request_redeem", { _amount: amount, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
       if (error) throw error;
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["wallet"] }),
         qc.invalidateQueries({ queryKey: ["withdrawals", user?.id] }),
         qc.invalidateQueries({ queryKey: ["transactions", user?.id] }),
       ]);
+      setUpiOpen(false);
       toast.success("Withdrawal request bhej di. Admin review ke baad payment hoga.");
       navigate({ to: "/withdraw" });
     } catch (error) {
@@ -86,6 +88,12 @@ function WithdrawMethodPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function onVoucherClick(value: number) {
+    setSelected(value);
+    if (method === "upi") setUpiOpen(true);
+    else submit(value);
   }
 
   if (!valid) {
