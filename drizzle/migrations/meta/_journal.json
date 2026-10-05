@@ -71,6 +71,13 @@
       "when": 1791181885834,
       "tag": "0009_award_bonus_after_principal_wallet_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791194308067,
+      "tag": "0010_winnings_only_withdrawals",
+      "breakpoints": true
     }
   ]
 }

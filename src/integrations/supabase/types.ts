@@ -349,18 +349,21 @@ export type Database = {
           locked: number
           updated_at: string
           user_id: string
+          winnings: number
         }
         Insert: {
           balance?: number
           locked?: number
           updated_at?: string
           user_id: string
+          winnings?: number
         }
         Update: {
           balance?: number
           locked?: number
           updated_at?: string
           user_id?: string
+          winnings?: number
         }
         Relationships: []
       }
