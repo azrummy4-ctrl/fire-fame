@@ -48,6 +48,25 @@ function EarnPage() {
   const referralCode = profile?.referral_code ?? "";
   const shareUrl = referralCode ? `${window.location.origin}/auth?ref=${referralCode}` : "";
 
+  async function shareApp() {
+    const message = `Free Fire khelte ho? FireZone par tournament khelo aur coins jeeto! Mera referral code: ${referralCode}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "FireZone — Free Fire Tournaments",
+          text: message,
+          url: shareUrl || window.location.origin,
+        });
+        return;
+      } catch (err) {
+        // User closed the share sheet — do nothing.
+        if ((err as DOMException)?.name === "AbortError") return;
+      }
+    }
+    // Fallback: copy the referral link to the clipboard.
+    copy(shareUrl || message, "Referral link");
+  }
+
   async function copy(text: string, what: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -106,6 +125,15 @@ function EarnPage() {
             <Share2 className="size-4.5" />
           </button>
         </div>
+          <button
+            type="button"
+            onClick={shareApp}
+            disabled={!referralCode}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-success py-3 font-display text-sm font-bold text-primary-foreground disabled:opacity-50"
+          >
+            <Share2 className="size-4.5" />
+            Share Now
+          </button>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
