@@ -57,6 +57,13 @@
       "when": 1791181621236,
       "tag": "0007_deposit_promo_bonus_on_completion",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791181799586,
+      "tag": "0008_allow_deposit_bonus_ledger_type",
+      "breakpoints": true
     }
   ]
 }
