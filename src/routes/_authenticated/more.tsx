@@ -21,9 +21,11 @@ export const Route = createFileRoute("/_authenticated/more")({
   component: MorePage,
 });
 
-const rows: ReadonlyArray<{ label: string; icon: typeof Gift; to?: string }> = [
+const SUPPORT_URL = "https://t.me/XpiralSoftware";
+
+const rows: ReadonlyArray<{ label: string; icon: typeof Gift; to?: string; external?: boolean }> = [
   { label: "Referral & rewards", icon: Gift, to: "/earn" },
-  { label: "Support", icon: LifeBuoy },
+  { label: "Support", icon: LifeBuoy, to: SUPPORT_URL, external: true },
   { label: "Terms, Privacy & Refund policy", icon: ScrollText },
   { label: "Responsible gaming", icon: ShieldCheck },
 ];
