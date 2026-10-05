@@ -46,7 +46,7 @@ function EarnPage() {
 
   const total = (rewards ?? []).reduce((s, t) => s + Number(t.amount), 0);
   const referralCode = profile?.referral_code ?? "";
-  const shareUrl = referralCode ? `${window.location.origin}/auth?ref=${referralCode}` : "";
+  const shareUrl = referralCode ? `https://firezone.live/auth?ref=${referralCode}` : "";
 
   async function shareApp() {
     const message = `Free Fire khelte ho? FireZone par tournament khelo aur coins jeeto! Mera referral code: ${referralCode}`;
