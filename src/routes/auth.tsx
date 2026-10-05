@@ -29,10 +29,16 @@ function AuthPage() {
   const [ign, setIgn] = useState("");
   const [ffUid, setFfUid] = useState("");
   const [phone, setPhone] = useState("");
+  const [refCode, setRefCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
   const { session } = useSession();
+
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get("ref");
+    if (r) setRefCode(r.toUpperCase());
+  }, []);
 
   useEffect(() => {
     if (session) navigate({ to: "/", replace: true });
@@ -60,7 +66,7 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { ign: ign.trim(), ff_uid: ffUid.trim(), phone: phone.trim() },
+            data: { ign: ign.trim(), ff_uid: ffUid.trim(), phone: phone.trim(), ref_code: refCode.trim().toUpperCase() },
           },
         });
         if (error) throw error;
