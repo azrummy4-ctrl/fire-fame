@@ -43,6 +43,13 @@
       "when": 1791155232479,
       "tag": "0005_redeem_vouchers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791174994407,
+      "tag": "0006_referral_first_deposit_reward",
+      "breakpoints": true
     }
   ]
 }

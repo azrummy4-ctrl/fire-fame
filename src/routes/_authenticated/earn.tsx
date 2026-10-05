@@ -78,7 +78,7 @@ function EarnPage() {
           <h2 className="font-display text-lg font-bold">Refer & earn</h2>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Apna referral code dosto ko bhejo — unke join karne par aapko reward milta hai.
+          Apna referral code dosto ko bhejo — jab dost register karke pehli baar Add Money karega, aapko upto ₹10 per refer milega.
         </p>
         <div className="mt-3 flex items-center gap-2">
           <div className="flex-1 rounded-xl border border-border bg-surface-2 px-3 py-2.5">
@@ -117,7 +117,7 @@ function EarnPage() {
         <div className="rounded-xl border border-border bg-surface p-3">
           <Users className="size-5 text-primary" />
           <p className="mt-1.5 font-display text-sm font-bold">Invite friends</p>
-          <p className="text-[11px] text-muted-foreground">Referral se reward kamao</p>
+          <p className="text-[11px] text-muted-foreground">Upto ₹10 per refer</p>
         </div>
       </div>
 
