@@ -6,6 +6,13 @@ import { REDEEM_AMOUNTS, redeemProgress } from "@/lib/redeem";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { formatINR, useSession, useWallet } from "@/lib/api";
 
