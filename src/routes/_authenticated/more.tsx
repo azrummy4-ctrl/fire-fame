@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/more")({
   component: MorePage,
 });
 
-const SUPPORT_URL = "https://t.me/XpiralSoftware";
+const SUPPORT_URL = "https://wa.me/917679621148";
 
 const rows: ReadonlyArray<{ label: string; icon: typeof Gift; to?: string; external?: boolean }> = [
   { label: "Referral & rewards", icon: Gift, to: "/earn" },

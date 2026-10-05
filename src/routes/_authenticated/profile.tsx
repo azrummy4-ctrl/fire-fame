@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 const rows: ReadonlyArray<{ label: string; icon: typeof Gift; href?: string }> = [
   { label: "Referral & rewards", icon: Gift },
-  { label: "Support", icon: LifeBuoy, href: "https://t.me/XpiralSoftware" },
+  { label: "Support", icon: LifeBuoy, href: "https://wa.me/917679621148" },
   { label: "Terms, Privacy & Refund policy", icon: ScrollText },
   { label: "Responsible gaming", icon: ShieldCheck },
 ];
