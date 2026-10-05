@@ -49,6 +49,7 @@ function WithdrawPage() {
   });
 
   const balance = Number(wallet?.balance ?? 0);
+  const winnings = Number(wallet?.winnings ?? 0);
   const pending = requests?.some((request) => request.status === "pending") ?? false;
   const disabled = settings?.enabled === false || pending;
 
@@ -65,11 +66,14 @@ function WithdrawPage() {
       </div>
 
       <div className="py-9 text-center">
-        <p className="text-sm text-muted-foreground">Available balance</p>
+        <p className="text-sm text-muted-foreground">Withdrawable winnings</p>
         <div className="mt-2 flex items-center justify-center gap-3">
           <span className="grid size-12 place-items-center rounded-full border-2 border-gold/50 bg-gold/15 text-gold"><Coins className="size-6" /></span>
-          <span className="font-display text-5xl font-bold text-gold">{formatINR(balance)}</span>
+          <span className="font-display text-5xl font-bold text-gold">{formatINR(winnings)}</span>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Total balance {formatINR(balance)} · Sirf winning cash withdraw ho sakta hai, deposit wala nahi.
+        </p>
       </div>
 
       <div className="flex items-center justify-between gap-3">
