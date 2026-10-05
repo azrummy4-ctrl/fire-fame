@@ -65,6 +65,7 @@ function WithdrawMethodPage() {
 
   const min = settings?.min_withdrawal ?? 100;
   const balance = Number(wallet?.balance ?? 0);
+  const winnings = Number(wallet?.winnings ?? 0);
   const disabled = settings?.enabled === false || pending === true;
 
   const upiValid = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/.test(upi.trim());
@@ -115,11 +116,14 @@ function WithdrawMethodPage() {
       </div>
 
       <div className="py-6 text-center">
-        <p className="text-sm text-muted-foreground">Available balance</p>
+        <p className="text-sm text-muted-foreground">Withdrawable winnings</p>
         <div className="mt-2 flex items-center justify-center gap-2">
           <Coins className="size-5 text-gold" />
-          <span className="font-display text-4xl font-bold text-gold">{formatINR(balance)}</span>
+          <span className="font-display text-4xl font-bold text-gold">{formatINR(winnings)}</span>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Total balance {formatINR(balance)} · Sirf winning cash withdraw ho sakta hai, deposit wala nahi.
+        </p>
       </div>
 
       {settings?.enabled === false && <p className="text-sm text-muted-foreground">Aapke region mein withdrawal abhi available nahi hai.</p>}
@@ -130,12 +134,12 @@ function WithdrawMethodPage() {
           <h2 className="font-display text-xl font-bold">Redeem Vouchers</h2>
           <div className="mt-4 grid grid-cols-2 gap-3">
             {REDEEM_AMOUNTS.map((value) => {
-              const locked = balance < value || value < min;
+              const locked = winnings < value || value < min;
               return (
                 <div key={value} className={`rounded-lg border bg-surface p-4 text-center ${selected === value ? "border-primary" : "border-border"}`}>
                   <p className="font-display text-2xl font-bold">{formatINR(value)}</p>
-                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground"><Coins className="size-4 text-gold" />{Math.floor(Math.min(balance, value))} of {value}</p>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-primary" style={{ width: `${redeemProgress(balance, value)}%` }} /></div>
+                  <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground"><Coins className="size-4 text-gold" />{Math.floor(Math.min(winnings, value))} of {value}</p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-primary" style={{ width: `${redeemProgress(winnings, value)}%` }} /></div>
                   <Button size="sm" disabled={locked} onClick={() => onVoucherClick(value)} className="mt-3 w-full rounded-full" aria-label={locked ? `${value} locked` : `Redeem ${value}`}>
                     {locked ? <Lock /> : "Redeem"}
                   </Button>
