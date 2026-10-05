@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Megaphone, RefreshCw, CalendarDays, CheckSquare } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { TournamentTile } from "@/components/TournamentCard";
+import { DEPOSIT_BONUSES } from "@/lib/deposit-bonus";
 import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
 import { requireSession } from "@/lib/auth-gate";
 import promoBanner from "@/assets/promo-banner.jpg";
@@ -34,6 +37,49 @@ const matchShortcuts = [
   { label: "Upcoming", icon: CalendarDays, tone: "bg-primary" },
   { label: "Completed", icon: CheckSquare, tone: "bg-gold" },
 ] as const;
+
+function HomeBanners() {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % 2), 5000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <section aria-label="Featured offers" className="mt-4">
+      <div className="relative h-44 overflow-hidden rounded-lg border border-primary/40 bg-surface">
+        <div aria-hidden={active !== 0} className={`absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none ${active === 0 ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
+          <img src={promoBanner} alt="Join daily tournaments" width={1200} height={688} className="h-full w-full object-cover" />
+          <Link to="/tournaments" tabIndex={active === 0 ? 0 : -1} className="absolute bottom-3 left-3 rounded-md bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+            More details
+          </Link>
+        </div>
+        <div aria-hidden={active !== 1} className={`absolute inset-0 overflow-hidden bg-surface-2 p-3 transition-opacity duration-500 motion-reduce:transition-none ${active === 1 ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-display text-xl font-bold leading-none text-foreground">FIREZONE <span className="text-gold">DEPOSIT BONUS</span></h2>
+            <Link to="/add-money" tabIndex={active === 1 ? 0 : -1} className="shrink-0 rounded-md bg-success px-2.5 py-1.5 text-xs font-bold text-primary-foreground">Add Money</Link>
+          </div>
+          <table className="mt-3 w-full table-fixed text-center text-sm font-bold tabular-nums">
+            <thead className="bg-background text-[11px] text-muted-foreground"><tr><th className="py-1">Deposit</th><th>Coins</th><th>Bonus</th><th>Total</th></tr></thead>
+            <tbody>{DEPOSIT_BONUSES.map(({ deposit, bonus }) => (
+              <tr key={deposit} className="border-t border-border/50 odd:bg-surface even:bg-surface-2">
+                <td className="py-1">₹{deposit}</td><td>{deposit}</td><td className="text-gold">+{bonus}</td><td className="text-success">{deposit + bonus}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      </div>
+      <div className="mt-2 flex justify-center gap-2" aria-label="Choose banner">
+        {[0, 1].map((index) => (
+          <Button key={index} type="button" variant="ghost" size="icon" aria-label={`Banner ${index + 1}`} aria-current={active === index ? "true" : undefined} onClick={() => setActive(index)} className="size-6 rounded-full p-0">
+            <span className={`size-2 rounded-full ${active === index ? "bg-primary" : "bg-muted-foreground"}`} />
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function Home() {
   const { data: tournaments, isLoading } = useTournaments();
@@ -68,23 +114,7 @@ function Home() {
         </p>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-primary/40">
-        <div className="relative">
-          <img
-            src={promoBanner}
-            alt="Join daily tournaments promotional banner"
-            width={1200}
-            height={688}
-            className="h-44 w-full object-cover"
-          />
-          <Link
-            to="/tournaments"
-            className="absolute bottom-3 left-3 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
-          >
-            More details
-          </Link>
-        </div>
-      </div>
+      <HomeBanners />
 
       <h2 className="mt-6 text-center font-display text-2xl font-bold">My Matches</h2>
       <div className="mt-3 grid grid-cols-3 gap-3">
