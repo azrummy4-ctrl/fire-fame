@@ -38,6 +38,7 @@ function WithdrawMethodPage() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<number | null>(null);
   const [upi, setUpi] = useState("");
+  const [upiOpen, setUpiOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const valid = method === "upi" || method === "google_play";
