@@ -48,6 +48,25 @@ function EarnPage() {
   const referralCode = profile?.referral_code ?? "";
   const shareUrl = referralCode ? `${window.location.origin}/auth?ref=${referralCode}` : "";
 
+  async function shareApp() {
+    const message = `Free Fire khelte ho? FireZone par tournament khelo aur coins jeeto! Mera referral code: ${referralCode}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "FireZone — Free Fire Tournaments",
+          text: message,
+          url: shareUrl || window.location.origin,
+        });
+        return;
+      } catch (err) {
+        // User closed the share sheet — do nothing.
+        if ((err as DOMException)?.name === "AbortError") return;
+      }
+    }
+    // Fallback: copy the referral link to the clipboard.
+    copy(shareUrl || message, "Referral link");
+  }
+
   async function copy(text: string, what: string) {
     try {
       await navigator.clipboard.writeText(text);
