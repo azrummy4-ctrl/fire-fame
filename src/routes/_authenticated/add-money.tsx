@@ -211,7 +211,7 @@ function AddMoneyPage() {
             <Headphones className="mt-0.5 size-4 shrink-0 text-success" />
             <span>
               <a
-                href="https://t.me/XpiralSoftware"
+                href="https://wa.me/917679621148"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-primary underline underline-offset-2"
