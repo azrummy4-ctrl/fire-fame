@@ -6,6 +6,13 @@ import { REDEEM_AMOUNTS, redeemProgress } from "@/lib/redeem";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { formatINR, useSession, useWallet } from "@/lib/api";
 
@@ -31,6 +38,7 @@ function WithdrawMethodPage() {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<number | null>(null);
   const [upi, setUpi] = useState("");
+  const [upiOpen, setUpiOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const valid = method === "upi" || method === "google_play";
@@ -59,18 +67,20 @@ function WithdrawMethodPage() {
   const balance = Number(wallet?.balance ?? 0);
   const disabled = settings?.enabled === false || pending === true;
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!valid || !selected) return;
+  const upiValid = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/.test(upi.trim());
+
+  async function submit(amount: number) {
+    if (!valid || !amount) return;
     setBusy(true);
     try {
-      const { error } = await supabase.rpc("request_redeem", { _amount: selected, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
+      const { error } = await supabase.rpc("request_redeem", { _amount: amount, _method: method, ...(method === "upi" ? { _upi: upi.trim() } : {}) });
       if (error) throw error;
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["wallet"] }),
         qc.invalidateQueries({ queryKey: ["withdrawals", user?.id] }),
         qc.invalidateQueries({ queryKey: ["transactions", user?.id] }),
       ]);
+      setUpiOpen(false);
       toast.success("Withdrawal request bhej di. Admin review ke baad payment hoga.");
       navigate({ to: "/withdraw" });
     } catch (error) {
@@ -78,6 +88,12 @@ function WithdrawMethodPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function onVoucherClick(value: number) {
+    setSelected(value);
+    if (method === "upi") setUpiOpen(true);
+    else submit(value);
   }
 
   if (!valid) {
@@ -120,7 +136,7 @@ function WithdrawMethodPage() {
                   <p className="font-display text-2xl font-bold">{formatINR(value)}</p>
                   <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground"><Coins className="size-4 text-gold" />{Math.floor(Math.min(balance, value))} of {value}</p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-primary" style={{ width: `${redeemProgress(balance, value)}%` }} /></div>
-                  <Button size="sm" disabled={locked} onClick={() => setSelected(value)} className="mt-3 w-full rounded-full" aria-label={locked ? `${value} locked` : `Redeem ${value}`}>
+                  <Button size="sm" disabled={locked} onClick={() => onVoucherClick(value)} className="mt-3 w-full rounded-full" aria-label={locked ? `${value} locked` : `Redeem ${value}`}>
                     {locked ? <Lock /> : "Redeem"}
                   </Button>
                 </div>
@@ -128,22 +144,45 @@ function WithdrawMethodPage() {
             })}
           </div>
 
-          {selected && (
-            <form onSubmit={submit} className="mt-5 space-y-4">
-              {method === "upi" ? (
-                <label className="block text-sm font-medium">UPI ID
-                  <input type="text" required value={upi} onChange={(e) => setUpi(e.target.value)} placeholder="name@bank" autoComplete="off" className="mt-2 w-full rounded-md border border-border bg-surface px-4 py-3 outline-none focus:border-primary" />
-                </label>
-              ) : (
-                <p className="text-sm text-muted-foreground">Admin approve karne ke baad Google Play redeem code History mein dikhega.</p>
-              )}
-              <Button type="submit" disabled={busy} className="h-12 w-full font-bold">
-                {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />} Redeem {formatINR(selected)}
-              </Button>
-            </form>
+          {method === "google_play" && (
+            <p className="mt-5 text-sm text-muted-foreground">Admin approve karne ke baad Google Play redeem code History mein dikhega.</p>
           )}
         </>
       )}
+
+      <Dialog open={upiOpen} onOpenChange={(open) => { if (!busy) { setUpiOpen(open); if (!open) setSelected(null); } }}>
+        <DialogContent className="w-[calc(100vw-2.5rem)] max-w-sm rounded-xl border-border bg-surface">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl font-bold">Enter UPI ID</DialogTitle>
+            <DialogDescription>
+              {selected ? `${formatINR(selected)} withdrawal request ke liye apni UPI ID daalein.` : "Apni UPI ID daalein."}
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (selected && upiValid) submit(selected);
+            }}
+            className="space-y-4"
+          >
+            <input
+              type="text"
+              required
+              autoFocus
+              value={upi}
+              onChange={(e) => setUpi(e.target.value)}
+              placeholder="yourname@bank"
+              autoComplete="off"
+              inputMode="email"
+              aria-label="UPI ID"
+              className="w-full rounded-md border border-border bg-surface-2 px-4 py-3 text-base outline-none focus:border-primary"
+            />
+            <Button type="submit" disabled={busy || !upiValid} className="h-12 w-full font-bold">
+              {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />} Redeem {selected ? formatINR(selected) : ""}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
