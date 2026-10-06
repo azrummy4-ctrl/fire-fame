@@ -78,6 +78,13 @@
       "when": 1791194308067,
       "tag": "0010_winnings_only_withdrawals",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791276745638,
+      "tag": "0011_block_join_after_start",
+      "breakpoints": true
     }
   ]
 }
