@@ -34,7 +34,7 @@ function TournamentsPage() {
   const [tab, setTab] = useState<(typeof tabs)[number]["key"]>("upcoming");
   const { data, isLoading } = useTournaments();
   const { data: counts } = useSlotCounts();
-  const list = (data ?? []).filter((t) => t.status === tab);
+  const list = (data ?? []).filter((t) => t.status === tab && !isOldCompleted(t));
 
   return (
     <AppShell>
