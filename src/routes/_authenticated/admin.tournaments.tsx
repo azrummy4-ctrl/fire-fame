@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog } from "@/lib/api";
+import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog, isOldCompleted } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
@@ -205,7 +205,8 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
 
       <h2 className="mt-6 font-display text-lg font-bold">{host ? "Mere tournaments" : "All tournaments"}</h2>
       {(() => {
-        const all = list ?? [];
+        // 24 ghante se purane resulted tournaments list se chhupa do (data DB me safe rehta hai).
+        const all = (list ?? []).filter((t) => !isOldCompleted(t as never));
         const groups = new Map<string, typeof all>();
         for (const t of all) {
           const c = (t.category || "OTHER").trim().toUpperCase();

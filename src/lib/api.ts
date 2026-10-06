@@ -240,6 +240,13 @@ function withEffectiveStatus(t: Tournament): Tournament {
   return { ...t, status: effectiveStatus(t) };
 }
 
+// Resulted tournaments match ke 24 ghante baad lists se chhup jate hain (DB me data safe rehta hai).
+export const COMPLETED_VISIBLE_MS = 24 * 60 * 60 * 1000;
+
+export function isOldCompleted(t: Pick<Tournament, "status" | "starts_at">, now = Date.now()) {
+  return t.status === "completed" && new Date(t.starts_at).getTime() + COMPLETED_VISIBLE_MS <= now;
+}
+
 export function useTournaments() {
   return useQuery({
     queryKey: ["tournaments"],

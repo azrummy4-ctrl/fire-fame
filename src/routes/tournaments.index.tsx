@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { TournamentRow } from "@/components/TournamentCard";
-import { useSlotCounts, useTournaments } from "@/lib/api";
+import { isOldCompleted, useSlotCounts, useTournaments } from "@/lib/api";
 import { requireSession } from "@/lib/auth-gate";
 
 export const Route = createFileRoute("/tournaments/")({
@@ -34,7 +34,7 @@ function TournamentsPage() {
   const [tab, setTab] = useState<(typeof tabs)[number]["key"]>("upcoming");
   const { data, isLoading } = useTournaments();
   const { data: counts } = useSlotCounts();
-  const list = (data ?? []).filter((t) => t.status === tab);
+  const list = (data ?? []).filter((t) => t.status === tab && !isOldCompleted(t));
 
   return (
     <AppShell>
