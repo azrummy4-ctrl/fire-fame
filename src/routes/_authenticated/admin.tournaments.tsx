@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog } from "@/lib/api";
+import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog, isOldCompleted } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
