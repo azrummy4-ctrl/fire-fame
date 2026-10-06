@@ -229,16 +229,28 @@ export function useIsAdmin() {
   });
 }
 
+// Time pura hote hi upcoming -> live (ongoing); result publish par DB status 'completed' ho jata hai.
+export function effectiveStatus(t: Pick<Tournament, "status" | "starts_at" | "results_published">, now = Date.now()) {
+  if (t.results_published) return "completed";
+  if (t.status === "upcoming" && new Date(t.starts_at).getTime() <= now) return "live";
+  return t.status;
+}
+
+function withEffectiveStatus(t: Tournament): Tournament {
+  return { ...t, status: effectiveStatus(t) };
+}
+
 export function useTournaments() {
   return useQuery({
     queryKey: ["tournaments"],
+    refetchInterval: 15_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournaments")
         .select("*")
         .order("starts_at", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as unknown as Tournament[];
+      return ((data ?? []) as unknown as Tournament[]).map(withEffectiveStatus);
     },
   });
 }
@@ -246,6 +258,7 @@ export function useTournaments() {
 export function useTournament(id: string) {
   return useQuery({
     queryKey: ["tournament", id],
+    refetchInterval: 15_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournaments")
@@ -253,7 +266,7 @@ export function useTournament(id: string) {
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
-      return data as unknown as Tournament | null;
+      return data ? withEffectiveStatus(data as unknown as Tournament) : null;
     },
   });
 }
