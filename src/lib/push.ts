@@ -76,7 +76,7 @@ let androidBridgeInstalled = false;
 export function installAndroidPushBridge() {
   if (androidBridgeInstalled || typeof window === "undefined") return;
   androidBridgeInstalled = true;
-  window["saveAndroidPushToken"] = async (token: unknown) => {
+  const saveAndroidToken = async (token: unknown) => {
     if (typeof token !== "string" || token.length < 10) return;
     try {
       await savePushToken({ data: { token, platform: "android" } });
@@ -84,4 +84,5 @@ export function installAndroidPushBridge() {
       console.error("Android push token save failed", error);
     }
   };
+  Object.assign(window, { saveAndroidPushToken: saveAndroidToken });
 }
