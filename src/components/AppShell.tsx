@@ -135,6 +135,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
+      <div className="px-4">
+        <PushPrompt />
+      </div>
+
       <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
 
       <nav className="app-header-gradient fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] rounded-t-2xl border-t border-border">
