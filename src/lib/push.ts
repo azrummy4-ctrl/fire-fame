@@ -76,9 +76,7 @@ let androidBridgeInstalled = false;
 export function installAndroidPushBridge() {
   if (androidBridgeInstalled || typeof window === "undefined") return;
   androidBridgeInstalled = true;
-  (window as unknown as Record<string, unknown>).saveAndroidPushToken = async (
-    token: unknown,
-  ) => {
+  window["saveAndroidPushToken"] = async (token: unknown) => {
     if (typeof token !== "string" || token.length < 10) return;
     try {
       await savePushToken({ data: { token, platform: "android" } });
