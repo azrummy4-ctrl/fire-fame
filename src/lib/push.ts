@@ -6,22 +6,29 @@ export type PushResult =
 
 // Push registration click handler se hi call karo — bina gesture browser prompt nahi dikhata.
 export async function enablePush(): Promise<PushResult> {
-  const appId = import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID as string | undefined;
-  const vapidKey = import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY as string | undefined;
-  const firebaseConfig = {
-    apiKey: import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY as string | undefined,
-    projectId: import.meta.env.VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID as string | undefined,
-    appId,
-    messagingSenderId: appId?.split(":")[1] ?? "",
-  };
+  const appId = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_APP_ID"] as
+    | string
+    | undefined;
+  const vapidKey = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_VAPID_KEY"] as
+    | string
+    | undefined;
+  const apiKey = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_WEB_API_KEY"] as
+    | string
+    | undefined;
+  const projectId = import.meta.env["VITE_LOVABLE_CONNECTOR_FIREBASE_MESSAGING_PROJECT_ID"] as
+    | string
+    | undefined;
 
-  if (
-    !firebaseConfig.apiKey ||
-    !firebaseConfig.projectId ||
-    !appId ||
-    !vapidKey ||
-    !firebaseConfig.messagingSenderId
-  ) {
+  if (!apiKey || !projectId || !appId || !vapidKey) {
+    return { status: "not-configured" };
+  }
+  const firebaseConfig = {
+    apiKey,
+    projectId,
+    appId,
+    messagingSenderId: appId.split(":")[1] ?? "",
+  };
+  if (!firebaseConfig.messagingSenderId) {
     return { status: "not-configured" };
   }
   if (!("Notification" in window) || !("serviceWorker" in navigator)) {
