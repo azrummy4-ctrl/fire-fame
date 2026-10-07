@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck } from "lucide-react";
-import type { ReactNode } from "react";
+import { Bell, BellRing, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import { formatINR, useIsAdmin, useNotifications, useSession, useWallet } from "@/lib/api";
+import { enablePush } from "@/lib/push";
 import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 const navItems = [
@@ -11,6 +13,69 @@ const navItems = [
   { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/more", label: "More", icon: Menu },
 ] as const;
+
+const PUSH_DISMISS_KEY = "fz_push_prompt_dismissed";
+
+function PushPrompt() {
+  const { session } = useSession();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (!session || !("Notification" in window)) return;
+    if (Notification.permission !== "default") return;
+    if (localStorage.getItem(PUSH_DISMISS_KEY) === "1") return;
+    setShow(true);
+  }, [session]);
+
+  if (!show) return null;
+
+  const dismiss = () => {
+    localStorage.setItem(PUSH_DISMISS_KEY, "1");
+    setShow(false);
+  };
+
+  const turnOn = async () => {
+    const result = await enablePush();
+    if (result.status === "registered") {
+      toast.success("Notifications on! 🎉", {
+        description: "Room ID, results aur wallet updates turant milenge.",
+      });
+    } else if (result.status === "denied") {
+      toast.error("Permission block hai", {
+        description: "Browser settings me is site ke notifications allow karein.",
+      });
+    } else if (result.status === "open-in-new-tab") {
+      toast("Naye tab me kholein", {
+        description: "Notifications enable karne ke liye app ko apne tab me kholkar try karein.",
+      });
+    } else if (result.status === "not-configured") {
+      toast.error("Abhi available nahi", { description: "Thodi der baad phir try karein." });
+    }
+    localStorage.setItem(PUSH_DISMISS_KEY, "1");
+    setShow(false);
+  };
+
+  return (
+    <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-primary/40 bg-surface-2 px-3 py-2.5">
+      <BellRing className="size-5 shrink-0 text-primary" />
+      <p className="flex-1 text-xs leading-snug">
+        <span className="font-bold">Match alerts on karein</span>
+        <span className="block text-muted-foreground">
+          Room ID, results aur wallet updates turant paayein.
+        </span>
+      </p>
+      <button
+        onClick={turnOn}
+        className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground"
+      >
+        Turn on
+      </button>
+      <button onClick={dismiss} aria-label="Dismiss" className="shrink-0 p-1 text-muted-foreground">
+        <X className="size-4" />
+      </button>
+    </div>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
