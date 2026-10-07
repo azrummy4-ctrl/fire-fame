@@ -33,6 +33,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin.withdrawals'
 import { Route as AuthenticatedWithdrawIndexRouteImport } from './routes/_authenticated/withdraw.index'
 import { Route as AuthenticatedWithdrawMethodRouteImport } from './routes/_authenticated/withdraw.$method'
+import { Route as ApiPublicPushFanoutRouteImport } from './routes/api/public/push/fanout'
 import { Route as ApiPublicWebhooksZapupiRouteImport } from './routes/api/public/webhooks/zapupi'
 
 const IndexRoute = IndexRouteImport.update({
@@ -161,6 +162,11 @@ const AuthenticatedWithdrawMethodRoute =
     path: '/$method',
     getParentRoute: () => AuthenticatedWithdrawRoute,
   } as any)
+const ApiPublicPushFanoutRoute = ApiPublicPushFanoutRouteImport.update({
+  id: '/api/public/push/fanout',
+  path: '/api/public/push/fanout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksZapupiRoute = ApiPublicWebhooksZapupiRouteImport.update({
   id: '/api/public/webhooks/zapupi',
   path: '/api/public/webhooks/zapupi',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/withdraw/': typeof AuthenticatedWithdrawIndexRoute
+  '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
 export interface FileRoutesByTo {
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/withdraw': typeof AuthenticatedWithdrawIndexRoute
+  '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
 export interface FileRoutesById {
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/withdraw/': typeof AuthenticatedWithdrawIndexRoute
+  '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
 export interface FileRouteTypes {
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/withdraw/$method'
     | '/admin/'
     | '/withdraw/'
+    | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/withdraw/$method'
     | '/admin'
     | '/withdraw'
+    | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   id:
     | '__root__'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/_authenticated/withdraw/$method'
     | '/_authenticated/admin/'
     | '/_authenticated/withdraw/'
+    | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   fileRoutesById: FileRoutesById
 }
@@ -335,6 +347,7 @@ export interface RootRouteChildren {
   GamesCategoryRoute: typeof GamesCategoryRoute
   TournamentsIdRoute: typeof TournamentsIdRoute
   TournamentsIndexRoute: typeof TournamentsIndexRoute
+  ApiPublicPushFanoutRoute: typeof ApiPublicPushFanoutRoute
   ApiPublicWebhooksZapupiRoute: typeof ApiPublicWebhooksZapupiRoute
 }
 
@@ -508,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWithdrawMethodRouteImport
       parentRoute: typeof AuthenticatedWithdrawRoute
     }
+    '/api/public/push/fanout': {
+      id: '/api/public/push/fanout'
+      path: '/api/public/push/fanout'
+      fullPath: '/api/public/push/fanout'
+      preLoaderRoute: typeof ApiPublicPushFanoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/zapupi': {
       id: '/api/public/webhooks/zapupi'
       path: '/api/public/webhooks/zapupi'
@@ -580,6 +600,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesCategoryRoute: GamesCategoryRoute,
   TournamentsIdRoute: TournamentsIdRoute,
   TournamentsIndexRoute: TournamentsIndexRoute,
+  ApiPublicPushFanoutRoute: ApiPublicPushFanoutRoute,
   ApiPublicWebhooksZapupiRoute: ApiPublicWebhooksZapupiRoute,
 }
 export const routeTree = rootRouteImport
