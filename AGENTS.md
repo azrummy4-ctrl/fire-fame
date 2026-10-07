@@ -14,3 +14,4 @@
 - Keep clean Home category artwork separate from poster-style tournament artwork so each surface preserves its intended presentation.
 - Keep withdrawal requests and history on a dedicated authenticated page while retaining the database payout function; this preserves server-validated balance and settlement rules.
 - Award promotional deposit bonuses on the server when a deposit changes to completed; this keeps gateway, webhook, and admin settlements consistent and prevents client-side bonus claims.
+- Send push notifications only through the DB trigger (`notify_push_fanout` → pg_net → `/api/public/push/fanout`) with the `x-push-secret` shared secret; the route fans out via the Firebase connector gateway. Do not send FCM from client code or bypass the secret check.
