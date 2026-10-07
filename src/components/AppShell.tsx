@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Bell, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
-import { formatINR, useIsAdmin, useSession, useWallet } from "@/lib/api";
+import { formatINR, useIsAdmin, useNotifications, useSession, useWallet } from "@/lib/api";
 import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 const navItems = [
@@ -17,6 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { session } = useSession();
   const { data: wallet } = useWallet();
   const { data: isAdmin } = useIsAdmin();
+  const { data: unread } = useNotifications();
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">
