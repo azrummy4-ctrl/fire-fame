@@ -84,6 +84,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: isAdmin } = useIsAdmin();
   const { unreadCount } = useNotifications();
 
+  useEffect(() => {
+    // APK ke native FCM token ko website side pe save karne ke liye bridge.
+    installAndroidPushBridge();
+  }, []);
+
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">
       <header className="app-header-gradient sticky top-0 z-30 rounded-b-2xl px-4 pb-3 pt-4 shadow-[var(--shadow-card)]">
