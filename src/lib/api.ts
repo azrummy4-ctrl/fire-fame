@@ -338,8 +338,10 @@ export function useNotifications() {
 
   useEffect(() => {
     if (!user) return;
+    // StrictMode double-mount me wahi channel dubara subscribe nahi ho sakta — unique naam zaroori hai.
+    const channelName = `notifications-${user.id}-${Date.now()}`;
     const channel = supabase
-      .channel(`notifications-${user.id}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
