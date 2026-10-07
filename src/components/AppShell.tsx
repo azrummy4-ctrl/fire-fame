@@ -3,7 +3,7 @@ import { Bell, BellRing, Coins, Gift, Home, Menu, Trophy, Wallet, ShieldCheck, X
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { formatINR, useIsAdmin, useNotifications, useSession, useWallet } from "@/lib/api";
-import { enablePush } from "@/lib/push";
+import { enablePush, installAndroidPushBridge } from "@/lib/push";
 import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 const navItems = [
@@ -83,6 +83,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: wallet } = useWallet();
   const { data: isAdmin } = useIsAdmin();
   const { unreadCount } = useNotifications();
+
+  useEffect(() => {
+    // APK ke native FCM token ko website side pe save karne ke liye bridge.
+    installAndroidPushBridge();
+  }, []);
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">

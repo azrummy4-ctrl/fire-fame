@@ -68,3 +68,21 @@ export async function enablePush(): Promise<PushResult> {
     return { status: "failed" };
   }
 }
+
+// Android APK (WebView) me service worker nahi chalta, isliye APK ka native
+// FCM token Kotlin se window.saveAndroidPushToken(token) ke through aata hai
+// aur yahi usse backend me save karta hai (same fanout pipeline).
+let androidBridgeInstalled = false;
+export function installAndroidPushBridge() {
+  if (androidBridgeInstalled || typeof window === "undefined") return;
+  androidBridgeInstalled = true;
+  const saveAndroidToken = async (token: unknown) => {
+    if (typeof token !== "string" || token.length < 10) return;
+    try {
+      await savePushToken({ data: { token, platform: "android" } });
+    } catch (error) {
+      console.error("Android push token save failed", error);
+    }
+  };
+  Object.assign(window, { saveAndroidPushToken: saveAndroidToken });
+}
