@@ -82,7 +82,10 @@ export const Route = createFileRoute("/api/public/push/fanout")({
             }
             const body = await res.text();
             console.error(`FCM send failed [${res.status}]: ${body}`);
-            if (res.status === 404 || body.includes("UNREGISTERED")) staleTokens.push(token);
+            // 404 UNREGISTERED ya 400 INVALID_ARGUMENT = token stale hai, hata do.
+            if (res.status === 404 || body.includes("UNREGISTERED") || body.includes("INVALID_ARGUMENT")) {
+              staleTokens.push(token);
+            }
           } catch (error) {
             console.error("FCM send error:", error);
           }
