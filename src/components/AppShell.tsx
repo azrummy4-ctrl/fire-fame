@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { session } = useSession();
   const { data: wallet } = useWallet();
   const { data: isAdmin } = useIsAdmin();
-  const { data: unread } = useNotifications();
+  const { unreadCount } = useNotifications();
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col">
@@ -57,9 +57,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               to="/notifications"
               aria-label="Notifications"
-              className="grid size-9 place-items-center rounded-full bg-surface-2 text-primary"
+              className="relative grid size-9 place-items-center rounded-full bg-surface-2 text-primary"
             >
               <Bell className="size-4.5" />
+              {!!unreadCount && (
+                <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>
