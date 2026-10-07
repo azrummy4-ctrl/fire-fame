@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import brFullMap from "@/assets/banner-br-full-map.jpg";
@@ -304,6 +305,71 @@ export function useSlotCounts() {
       return counts;
     },
   });
+}
+
+export type AppNotification = {
+  id: string;
+  user_id: string | null;
+  title: string;
+  body: string;
+  kind: string;
+  read: boolean;
+  created_at: string;
+};
+
+// Live notifications: unread badge ke liye count + naya notification aate hi turant alert.
+export function useNotifications() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ["notifications", user?.id],
+    enabled: !!user,
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as AppNotification[];
+    },
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    // StrictMode double-mount me wahi channel dubara subscribe nahi ho sakta — unique naam zaroori hai.
+    const channelName = `notifications-${user.id}-${Date.now()}`;
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+          const n = payload.new as AppNotification;
+          if (n?.title) toast(n.title, { description: n.body, duration: 5000 });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
+
+  const unreadCount = (query.data ?? []).filter((n) => !n.read).length;
+
+  const markAllRead = async () => {
+    if (!user) return;
+    await supabase
+      .from("notifications")
+      .update({ read: true })
+      .eq("user_id", user.id)
+      .eq("read", false);
+    queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+  };
+
+  return { ...query, unreadCount, markAllRead };
 }
 
 export function useInvalidate() {

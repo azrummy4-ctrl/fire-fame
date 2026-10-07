@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
-import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, useSession } from "@/lib/api";
+import { formatDateTime, useNotifications } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -19,34 +17,40 @@ export const Route = createFileRoute("/_authenticated/notifications")({
 });
 
 function NotificationsPage() {
-  const { user } = useSession();
-  const { data } = useQuery({
-    queryKey: ["notifications", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  const { data, unreadCount, markAllRead } = useNotifications();
+  const notifications = data ?? [];
 
   return (
     <AppShell>
-      <h1 className="font-display text-2xl font-bold">Notifications</h1>
-      {(data ?? []).length === 0 ? (
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-bold">Notifications</h1>
+        {unreadCount > 0 && (
+          <button
+            onClick={() => markAllRead()}
+            className="rounded-full border border-border bg-surface-2 px-3 py-1.5 text-xs font-semibold text-primary"
+          >
+            Mark all read ({unreadCount})
+          </button>
+        )}
+      </div>
+      {notifications.length === 0 ? (
         <p className="mt-3 rounded-xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground">
           Abhi koi notification nahi. Room ID release, results aur wallet updates yahan aayenge.
         </p>
       ) : (
         <ul className="mt-3 space-y-2">
-          {(data ?? []).map((n) => (
-            <li key={n.id} className="rounded-xl border border-border bg-surface px-3 py-3">
-              <p className="text-sm font-bold">{n.title}</p>
-              <p className="text-xs text-muted-foreground">{n.body}</p>
+          {notifications.map((n) => (
+            <li
+              key={n.id}
+              className={`rounded-xl border px-3 py-3 ${
+                n.read ? "border-border bg-surface" : "border-primary/40 bg-surface-2"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {!n.read && <span className="size-2 shrink-0 rounded-full bg-primary" />}
+                <p className="text-sm font-bold">{n.title}</p>
+              </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>
               <p className="mt-1 text-[10px] text-muted-foreground">{formatDateTime(n.created_at)}</p>
             </li>
           ))}
