@@ -60,7 +60,7 @@ export function MilestoneRewards() {
         </div>
       )}
       <Dialog open={selected !== null} onOpenChange={open => { if (!open && !spinning) setSelected(null); }}>
-        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-sm gap-5 overflow-y-auto rounded-lg border-spin-surface bg-spin-background px-5 py-6 text-spin-dark [&>button]:hidden" onEscapeKeyDown={e => { if (spinning) e.preventDefault(); }} onPointerDownOutside={e => { if (spinning) e.preventDefault(); }}>
+        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-sm gap-5 overflow-y-auto rounded-lg border-spin-surface bg-spin-background px-5 py-6 text-spin-dark [&>button.absolute]:hidden" onEscapeKeyDown={e => { if (spinning) e.preventDefault(); }} onPointerDownOutside={e => { if (spinning) e.preventDefault(); }}>
           <div className="flex items-center gap-3">
             <Button size="icon" variant="ghost" className="rounded-full bg-spin-surface text-spin-primary hover:bg-spin-surface" disabled={spinning} onClick={() => setSelected(null)} aria-label="Back to milestones"><ArrowLeft /></Button>
             <DialogTitle className="font-display text-2xl font-bold italic text-spin-primary">SPIN AND EARN</DialogTitle>
