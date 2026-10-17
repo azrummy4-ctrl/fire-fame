@@ -52,6 +52,11 @@
   --color-gold-foreground: var(--gold-foreground);
   --color-live: var(--live);
   --color-success: var(--success);
+  --color-spin-background: var(--spin-background);
+  --color-spin-surface: var(--spin-surface);
+  --color-spin-primary: var(--spin-primary);
+  --color-spin-dark: var(--spin-dark);
+  --color-spin-muted: var(--spin-muted);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -98,6 +103,16 @@
   --gold-foreground: oklch(0.2 0.04 250);
   --live: oklch(0.66 0.21 25);
   --success: oklch(0.74 0.17 155);
+  --spin-background: oklch(0.98 0.025 125);
+  --spin-surface: oklch(0.995 0.008 125);
+  --spin-primary: oklch(0.61 0.19 132);
+  --spin-dark: oklch(0.13 0.02 140);
+  --spin-muted: oklch(0.53 0.02 140);
+  --spin-wedge: oklch(0.83 0.25 130);
+  --spin-rim: oklch(0.8 0.17 75);
+  --spin-hub: oklch(0.89 0.14 95);
+  --spin-pointer: oklch(0.59 0.23 28);
+  --shadow-spin: 0 4px 20px oklch(0.61 0.19 132 / 0.12);
   --chart-1: oklch(0.72 0.16 225);
   --chart-2: oklch(0.84 0.16 88);
   --chart-3: oklch(0.74 0.17 155);
@@ -145,9 +160,16 @@
 }
 
 
-.milestone-wheel {
-  background: conic-gradient(var(--gold) 0deg 45deg, var(--primary) 45deg 90deg, var(--success) 90deg 135deg, var(--surface-2) 135deg 180deg, var(--gold) 180deg 225deg, var(--primary) 225deg 270deg, var(--success) 270deg 315deg, var(--surface-2) 315deg 360deg);
-}
+.spin-summary { box-shadow: var(--shadow-spin); }
+.spin-rim { fill: var(--spin-rim); }
+.spin-sector-dark { fill: var(--spin-dark); }
+.spin-sector-green { fill: var(--spin-wedge); }
+.spin-label-green { fill: var(--spin-wedge); }
+.spin-label-dark { fill: var(--spin-dark); }
+.spin-wheel-frame text { font-size: 24px; font-weight: 800; font-family: var(--font-body-family); }
+.spin-hub { fill: var(--spin-hub); }
+.spin-hub-icon { color: var(--spin-primary); }
+.spin-pointer { color: var(--spin-pointer); }
 .milestone-wheel-spinning { animation: milestone-spin 0.7s linear infinite; }
 @keyframes milestone-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .milestone-wheel-spinning { animation: none; } }
