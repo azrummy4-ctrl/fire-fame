@@ -96,10 +96,10 @@ function Home() {
     ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),
     ...tournamentGames.filter((t) => !homeGameCatalog.some((game) => game.category.toLowerCase() === t.category.toLowerCase())),
   ];
-  // Green badge counts only live (ongoing) tournaments — upcoming/resulted excluded.
+  // Green badge counts only upcoming tournaments (registration open) — live/resulted excluded.
   const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
-    if (t.status !== "live") return acc;
-    acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
+    if (t.status !== "upcoming") return acc;
+    acc[t.category] = (acc[t.category] ?? 0) + 1;
     return acc;
   }, {});
 
