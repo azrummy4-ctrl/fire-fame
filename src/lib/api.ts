@@ -248,6 +248,16 @@ export function isOldCompleted(t: Pick<Tournament, "status" | "starts_at">, now 
   return t.status === "completed" && new Date(t.starts_at).getTime() + COMPLETED_VISIBLE_MS <= now;
 }
 
+// Home game cards ka green badge sirf upcoming (join karne ke liye khule) tournaments ginta hai.
+export function homeUpcomingCounts(tournaments: Pick<Tournament, "category" | "status">[]) {
+  const counts: Record<string, number> = {};
+  for (const t of tournaments) {
+    if (t.status !== "upcoming") continue;
+    counts[t.category] = (counts[t.category] ?? 0) + 1;
+  }
+  return counts;
+}
+
 export function useTournaments() {
   return useQuery({
     queryKey: ["tournaments"],
