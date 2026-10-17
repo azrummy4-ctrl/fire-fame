@@ -30,6 +30,14 @@ function EarnPage() {
   const { data: profile } = useProfile();
   const [copied, setCopied] = useState(false);
 
+  // Earn page khulte hi milestone check hota hai — pure hue milestone wallet me auto credit hote hain.
+  const { data: milestones } = useQuery({
+    queryKey: ["milestones", user?.id],
+    enabled: !!user,
+    staleTime: 60_000,
+    queryFn: () => syncMilestones(),
+  });
+
   const { data: rewards } = useQuery({
     queryKey: ["earn-rewards", user?.id],
     enabled: !!user,
