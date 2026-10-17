@@ -85,6 +85,13 @@
       "when": 1791276745638,
       "tag": "0011_block_join_after_start",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792262692751,
+      "tag": "0012_milestone_claims",
+      "breakpoints": true
     }
   ]
 }
