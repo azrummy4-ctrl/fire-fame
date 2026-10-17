@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { TournamentTile } from "@/components/TournamentCard";
 import { DEPOSIT_BONUSES } from "@/lib/deposit-bonus";
-import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { hiddenCategories, homeGameCatalog, homeUpcomingCounts, useIsAdmin, useTournaments } from "@/lib/api";
 import { requireSession } from "@/lib/auth-gate";
 import promoBanner from "@/assets/promo-banner.jpg";
 
@@ -83,7 +83,6 @@ function HomeBanners() {
 
 function Home() {
   const { data: tournaments, isLoading } = useTournaments();
-  const { data: counts } = useSlotCounts();
   const { data: isAdmin } = useIsAdmin();
 
   // Keep all reference game modes visible even before an admin creates their first contest.
@@ -96,12 +95,8 @@ function Home() {
     ...homeGameCatalog.map((game) => ({ ...game, id: `catalog-${game.category}` })),
     ...tournamentGames.filter((t) => !homeGameCatalog.some((game) => game.category.toLowerCase() === t.category.toLowerCase())),
   ];
-  // Green badge counts only live (ongoing) tournaments — upcoming/resulted excluded.
-  const joinedByCategory = (tournaments ?? []).reduce<Record<string, number>>((acc, t) => {
-    if (t.status !== "live") return acc;
-    acc[t.category] = (acc[t.category] ?? 0) + (counts?.[t.id] ?? 0);
-    return acc;
-  }, {});
+  // Green badge counts only upcoming tournaments (registration open) — live/resulted excluded.
+  const joinedByCategory = homeUpcomingCounts(tournaments ?? []);
 
   return (
     <AppShell>
