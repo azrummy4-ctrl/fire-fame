@@ -98,6 +98,30 @@ export type Database = {
         }
         Relationships: []
       }
+      milestone_spins: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          milestone: number
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          milestone: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          milestone?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -540,6 +564,7 @@ export type Database = {
         }
       }
       can_manage_tournament: { Args: { _tid: string }; Returns: boolean }
+      claim_milestone_spin: { Args: { _milestone: number }; Returns: Json }
       create_deposit: {
         Args: { _amount: number; _provider_ref: string }
         Returns: {

@@ -92,6 +92,13 @@
       "when": 1792262692751,
       "tag": "0012_milestone_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792263217527,
+      "tag": "0013_milestone_spin_rewards",
+      "breakpoints": true
     }
   ]
 }
