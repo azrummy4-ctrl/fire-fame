@@ -1,27 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { MILESTONES, achievedMilestones, milestoneProgress } from "./milestones";
 
-describe("milestones", () => {
-  it("targets ascending hain aur rewards positive hain", () => {
-    for (let i = 1; i < MILESTONES.length; i++) {
-      expect(MILESTONES[i]!.matches).toBeGreaterThan(MILESTONES[i - 1]!.matches);
-    }
-    for (const m of MILESTONES) {
-      expect(m.amount).toBeGreaterThan(0);
-    }
+describe("milestone spin rules", () => {
+  it("offers only 5, 10, 15 and 20 matches", () => {
+    expect(MILESTONES.map(m => m.matches)).toEqual([5, 10, 15, 20]);
   });
-
-  it("progress 0-100 ke beech clamp hota hai", () => {
-    const { matches } = MILESTONES[0];
-    expect(milestoneProgress(0, matches)).toBe(0);
-    expect(milestoneProgress(matches, matches)).toBe(100);
-    expect(milestoneProgress(matches * 5, matches)).toBe(100);
+  it("5 matches pays only 1 or 2 rupees", () => {
+    expect(MILESTONES.find(m => m.matches === 5)).toEqual({ matches: 5, minAmount: 1, amount: 2 });
   });
-
-  it("sirf pure hue milestones achieved list me aate hain", () => {
-    const played = MILESTONES[1].matches;
-    expect(achievedMilestones(played)).toHaveLength(2);
-    expect(achievedMilestones(played - 1)).toHaveLength(1);
-    expect(achievedMilestones(0)).toHaveLength(0);
+  it.each([[10, 3], [15, 5], [20, 8]])("%i matches pays exactly %i rupees", (matches, amount) => {
+    expect(MILESTONES.find(m => m.matches === matches)).toEqual({ matches, minAmount: amount, amount });
+  });
+  it("unlocks a spin only once the target is complete", () => {
+    expect(achievedMilestones(4)).toEqual([]);
+    expect(achievedMilestones(5).map(m => m.matches)).toEqual([5]);
+    expect(achievedMilestones(19).map(m => m.matches)).toEqual([5, 10, 15]);
+    expect(achievedMilestones(20).map(m => m.matches)).toEqual([5, 10, 15, 20]);
+  });
+  it("clamps progress", () => {
+    expect(milestoneProgress(-1, 5)).toBe(0);
+    expect(milestoneProgress(3, 5)).toBe(60);
+    expect(milestoneProgress(30, 20)).toBe(100);
   });
 });
