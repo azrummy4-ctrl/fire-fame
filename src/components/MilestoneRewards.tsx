@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { MILESTONES, milestoneProgress, type Milestone } from "@/lib/milestones";
+import { MILESTONES, SPIN_WHEEL_DISPLAY, milestoneProgress, type Milestone } from "@/lib/milestones";
 import { syncMilestones, spinMilestone } from "@/lib/milestones.functions";
 import { useSession, formatINR } from "@/lib/api";
 import { SpinWheel } from "@/components/SpinWheel";
@@ -40,7 +40,7 @@ export function MilestoneRewards() {
   return (
     <section className="mt-5">
       <div className="flex items-center gap-2"><Flag className="size-5 text-gold" /><h2 className="font-display text-xl font-bold">Milestone Spins</h2></div>
-      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground"><span>{data?.played ?? 0} completed matches</span><span>Rewards up to ₹8</span></div>
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground"><span>{data?.played ?? 0} completed matches</span><span>Win up to ₹1000</span></div>
       {isError ? <Button variant="outline" className="mt-3" onClick={() => refetch()}>Retry</Button> : (
         <div className="mt-3 grid grid-cols-2 gap-3">
           {MILESTONES.map(m => {
@@ -67,10 +67,10 @@ export function MilestoneRewards() {
           </div>
           <div className="spin-summary flex items-center gap-3 rounded-full border-2 border-spin-surface bg-spin-surface px-4 py-4">
             <div className="grid size-12 shrink-0 place-items-center rounded-full bg-spin-primary text-spin-surface"><Trophy className="size-6" /></div>
-            <div className="min-w-0 flex-1"><p className="text-lg font-bold text-spin-primary">Lucky Wheel</p><DialogDescription className="text-[10px] font-bold text-spin-muted">{selected?.matches} MATCHES · WIN COINS</DialogDescription></div>
+            <div className="min-w-0 flex-1"><p className="text-lg font-bold text-spin-primary">Lucky Wheel</p><DialogDescription className="text-[10px] font-bold text-spin-muted">{selected?.matches} MATCHES · UPTO ₹1000</DialogDescription></div>
             <div className="text-center text-spin-primary"><p className="text-[10px] font-bold">SPINS LEFT</p><p className="text-3xl font-extrabold italic">{spinsLeft}</p></div>
           </div>
-          <SpinWheel spinning={spinning} amounts={selected?.minAmount === selected?.amount ? [selected?.amount ?? 1] : [1, 2]} />
+          <SpinWheel spinning={spinning} amounts={[...SPIN_WHEEL_DISPLAY]} />
           <p className="min-h-7 text-center text-lg font-bold text-spin-primary" aria-live="polite">{reward !== null ? `${formatINR(reward)} added to wallet!` : selectedClaim ? `Already won ${formatINR(Number(selectedClaim.amount))}` : canSpin ? "You have a free spin available." : `${Math.max(0, (selected?.matches ?? 0) - (data?.played ?? 0))} more matches to unlock`}</p>
           <Button size="lg" className="mx-auto h-12 w-full max-w-72 rounded-full bg-spin-primary text-lg font-bold text-spin-surface hover:bg-spin-primary/90" disabled={spinning || (reward === null && !canSpin)} onClick={reward === null ? spin : () => setSelected(null)}><RotateCw />{spinning ? "SPINNING…" : reward === null ? "SPIN TO WIN" : "DONE"}</Button>
           <p className="text-center text-xs font-bold text-spin-muted">{reward !== null ? "CONGRATULATIONS!" : "COMPLETE MATCHES TO GET MORE SPINS"}</p>
