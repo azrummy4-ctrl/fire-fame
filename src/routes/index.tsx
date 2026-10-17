@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { TournamentTile } from "@/components/TournamentCard";
 import { DEPOSIT_BONUSES } from "@/lib/deposit-bonus";
-import { hiddenCategories, homeGameCatalog, useIsAdmin, useSlotCounts, useTournaments } from "@/lib/api";
+import { hiddenCategories, homeGameCatalog, useIsAdmin, useTournaments } from "@/lib/api";
 import { requireSession } from "@/lib/auth-gate";
 import promoBanner from "@/assets/promo-banner.jpg";
 
@@ -83,7 +83,6 @@ function HomeBanners() {
 
 function Home() {
   const { data: tournaments, isLoading } = useTournaments();
-  const { data: counts } = useSlotCounts();
   const { data: isAdmin } = useIsAdmin();
 
   // Keep all reference game modes visible even before an admin creates their first contest.
