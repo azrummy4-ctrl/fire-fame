@@ -99,6 +99,13 @@
       "when": 1792263217527,
       "tag": "0013_milestone_spin_rewards",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792263396470,
+      "tag": "0014_allow_milestone_reward_transactions",
+      "breakpoints": true
     }
   ]
 }
