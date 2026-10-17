@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, Gift, Share2, Trophy, Users } from "lucide-react";
+import { Copy, Flag, Gift, Share2, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useProfile, useSession } from "@/lib/api";
+import { MILESTONES, milestoneProgress } from "@/lib/milestones";
+import { syncMilestones } from "@/lib/milestones.functions";
 
 export const Route = createFileRoute("/_authenticated/earn")({
   head: () => ({
