@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Coins, Flag, LockKeyhole, RotateCw } from "lucide-react";
+import { ArrowLeft, Flag, LockKeyhole, RotateCw, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { MILESTONES, milestoneProgress, type Milestone } from "@/lib/milestones";
 import { syncMilestones, spinMilestone } from "@/lib/milestones.functions";
 import { useSession, formatINR } from "@/lib/api";
+import { SpinWheel } from "@/components/SpinWheel";
 
 export function MilestoneRewards() {
   const { user } = useSession();
@@ -19,6 +20,9 @@ export function MilestoneRewards() {
   const [selected, setSelected] = useState<Milestone | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [reward, setReward] = useState<number | null>(null);
+  const spinsLeft = MILESTONES.filter(m => (data?.played ?? 0) >= m.matches && !data?.claims.some(c => c.milestone === m.matches)).length;
+  const selectedClaim = data?.claims.find(c => c.milestone === selected?.matches);
+  const canSpin = selected !== null && (data?.played ?? 0) >= selected.matches && !selectedClaim;
   async function spin() {
     if (!selected || spinning || reward !== null) return;
     setSpinning(true);
@@ -48,7 +52,7 @@ export function MilestoneRewards() {
               <p className="mt-1 text-xs text-gold">{m.minAmount === m.amount ? formatINR(m.amount) : "₹1–₹2"} reward</p>
               <Progress className="mt-3" value={milestoneProgress(played, m.matches)} aria-label={`${m.matches} match progress`} />
               <p className="mt-2 text-xs text-muted-foreground">{claim ? `Won ${formatINR(Number(claim.amount))}` : ready ? "1 spin available" : `${Math.max(0, m.matches - played)} matches baaki`}</p>
-              <Button className="mt-3 w-full" variant={claim ? "secondary" : "default"} disabled={Boolean(claim) || !ready || isPending} onClick={() => { setSelected(m); setReward(null); }}>
+              <Button className="mt-3 w-full" variant={claim ? "secondary" : "default"} disabled={isPending} onClick={() => { setSelected(m); setReward(null); }}>
                 {ready ? <RotateCw /> : <LockKeyhole />}{claim ? "Claimed" : "Spin"}
               </Button>
             </div>;
@@ -56,15 +60,20 @@ export function MilestoneRewards() {
         </div>
       )}
       <Dialog open={selected !== null} onOpenChange={open => { if (!open && !spinning) setSelected(null); }}>
-        <DialogContent className="max-w-[calc(100%-2rem)] rounded-lg sm:max-w-sm" onEscapeKeyDown={e => { if (spinning) e.preventDefault(); }} onPointerDownOutside={e => { if (spinning) e.preventDefault(); }}>
-          <DialogTitle className="text-center font-display text-2xl">{reward === null ? "Milestone Spin" : "Congratulations!"}</DialogTitle>
-          <DialogDescription className="text-center">{selected?.matches} Matches · {selected?.minAmount === selected?.amount ? formatINR(selected?.amount ?? 0) : "₹1–₹2"} reward</DialogDescription>
-          <div className="relative mx-auto grid size-52 place-items-center">
-            <div className={`milestone-wheel absolute inset-0 rounded-full border-4 border-gold ${spinning ? "milestone-wheel-spinning" : ""}`} />
-            <div className="relative grid size-24 place-items-center rounded-full border-4 border-gold bg-background text-gold"><Coins className="size-10" /></div>
+        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-sm gap-5 overflow-y-auto rounded-lg border-spin-surface bg-spin-background px-5 py-6 text-spin-dark [&>button.absolute]:hidden" onEscapeKeyDown={e => { if (spinning) e.preventDefault(); }} onPointerDownOutside={e => { if (spinning) e.preventDefault(); }}>
+          <div className="flex items-center gap-3">
+            <Button size="icon" variant="ghost" className="rounded-full bg-spin-surface text-spin-primary hover:bg-spin-surface" disabled={spinning} onClick={() => setSelected(null)} aria-label="Back to milestones"><ArrowLeft /></Button>
+            <DialogTitle className="font-display text-2xl font-bold italic text-spin-primary">SPIN AND EARN</DialogTitle>
           </div>
-          <p className="min-h-8 text-center font-display text-xl font-bold text-gold" aria-live="polite">{reward === null ? "Rewards up to ₹8" : `${formatINR(reward)} added to wallet`}</p>
-          <Button size="lg" disabled={spinning} onClick={reward === null ? spin : () => setSelected(null)}><RotateCw />{spinning ? "Spinning…" : reward === null ? "SPIN NOW" : "Done"}</Button>
+          <div className="spin-summary flex items-center gap-3 rounded-full border-2 border-spin-surface bg-spin-surface px-4 py-4">
+            <div className="grid size-12 shrink-0 place-items-center rounded-full bg-spin-primary text-spin-surface"><Trophy className="size-6" /></div>
+            <div className="min-w-0 flex-1"><p className="text-lg font-bold text-spin-primary">Lucky Wheel</p><DialogDescription className="text-[10px] font-bold text-spin-muted">{selected?.matches} MATCHES · WIN COINS</DialogDescription></div>
+            <div className="text-center text-spin-primary"><p className="text-[10px] font-bold">SPINS LEFT</p><p className="text-3xl font-extrabold italic">{spinsLeft}</p></div>
+          </div>
+          <SpinWheel spinning={spinning} amounts={selected?.minAmount === selected?.amount ? [selected?.amount ?? 1] : [1, 2]} />
+          <p className="min-h-7 text-center text-lg font-bold text-spin-primary" aria-live="polite">{reward !== null ? `${formatINR(reward)} added to wallet!` : selectedClaim ? `Already won ${formatINR(Number(selectedClaim.amount))}` : canSpin ? "You have a free spin available." : `${Math.max(0, (selected?.matches ?? 0) - (data?.played ?? 0))} more matches to unlock`}</p>
+          <Button size="lg" className="mx-auto h-12 w-full max-w-72 rounded-full bg-spin-primary text-lg font-bold text-spin-surface hover:bg-spin-primary/90" disabled={spinning || (reward === null && !canSpin)} onClick={reward === null ? spin : () => setSelected(null)}><RotateCw />{spinning ? "SPINNING…" : reward === null ? "SPIN TO WIN" : "DONE"}</Button>
+          <p className="text-center text-xs font-bold text-spin-muted">{reward !== null ? "CONGRATULATIONS!" : "COMPLETE MATCHES TO GET MORE SPINS"}</p>
         </DialogContent>
       </Dialog>
     </section>
