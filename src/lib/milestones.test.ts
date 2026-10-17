@@ -4,7 +4,7 @@ import { MILESTONES, achievedMilestones, milestoneProgress } from "./milestones"
 describe("milestones", () => {
   it("targets ascending hain aur rewards positive hain", () => {
     for (let i = 1; i < MILESTONES.length; i++) {
-      expect(MILESTONES[i].matches).toBeGreaterThan(MILESTONES[i - 1].matches);
+      expect(MILESTONES[i]!.matches).toBeGreaterThan(MILESTONES[i - 1]!.matches);
     }
     for (const m of MILESTONES) {
       expect(m.amount).toBeGreaterThan(0);
