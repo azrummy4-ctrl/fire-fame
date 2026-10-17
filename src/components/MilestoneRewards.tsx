@@ -49,7 +49,7 @@ export function MilestoneRewards() {
             const ready = played >= m.matches;
             return <div key={m.matches} className={`rounded-lg border p-3 ${claim ? "border-success/40 bg-success/10" : "border-border bg-surface"}`}>
               <p className="font-display text-lg font-bold">{m.matches} Matches</p>
-              <p className="mt-1 text-xs text-gold">{m.minAmount === m.amount ? formatINR(m.amount) : "₹1–₹2"} reward</p>
+              <p className="mt-1 text-xs text-gold">Upto ₹1000 reward</p>
               <Progress className="mt-3" value={milestoneProgress(played, m.matches)} aria-label={`${m.matches} match progress`} />
               <p className="mt-2 text-xs text-muted-foreground">{claim ? `Won ${formatINR(Number(claim.amount))}` : ready ? "1 spin available" : `${Math.max(0, m.matches - played)} matches baaki`}</p>
               <Button className="mt-3 w-full" variant={claim ? "secondary" : "default"} disabled={isPending} onClick={() => { setSelected(m); setReward(null); }}>
