@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Keep the Home game-mode catalogue independent from tournament rows so admins can add the first contest for an empty mode.
+- Keep milestone spin eligibility, one-time claims, wallet credit, and reward notification in one authenticated database transaction; this prevents replay rewards and partial settlements. Earn milestone reads must never auto-credit rewards.
 - Keep tournament team-size options in a shared module so host and admin forms use the same allowed choices.
 - Keep clean Home category artwork separate from poster-style tournament artwork so each surface preserves its intended presentation.
 - Keep withdrawal requests and history on a dedicated authenticated page while retaining the database payout function; this preserves server-validated balance and settlement rules.
