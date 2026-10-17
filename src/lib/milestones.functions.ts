@@ -1,66 +1,27 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { MILESTONES } from "./milestones";
 
-// Milestone rewards sirf server pe credit hote hain — client se amount claim nahi ho sakta.
-// Earn page khulte hi ye chalega: played count dekho, naye milestone pura hua to wallet me
-// auto credit + notification. Idempotent: milestone_claims me unique (user_id, milestone).
 export const syncMilestones = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const uid = context.userId;
-
-    // Matches played = result publish ho chuke tournaments jinme user join tha
-    const { count, error: cErr } = await context.supabase
+    const { data: matches, error } = await context.supabase
       .from("participants")
-      .select("id, tournaments!inner(results_published)", { count: "exact", head: true })
-      .eq("user_id", uid)
+      .select("tournament_id, tournaments!inner(results_published)")
+      .eq("user_id", context.userId)
       .eq("tournaments.results_published", true);
-    if (cErr) throw cErr;
-    const played = count ?? 0;
+    if (error) throw error;
+    const { data: claims, error: claimError } = await context.supabase
+      .from("milestone_spins").select("milestone, amount").eq("user_id", context.userId);
+    if (claimError) throw claimError;
+    return { played: new Set((matches ?? []).map(m => m.tournament_id)).size, claims: claims ?? [] };
+  });
 
-    const { data: claims, error: clErr } = await context.supabase
-      .from("milestone_claims")
-      .select("milestone")
-      .eq("user_id", uid);
-    if (clErr) throw clErr;
-    const claimed = new Set((claims ?? []).map((c) => Number(c.milestone)));
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    for (const m of MILESTONES) {
-      if (claimed.has(m.matches) || played < m.matches) continue;
-
-      // Insert first — unique constraint concurrent double-credit ko rokta hai
-      const { data: claim, error: insErr } = await supabaseAdmin
-        .from("milestone_claims")
-        .insert({ user_id: uid, milestone: m.matches, amount: m.amount })
-        .select("id")
-        .maybeSingle();
-      if (insErr) continue; // already claimed concurrently
-      if (!claim) continue;
-
-      const { error: walletErr } = await supabaseAdmin.rpc("wallet_apply", {
-        _user_id: uid,
-        _type: "milestone_reward",
-        _amount: m.amount,
-        _ref: claim.id as string,
-        _note: `Milestone: ${m.matches} matches played`,
-      });
-      if (walletErr) {
-        console.error("Milestone wallet credit failed", m.matches, walletErr);
-        continue;
-      }
-
-      await supabaseAdmin.from("notifications").insert({
-        user_id: uid,
-        title: "Milestone achieved! 🏆",
-        body: `Aapne ${m.matches} matches khel liye — ₹${m.amount} bonus wallet me add ho gaya!`,
-        kind: "reward",
-      });
-
-      claimed.add(m.matches);
-    }
-
-    return { played, claimedMilestones: [...claimed].sort((a, b) => a - b) };
+export const spinMilestone = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ milestone: z.union([z.literal(5), z.literal(10), z.literal(15), z.literal(20)]) }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { data: reward, error } = await context.supabase.rpc("claim_milestone_spin", { _milestone: data.milestone });
+    if (error) throw new Error(error.message);
+    return z.object({ amount: z.number(), milestone: z.number(), alreadyClaimed: z.boolean() }).parse(reward);
   });

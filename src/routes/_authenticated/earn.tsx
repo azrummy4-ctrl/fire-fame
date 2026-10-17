@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Copy, Flag, Gift, Share2, Trophy, Users } from "lucide-react";
+import { Copy, Gift, Share2, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR, useProfile, useSession } from "@/lib/api";
-import { MILESTONES, milestoneProgress } from "@/lib/milestones";
-import { syncMilestones } from "@/lib/milestones.functions";
+import { MilestoneRewards } from "@/components/MilestoneRewards";
 
 export const Route = createFileRoute("/_authenticated/earn")({
   head: () => ({
@@ -30,14 +29,6 @@ function EarnPage() {
   const { data: profile } = useProfile();
   const [copied, setCopied] = useState(false);
 
-  // Earn page khulte hi milestone check hota hai — pure hue milestone wallet me auto credit hote hain.
-  const { data: milestones } = useQuery({
-    queryKey: ["milestones", user?.id],
-    enabled: !!user,
-    staleTime: 60_000,
-    queryFn: () => syncMilestones(),
-  });
-
   const { data: rewards } = useQuery({
     queryKey: ["earn-rewards", user?.id],
     enabled: !!user,
@@ -45,8 +36,8 @@ function EarnPage() {
       const { data, error } = await supabase
         .from("transactions")
         .select("id, type, amount, note, created_at")
-        .eq("user_id", user!.id)
-        .in("type", ["referral_reward", "prize"])
+        .eq("user_id", user?.id ?? "")
+        .in("type", ["referral_reward", "prize", "milestone_reward"])
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
@@ -104,51 +95,10 @@ function EarnPage() {
       <div className="card-elevated mt-3 rounded-2xl border border-border bg-gradient-to-br from-primary/15 to-transparent p-4">
         <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Total earnings</p>
         <p className="font-display text-3xl font-bold text-gold">{formatINR(total)}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Prize + referral rewards, wallet me direct credit</p>
+        <p className="mt-1 text-xs text-muted-foreground">Prize + referral + milestone rewards</p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
-        <div className="flex items-center gap-2">
-          <Flag className="size-4.5 text-gold" />
-          <h2 className="font-display text-lg font-bold">Milestone Rewards</h2>
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Jitne match kheloge, utne bonus milega — milestone pure hote hi wallet me auto credit.
-        </p>
-        <div className="mt-3 space-y-2">
-          {MILESTONES.map((m) => {
-            const played = milestones?.played ?? 0;
-            const done = milestones?.claimedMilestones?.includes(m.matches) ?? false;
-            const pct = milestoneProgress(played, m.matches);
-            return (
-              <div
-                key={m.matches}
-                className={`rounded-xl border p-3 ${
-                  done ? "border-success/40 bg-success/10" : "border-border bg-surface-2"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="font-display text-sm font-bold">
-                    {m.matches} Matches {done && <span className="text-success">✓</span>}
-                  </p>
-                  <span className={`font-display text-sm font-bold ${done ? "text-success" : "text-gold"}`}>
-                    +{formatINR(m.amount)}
-                  </span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface">
-                  <div
-                    className={`h-full rounded-full ${done ? "bg-success" : "bg-gold"}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  {done ? "Bonus wallet me credit ho gaya" : `${Math.max(0, m.matches - played)} matches baaki`}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <MilestoneRewards />
 
       <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
         <div className="flex items-center gap-2">

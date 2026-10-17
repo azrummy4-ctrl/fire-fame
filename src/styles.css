@@ -144,3 +144,10 @@
   box-shadow: var(--shadow-card);
 }
 
+
+.milestone-wheel {
+  background: conic-gradient(var(--gold) 0deg 45deg, var(--primary) 45deg 90deg, var(--success) 90deg 135deg, var(--surface-2) 135deg 180deg, var(--gold) 180deg 225deg, var(--primary) 225deg 270deg, var(--success) 270deg 315deg, var(--surface-2) 315deg 360deg);
+}
+.milestone-wheel-spinning { animation: milestone-spin 0.7s linear infinite; }
+@keyframes milestone-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .milestone-wheel-spinning { animation: none; } }

@@ -1,0 +1,2 @@
+ALTER TABLE public.transactions DROP CONSTRAINT transactions_type_check;
+ALTER TABLE public.transactions ADD CONSTRAINT transactions_type_check CHECK (type IN ('deposit','deposit_bonus','entry_fee','prize','referral_reward','withdrawal','refund','admin_adjustment','milestone_reward'));
