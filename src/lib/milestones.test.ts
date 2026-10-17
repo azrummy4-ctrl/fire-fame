@@ -8,8 +8,11 @@ describe("milestone spin rules", () => {
   it("5 matches pays only 1 or 2 rupees", () => {
     expect(MILESTONES.find(m => m.matches === 5)).toEqual({ matches: 5, minAmount: 1, amount: 2 });
   });
-  it.each([[10, 3], [15, 5], [20, 8]])("%i matches pays exactly %i rupees", (matches, amount) => {
+  it.each([[10, 3], [15, 5], [20, 5]])("%i matches pays exactly %i rupees", (matches, amount) => {
     expect(MILESTONES.find(m => m.matches === matches)).toEqual({ matches, minAmount: amount, amount });
+  });
+  it("never pays more than 5 rupees", () => {
+    expect(MILESTONES.every(m => m.amount <= 5 && m.minAmount <= 5)).toBe(true);
   });
   it("unlocks a spin only once the target is complete", () => {
     expect(achievedMilestones(4)).toEqual([]);
