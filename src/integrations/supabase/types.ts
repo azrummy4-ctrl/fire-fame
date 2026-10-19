@@ -101,6 +101,7 @@ export type Database = {
       milestone_spins: {
         Row: {
           amount: number
+          claim_date: string
           created_at: string
           id: string
           milestone: number
@@ -108,6 +109,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          claim_date?: string
           created_at?: string
           id?: string
           milestone: number
@@ -115,6 +117,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          claim_date?: string
           created_at?: string
           id?: string
           milestone?: number
