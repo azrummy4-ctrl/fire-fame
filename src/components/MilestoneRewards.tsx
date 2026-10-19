@@ -40,7 +40,7 @@ export function MilestoneRewards() {
   return (
     <section className="mt-5">
       <div className="flex items-center gap-2"><Flag className="size-5 text-gold" /><h2 className="font-display text-xl font-bold">Milestone Spins</h2></div>
-      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground"><span>{data?.played ?? 0} completed matches</span><span>Win up to ₹1000</span></div>
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground"><span>Aaj {data?.played ?? 0} matches complete</span><span>Roz raat 12 baje reset</span></div>
       {isError ? <Button variant="outline" className="mt-3" onClick={() => refetch()}>Retry</Button> : (
         <div className="mt-3 grid grid-cols-2 gap-3">
           {MILESTONES.map(m => {
