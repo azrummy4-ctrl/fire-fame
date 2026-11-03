@@ -28,6 +28,7 @@ import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin.deposits'
+import { Route as AuthenticatedAdminPushRouteImport } from './routes/_authenticated/admin.push'
 import { Route as AuthenticatedAdminTournamentsRouteImport } from './routes/_authenticated/admin.tournaments'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin.withdrawals'
@@ -133,6 +134,11 @@ const AuthenticatedAdminDepositsRoute =
     path: '/admin/deposits',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPushRoute = AuthenticatedAdminPushRouteImport.update({
+  id: '/admin/push',
+  path: '/admin/push',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminTournamentsRoute =
   AuthenticatedAdminTournamentsRouteImport.update({
     id: '/admin/tournaments',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin/push': typeof AuthenticatedAdminPushRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments': typeof TournamentsIndexRoute
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
+  '/admin/push': typeof AuthenticatedAdminPushRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/tournaments/': typeof TournamentsIndexRoute
   '/_authenticated/admin/deposits': typeof AuthenticatedAdminDepositsRoute
+  '/_authenticated/admin/push': typeof AuthenticatedAdminPushRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/tournaments/'
     | '/admin/deposits'
+    | '/admin/push'
     | '/admin/tournaments'
     | '/admin/users'
     | '/admin/withdrawals'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/tournaments'
     | '/admin/deposits'
+    | '/admin/push'
     | '/admin/tournaments'
     | '/admin/users'
     | '/admin/withdrawals'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/tournaments/'
     | '/_authenticated/admin/deposits'
+    | '/_authenticated/admin/push'
     | '/_authenticated/admin/tournaments'
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/withdrawals'
@@ -486,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDepositsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/push': {
+      id: '/_authenticated/admin/push'
+      path: '/admin/push'
+      fullPath: '/admin/push'
+      preLoaderRoute: typeof AuthenticatedAdminPushRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/tournaments': {
       id: '/_authenticated/admin/tournaments'
       path: '/admin/tournaments'
@@ -565,6 +584,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedWithdrawRoute: typeof AuthenticatedWithdrawRouteWithChildren
   AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
+  AuthenticatedAdminPushRoute: typeof AuthenticatedAdminPushRoute
   AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
@@ -583,6 +603,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedWithdrawRoute: AuthenticatedWithdrawRouteWithChildren,
   AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
+  AuthenticatedAdminPushRoute: AuthenticatedAdminPushRoute,
   AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
