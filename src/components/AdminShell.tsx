@@ -8,6 +8,7 @@ const tabs = [
   { to: "/admin/deposits", label: "Deposits" },
   { to: "/admin/withdrawals", label: "Withdrawals" },
   { to: "/admin/users", label: "Users" },
+  { to: "/admin/push", label: "Push Notification" },
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
