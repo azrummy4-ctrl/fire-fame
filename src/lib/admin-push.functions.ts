@@ -57,7 +57,14 @@ export const broadcastPush = createServerFn({ method: "POST" })
                 body: data.body,
                 ...(data.image ? { image: data.image } : {}),
               },
-              data: { url: link, kind: "broadcast" },
+              data: {
+                title: data.title,
+                message: data.body,
+                body: data.body,
+                banner: data.image ?? "",
+                url: link,
+                kind: "broadcast",
+              },
               android: { priority: "high" },
               webpush: {
                 headers: { Urgency: "high" },
