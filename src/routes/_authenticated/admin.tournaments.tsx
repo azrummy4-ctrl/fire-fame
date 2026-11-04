@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { HostShell } from "@/components/HostShell";
 import { supabase } from "@/integrations/supabase/client";
-import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog, isOldCompleted } from "@/lib/api";
+import { bannerFor, categoryBannerKey, formatDateTime, formatINR, hiddenCategories, homeBannerFor, homeGameCatalog, isOldCompleted, TOURNAMENT_COLUMNS } from "@/lib/api";
 import { rulesFor } from "@/lib/tournament-rules";
 import { tournamentModes } from "@/lib/tournament-mode";
 
@@ -104,7 +104,7 @@ export function AdminTournaments({ host = false }: { host?: boolean }) {
   const { data: list } = useQuery({
     queryKey: ["admin", "tournaments", host],
     queryFn: async () => {
-      let q = supabase.from("tournaments").select("*").order("starts_at");
+      let q = supabase.from("tournaments").select(TOURNAMENT_COLUMNS).order("starts_at");
       if (host) {
         const { data: u } = await supabase.auth.getUser();
         q = q.eq("created_by", u.user?.id ?? "");
