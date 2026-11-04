@@ -72,6 +72,12 @@ export const Route = createFileRoute("/api/public/push/fanout")({
                   data: {
                     kind: notification.kind ?? "info",
                     notification_id: notification.id,
+                    url:
+                      notification.kind === "room"
+                        ? "https://fire-fame.lovable.app/my-games"
+                        : notification.kind === "result"
+                          ? "https://fire-fame.lovable.app/leaderboard"
+                          : "https://fire-fame.lovable.app/notifications",
                   },
                 },
               }),
