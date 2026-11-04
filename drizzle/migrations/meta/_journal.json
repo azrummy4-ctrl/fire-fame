@@ -120,6 +120,13 @@
       "when": 1792422672031,
       "tag": "0016_milestone_daily_reset",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793764730121,
+      "tag": "0017_tighten_rls_and_hide_room_credentials",
+      "breakpoints": true
     }
   ]
 }
