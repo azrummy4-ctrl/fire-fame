@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
-import { broadcastPush } from "@/lib/admin-push.functions";
+import { broadcastPush, getPushStats } from "@/lib/admin-push.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/push")({
   head: () => ({
@@ -29,6 +30,8 @@ const pages = [
 
 function AdminPush() {
   const send = useServerFn(broadcastPush);
+  const stats = useQuery({ queryKey: ["admin", "push-stats"], queryFn: () => getPushStats() });
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [image, setImage] = useState("");
@@ -47,6 +50,7 @@ function AdminPush() {
       setTitle("");
       setBody("");
       setImage("");
+      queryClient.invalidateQueries({ queryKey: ["admin", "push-stats"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Send nahi hua");
     } finally {
@@ -58,7 +62,16 @@ function AdminPush() {
   return (
     <AdminShell>
       <h1 className="font-display text-xl font-bold">Push Notification bhejo</h1>
-      <p className="text-xs text-muted-foreground">Sabhi users jinhone notification on kiya hai unko jayega.</p>
+      <p className="text-xs text-muted-foreground">
+        {stats.isLoading
+          ? "Devices check ho rahe hain..."
+          : `${stats.data?.devices ?? 0} devices registered (${stats.data?.users ?? 0} users) — notification unko jayega.`}
+      </p>
+      {(stats.data?.devices ?? 0) === 0 && (
+        <p className="mt-2 rounded-xl border border-border bg-surface-2 p-3 text-xs text-muted-foreground">
+          Koi device registered nahi hai. User ko https://fire-fame.lovable.app Chrome me khole aur Notifications page pe "Turn on" dabaayein — tab uska device add hoga. APK me native Firebase setup ke baad hi push aayega.
+        </p>
+      )}
       <div className="mt-4 space-y-3">
         <input className={input} placeholder="Title (jaise: Fire Zone Special Event! 🔥)" value={title} maxLength={100} onChange={(e) => setTitle(e.target.value)} />
         <textarea className={input} rows={3} placeholder="Message" value={body} maxLength={500} onChange={(e) => setBody(e.target.value)} />

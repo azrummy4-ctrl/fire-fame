@@ -96,3 +96,23 @@ export const broadcastPush = createServerFn({ method: "POST" })
 
     return { sent, total: tokens.length };
   });
+
+// Admin-only: kitne devices notification ke liye registered hain.
+export const getPushStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { count } = await supabaseAdmin
+      .from("push_tokens")
+      .select("id", { count: "exact", head: true });
+    const { data: users } = await supabaseAdmin
+      .from("push_tokens")
+      .select("user_id");
+    return { devices: count ?? 0, users: new Set((users ?? []).map((u) => u.user_id)).size };
+  });
