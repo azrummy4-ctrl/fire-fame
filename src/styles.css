@@ -173,3 +173,13 @@
 .milestone-wheel-spinning { animation: milestone-spin 0.7s linear infinite; }
 @keyframes milestone-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .milestone-wheel-spinning { animation: none; } }
+
+/* Lovable badge / branding links chhupao */
+a[href*="lovable.dev"],
+a[href*="lovable.app"],
+div:has(> a[href*="lovable"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
