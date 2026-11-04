@@ -258,6 +258,11 @@ export function homeUpcomingCounts(tournaments: Pick<Tournament, "category" | "s
   return counts;
 }
 
+// Room ID/Password kabhi client se read nahi hote — sirf get_room_details() RPC se.
+// DB me in columns ka SELECT grant nahi hai, isliye select(*) ki jagah ye list use karo.
+export const TOURNAMENT_COLUMNS =
+  "id, name, category, banner_url, mode, map, entry_fee, prize_pool, per_kill, max_players, starts_at, status, rules, prize_split, room_published, results_published, created_at, updated_at, created_by";
+
 export function useTournaments() {
   return useQuery({
     queryKey: ["tournaments"],
@@ -265,7 +270,7 @@ export function useTournaments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournaments")
-        .select("*")
+        .select(TOURNAMENT_COLUMNS)
         .order("starts_at", { ascending: true });
       if (error) throw error;
       return ((data ?? []) as unknown as Tournament[]).map(withEffectiveStatus);
@@ -280,7 +285,7 @@ export function useTournament(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tournaments")
-        .select("*")
+        .select(TOURNAMENT_COLUMNS)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
