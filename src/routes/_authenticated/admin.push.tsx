@@ -30,6 +30,8 @@ const pages = [
 
 function AdminPush() {
   const send = useServerFn(broadcastPush);
+  const stats = useQuery({ queryKey: ["admin", "push-stats"], queryFn: () => getPushStats() });
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [image, setImage] = useState("");
@@ -48,6 +50,7 @@ function AdminPush() {
       setTitle("");
       setBody("");
       setImage("");
+      queryClient.invalidateQueries({ queryKey: ["admin", "push-stats"] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Send nahi hua");
     } finally {
