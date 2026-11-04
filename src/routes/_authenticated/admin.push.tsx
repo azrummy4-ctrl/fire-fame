@@ -36,7 +36,10 @@ function AdminPush() {
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    if (!title.trim() || !body.trim()) return toast.error("Title aur message dono likho");
+    if (!title.trim() || !body.trim()) {
+      toast.error("Title aur message dono likho");
+      return;
+    }
     setBusy(true);
     try {
       const r = await send({ data: { title, body, image, link } });
