@@ -45,13 +45,20 @@ function AdminDashboard() {
   return (
     <AdminShell>
       <div className="grid grid-cols-2 gap-2">
-        <Card label="Users" value={String(data?.users ?? 0)} />
-        <Card label="Tournaments" value={String(data?.tournaments ?? 0)} />
+        <Link to="/admin/users" className="contents">
+          <Card label="Total Users" value={String(data?.users ?? 0)} hint="Click → Users" />
+        </Link>
+        <Link to="/admin/tournaments" className="contents">
+          <Card label="Tournaments" value={String(data?.tournaments ?? 0)} hint="Click → Tournaments" />
+        </Link>
         <Card
           label={`Pending withdrawals (${data?.pendingWithdrawals.length ?? 0})`}
           value={formatINR(wd)}
         />
         <Card label={`Pending deposits (${data?.pendingDeposits.length ?? 0})`} value={formatINR(dp)} />
+        <Link to="/admin/push" className="col-span-2">
+          <Card label="Push Notification" value="Bhejo →" hint="Click → Push page khulega" />
+        </Link>
       </div>
 
       <h2 className="mt-6 font-display text-lg font-bold">Recent admin activity</h2>
@@ -74,11 +81,12 @@ function AdminDashboard() {
   );
 }
 
-function Card({ label, value }: { label: string; value: string }) {
+function Card({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="card-elevated rounded-2xl border border-border p-4">
+    <div className="card-elevated h-full rounded-2xl border border-border p-4">
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className="font-display text-xl font-bold text-gold">{value}</p>
+      {hint && <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{hint}</p>}
     </div>
   );
 }
