@@ -134,6 +134,13 @@
       "when": 1793764905170,
       "tag": "0018_rls_real_predicates_settings_participants",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793859114128,
+      "tag": "0019_tournaments_read_real_predicate",
+      "breakpoints": true
     }
   ]
 }
