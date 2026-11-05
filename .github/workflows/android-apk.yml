@@ -39,8 +39,12 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # ubuntu-latest me Android SDK pehle se installed hota hai (ANDROID_HOME set).
+      # setup-android action yahan fail ho raha tha, isliye use nahi karte.
+      - name: Point Gradle to Android SDK
+        run: |
+          echo "sdk.dir=${ANDROID_HOME:-$ANDROID_SDK_ROOT}" > android/local.properties
+          cat android/local.properties
 
       - name: Build APK
         working-directory: android
