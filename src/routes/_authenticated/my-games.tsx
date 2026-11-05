@@ -26,7 +26,7 @@ function MyGames() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("participants")
-        .select("*, tournaments(*)")
+        .select(`*, tournaments(${TOURNAMENT_COLUMNS})`)
         .eq("user_id", user!.id)
         .order("joined_at", { ascending: false });
       if (error) throw error;
