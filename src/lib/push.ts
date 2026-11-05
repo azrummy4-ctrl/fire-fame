@@ -85,4 +85,30 @@ export function installAndroidPushBridge() {
     }
   };
   Object.assign(window, { saveAndroidPushToken: saveAndroidToken });
+  syncAndroidPushToken();
+}
+
+// APK ka token thodi der me aata hai, isliye kuch baar check karke save karo.
+let lastSavedAndroidToken: string | null = null;
+export function syncAndroidPushToken() {
+  if (typeof window === "undefined") return;
+  const bridge = (window as unknown as { AndroidPush?: { getToken(): string } }).AndroidPush;
+  if (!bridge) return;
+  let tries = 0;
+  const attempt = async () => {
+    tries += 1;
+    const token = bridge.getToken();
+    if (token && token.length >= 10) {
+      if (token === lastSavedAndroidToken) return;
+      try {
+        await savePushToken({ data: { token, platform: "android" } });
+        lastSavedAndroidToken = token;
+      } catch (error) {
+        console.error("Android push token save failed", error);
+      }
+      return;
+    }
+    if (tries < 10) setTimeout(attempt, 3000);
+  };
+  void attempt();
 }

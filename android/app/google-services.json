@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "767501707758",
+    "firebase_url": "https://fireplay-d55ea-default-rtdb.firebaseio.com",
+    "project_id": "fireplay-d55ea",
+    "storage_bucket": "fireplay-d55ea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767501707758:android:bc17da9a05cbaa3c8586ff",
+        "android_client_info": {
+          "package_name": "com.firefame.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAtWOCiHyIyXD1WGaB0DQk52M8XPhyuiU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
