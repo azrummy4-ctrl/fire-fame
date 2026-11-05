@@ -9,6 +9,8 @@ const config: CapacitorConfig = {
   },
   server: {
     androidScheme: "https",
+    url: "https://fire-fame.lovable.app",
+    cleartext: false,
   },
 };
 
