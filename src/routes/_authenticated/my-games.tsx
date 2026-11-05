@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDateTime, formatINR, useSession } from "@/lib/api";
+import { TOURNAMENT_COLUMNS, formatDateTime, formatINR, useSession } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/my-games")({
   head: () => ({
@@ -26,7 +26,7 @@ function MyGames() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("participants")
-        .select("*, tournaments(*)")
+        .select(`*, tournaments(${TOURNAMENT_COLUMNS})`)
         .eq("user_id", user!.id)
         .order("joined_at", { ascending: false });
       if (error) throw error;

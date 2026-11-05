@@ -601,6 +601,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_tournament_participant: {
+        Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
       join_tournament:
         | {
             Args: { _tournament_id: string }
