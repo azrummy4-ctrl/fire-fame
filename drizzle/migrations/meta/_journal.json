@@ -148,6 +148,13 @@
       "when": 1793859183400,
       "tag": "0020_tournaments_read_participant_helper",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794053988076,
+      "tag": "0021_admin_user_controls_and_device_id",
+      "breakpoints": true
     }
   ]
 }

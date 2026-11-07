@@ -217,6 +217,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          device_id: string | null
           ff_uid: string | null
           id: string
           ign: string | null
@@ -228,6 +229,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          device_id?: string | null
           ff_uid?: string | null
           id: string
           ign?: string | null
@@ -239,6 +241,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          device_id?: string | null
           ff_uid?: string | null
           id?: string
           ign?: string | null
@@ -483,6 +486,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_coins: {
+        Args: { _amount: number; _note?: string; _user_id: string }
+        Returns: number
+      }
+      admin_get_user_detail: {
+        Args: { _user_id: string }
+        Returns: {
+          balance: number
+          created_at: string
+          device_id: string
+          email: string
+          ign: string
+          referral_code: string
+          status: string
+          user_id: string
+        }[]
+      }
+      admin_list_users: {
+        Args: { _page?: number; _search?: string; _status?: string }
+        Returns: {
+          balance: number
+          created_at: string
+          device_id: string
+          email: string
+          ign: string
+          referral_code: string
+          status: string
+          total_count: number
+          user_id: string
+        }[]
+      }
       admin_publish_results: {
         Args: { _tournament_id: string }
         Returns: undefined
@@ -526,6 +560,10 @@ export type Database = {
       admin_set_host: {
         Args: { _enable: boolean; _user_id: string }
         Returns: undefined
+      }
+      admin_set_user_status: {
+        Args: { _status: string; _user_id: string }
+        Returns: string
       }
       admin_settle_deposit: {
         Args: { _decision: string; _id: string }
