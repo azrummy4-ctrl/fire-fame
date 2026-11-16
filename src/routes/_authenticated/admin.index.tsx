@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Ban, BellRing, Coins, CreditCard, Trophy, Users } from "lucide-react";
+import { Ban, BellRing, CreditCard, Trophy, Users } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR } from "@/lib/api";
@@ -24,7 +24,8 @@ function AdminDashboard() {
     queryKey: ["admin", "stats"],
     queryFn: async () => {
       const [users, tournaments, withdrawals, deposits, logs] = await Promise.all([
-        supabase.from("profiles").select("id,status", { count: "exact" }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).neq("status", "active"),
         supabase.from("tournaments").select("id", { count: "exact", head: true }),
         supabase.from("withdrawals").select("amount").eq("status", "pending"),
         supabase.from("deposits").select("amount").eq("status", "pending"),
@@ -32,7 +33,7 @@ function AdminDashboard() {
       ]);
       return {
         users: users.count ?? 0,
-        blocked: (users.data ?? []).filter((u) => u.status !== "active").length,
+        blocked: 0,
         tournaments: tournaments.count ?? 0,
         pendingWithdrawals: withdrawals.data ?? [],
         pendingDeposits: deposits.data ?? [],

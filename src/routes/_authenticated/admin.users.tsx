@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 
 function AdminUsers() {
   const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
   const listUsers = useServerFn(listAdminUsers);
   const [search, setSearch] = useState("");
   const showBlocked = searchParams.status === "blocked";
@@ -45,7 +46,7 @@ function AdminUsers() {
           type="button"
           variant={showBlocked ? "default" : "outline"}
           size="sm"
-          onClick={() => window.history.replaceState(window.history.state, "", showBlocked ? "/admin/users" : "/admin/users?status=blocked")}
+          onClick={() => void navigate({ search: { status: showBlocked ? "all" : "blocked" } })}
         >
           {showBlocked ? <CircleCheck /> : <Ban />}
           {showBlocked ? "All users" : "Blocked"}
