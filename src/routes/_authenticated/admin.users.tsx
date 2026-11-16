@@ -1,17 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Search, UserRound, Ban, CircleCheck } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { listAdminUsers } from "@/lib/admin-users.functions";
+import { formatINR } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
+  validateSearch: (search: Record<string, unknown>) => ({ status: search.status === "blocked" ? "blocked" as const : "all" as const }),
   head: () => ({
     meta: [
-      { title: "Users & Account Status | FireZone Admin" },
-      { name: "description", content: "Search players by name or Free Fire UID and manage account status." },
-      { property: "og:title", content: "Users | FireZone Admin" },
-      { property: "og:description", content: "Player search, UID lookup and ban/unban controls." },
+      { title: "User Management | FireZone Admin" },
+      { name: "description", content: "Search FireZone accounts and review player status and coins." },
+      { property: "og:title", content: "User Management | FireZone Admin" },
+      { property: "og:description", content: "Search player accounts and manage blocked users." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -20,101 +24,82 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 });
 
 function AdminUsers() {
-  const qc = useQueryClient();
-  const [q, setQ] = useState("");
-
-  const { data: users } = useQuery({
-    queryKey: ["admin", "users"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(200);
-      if (error) throw error;
-      return data ?? [];
-    },
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const listUsers = useServerFn(listAdminUsers);
+  const [search, setSearch] = useState("");
+  const showBlocked = searchParams.status === "blocked";
+  const { data: users = [], isLoading, isError } = useQuery({
+    queryKey: ["admin", "user-list", search, showBlocked],
+    queryFn: () => listUsers({ data: { search, status: showBlocked ? "blocked" : "all", page: 1 } }),
   });
-
-  const { data: hosts } = useQuery({
-    queryKey: ["admin", "hosts"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("user_id").eq("role", "host");
-      if (error) throw error;
-      return new Set((data ?? []).map((r) => r.user_id));
-    },
-  });
-
-  async function toggleHost(id: string, enable: boolean) {
-    const { error } = await supabase.rpc("admin_set_host", { _user_id: id, _enable: enable });
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(enable ? "Host permission de di" : "Host permission hata di");
-    qc.invalidateQueries({ queryKey: ["admin", "hosts"] });
-  }
-
-  const filtered = (users ?? []).filter(
-    (u) =>
-      !q ||
-      (u.ign ?? "").toLowerCase().includes(q.toLowerCase()) ||
-      (u.ff_uid ?? "").includes(q),
-  );
-
-  async function setStatus(id: string, status: string) {
-    const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(`Account ${status}`);
-    qc.invalidateQueries({ queryKey: ["admin", "users"] });
-  }
+  const total = users[0]?.total_count ?? 0;
 
   return (
     <AdminShell>
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Search by name or Free Fire UID"
-        className="w-full rounded-xl border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary"
-      />
-      <ul className="mt-3 space-y-2">
-        {filtered.map((u) => (
-          <li key={u.id} className="rounded-xl border border-border bg-surface p-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-bold">{u.ign ?? "—"}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  UID {u.ff_uid ?? "—"} · {u.phone ?? "no phone"}
-                </p>
-              </div>
-              {hosts?.has(u.id) && <span className="mr-1 rounded-full bg-primary/20 px-2 py-1 text-[10px] font-bold text-primary">HOST</span>}
-              <span className="rounded-full bg-surface-2 px-2 py-1 text-[10px] font-bold uppercase">{u.status}</span>
-            </div>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {(["active", "suspended", "banned"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatus(u.id, s)}
-                  disabled={u.status === s}
-                  className="rounded-lg bg-surface-2 py-1.5 text-[11px] font-bold capitalize disabled:opacity-40"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => toggleHost(u.id, !hosts?.has(u.id))}
-              className={`mt-2 w-full rounded-lg py-1.5 text-[11px] font-bold ${hosts?.has(u.id) ? "bg-surface-2 text-live" : "bg-primary text-primary-foreground"}`}
-            >
-              {hosts?.has(u.id) ? "Remove Host permission" : "Make Host (tournament + results)"}
-            </button>
-          </li>
-        ))}
-        {filtered.length === 0 && (
-          <li className="rounded-xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">
-            Koi user nahi mila.
-          </li>
-        )}
-      </ul>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold">User Management</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{total} player accounts</p>
+        </div>
+        <Button
+          type="button"
+          variant={showBlocked ? "default" : "outline"}
+          size="sm"
+          onClick={() => void navigate({ search: { status: showBlocked ? "all" : "blocked" } })}
+        >
+          {showBlocked ? <CircleCheck /> : <Ban />}
+          {showBlocked ? "All users" : "Blocked"}
+        </Button>
+      </div>
+
+      <label className="relative mt-4 block">
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search name or Gmail"
+          maxLength={120}
+          className="h-11 w-full rounded-md border border-input bg-surface pl-9 pr-3 text-sm outline-none focus:border-primary"
+        />
+      </label>
+
+      {isLoading ? (
+        <p className="mt-5 text-center text-sm text-muted-foreground">Loading players…</p>
+      ) : isError ? (
+        <p className="mt-5 rounded-md border border-destructive/40 bg-surface p-4 text-sm">Players load nahi hue. Dobara try karein.</p>
+      ) : users.length === 0 ? (
+        <p className="mt-5 rounded-md border border-border bg-surface p-5 text-center text-sm text-muted-foreground">Koi player nahi mila.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-border border-y border-border">
+          {users.map((user) => (
+            <li key={user.user_id}>
+              <Link
+                to="/admin/users/$userId"
+                params={{ userId: user.user_id }}
+                className="flex min-h-20 items-center gap-3 py-3 transition-colors hover:bg-surface/70"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-2 text-primary">
+                  <UserRound className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold">{user.ign || "Player"}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{user.email || "Gmail unavailable"}</span>
+                </span>
+                <span className="shrink-0 text-right">
+                  <span className="block text-sm font-bold text-gold">{formatINR(Number(user.balance))}</span>
+                  <span className={`text-[10px] font-semibold uppercase ${user.status === "active" ? "text-success" : "text-live"}`}>
+                    {user.status === "active" ? "Active" : "Blocked"}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!showBlocked && total > users.length && (
+        <p className="mt-3 text-center text-xs text-muted-foreground">Showing first {users.length} of {total}; use search to find others.</p>
+      )}
     </AdminShell>
   );
 }

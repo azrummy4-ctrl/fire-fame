@@ -34,6 +34,7 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin.withdrawals'
 import { Route as AuthenticatedWithdrawIndexRouteImport } from './routes/_authenticated/withdraw.index'
 import { Route as AuthenticatedWithdrawMethodRouteImport } from './routes/_authenticated/withdraw.$method'
+import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin.users.$userId'
 import { Route as ApiPublicPushFanoutRouteImport } from './routes/api/public/push/fanout'
 import { Route as ApiPublicWebhooksZapupiRouteImport } from './routes/api/public/webhooks/zapupi'
 
@@ -168,6 +169,12 @@ const AuthenticatedWithdrawMethodRoute =
     path: '/$method',
     getParentRoute: () => AuthenticatedWithdrawRoute,
   } as any)
+const AuthenticatedAdminUsersUserIdRoute =
+  AuthenticatedAdminUsersUserIdRouteImport.update({
+    id: '/$userId',
+    path: '/$userId',
+    getParentRoute: () => AuthenticatedAdminUsersRoute,
+  } as any)
 const ApiPublicPushFanoutRoute = ApiPublicPushFanoutRouteImport.update({
   id: '/api/public/push/fanout',
   path: '/api/public/push/fanout',
@@ -199,11 +206,12 @@ export interface FileRoutesByFullPath {
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin/push': typeof AuthenticatedAdminPushRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/withdraw/': typeof AuthenticatedWithdrawIndexRoute
+  '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
@@ -226,11 +234,12 @@ export interface FileRoutesByTo {
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
   '/admin/push': typeof AuthenticatedAdminPushRoute
   '/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/withdraw': typeof AuthenticatedWithdrawIndexRoute
+  '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
@@ -256,11 +265,12 @@ export interface FileRoutesById {
   '/_authenticated/admin/deposits': typeof AuthenticatedAdminDepositsRoute
   '/_authenticated/admin/push': typeof AuthenticatedAdminPushRoute
   '/_authenticated/admin/tournaments': typeof AuthenticatedAdminTournamentsRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
   '/_authenticated/withdraw/$method': typeof AuthenticatedWithdrawMethodRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/withdraw/': typeof AuthenticatedWithdrawIndexRoute
+  '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/push/fanout': typeof ApiPublicPushFanoutRoute
   '/api/public/webhooks/zapupi': typeof ApiPublicWebhooksZapupiRoute
 }
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/withdraw/$method'
     | '/admin/'
     | '/withdraw/'
+    | '/admin/users/$userId'
     | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   fileRoutesByTo: FileRoutesByTo
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/withdraw/$method'
     | '/admin'
     | '/withdraw'
+    | '/admin/users/$userId'
     | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   id:
@@ -347,6 +359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/withdraw/$method'
     | '/_authenticated/admin/'
     | '/_authenticated/withdraw/'
+    | '/_authenticated/admin/users/$userId'
     | '/api/public/push/fanout'
     | '/api/public/webhooks/zapupi'
   fileRoutesById: FileRoutesById
@@ -540,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWithdrawMethodRouteImport
       parentRoute: typeof AuthenticatedWithdrawRoute
     }
+    '/_authenticated/admin/users/$userId': {
+      id: '/_authenticated/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
+      parentRoute: typeof AuthenticatedAdminUsersRoute
+    }
     '/api/public/push/fanout': {
       id: '/api/public/push/fanout'
       path: '/api/public/push/fanout'
@@ -572,6 +592,20 @@ const AuthenticatedWithdrawRouteWithChildren =
     AuthenticatedWithdrawRouteChildren,
   )
 
+interface AuthenticatedAdminUsersRouteChildren {
+  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
+}
+
+const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
+  {
+    AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
+  }
+
+const AuthenticatedAdminUsersRouteWithChildren =
+  AuthenticatedAdminUsersRoute._addFileChildren(
+    AuthenticatedAdminUsersRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAddMoneyRoute: typeof AuthenticatedAddMoneyRoute
   AuthenticatedEarnRoute: typeof AuthenticatedEarnRoute
@@ -586,7 +620,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminDepositsRoute: typeof AuthenticatedAdminDepositsRoute
   AuthenticatedAdminPushRoute: typeof AuthenticatedAdminPushRoute
   AuthenticatedAdminTournamentsRoute: typeof AuthenticatedAdminTournamentsRoute
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -605,7 +639,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminDepositsRoute: AuthenticatedAdminDepositsRoute,
   AuthenticatedAdminPushRoute: AuthenticatedAdminPushRoute,
   AuthenticatedAdminTournamentsRoute: AuthenticatedAdminTournamentsRoute,
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

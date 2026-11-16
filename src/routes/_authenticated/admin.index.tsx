@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Ban, BellRing, CreditCard, Trophy, Users } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDateTime, formatINR } from "@/lib/api";
@@ -24,6 +25,7 @@ function AdminDashboard() {
     queryFn: async () => {
       const [users, tournaments, withdrawals, deposits, logs] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).neq("status", "active"),
         supabase.from("tournaments").select("id", { count: "exact", head: true }),
         supabase.from("withdrawals").select("amount").eq("status", "pending"),
         supabase.from("deposits").select("amount").eq("status", "pending"),
@@ -31,6 +33,7 @@ function AdminDashboard() {
       ]);
       return {
         users: users.count ?? 0,
+        blocked: 0,
         tournaments: tournaments.count ?? 0,
         pendingWithdrawals: withdrawals.data ?? [],
         pendingDeposits: deposits.data ?? [],
@@ -44,22 +47,41 @@ function AdminDashboard() {
 
   return (
     <AdminShell>
-      <div className="grid grid-cols-2 gap-2">
-        <Link to="/admin/users" className="contents">
-          <Card label="Total Users" value={String(data?.users ?? 0)} hint="Click → Users" />
-        </Link>
-        <Link to="/admin/tournaments" className="contents">
-          <Card label="Tournaments" value={String(data?.tournaments ?? 0)} hint="Click → Tournaments" />
-        </Link>
-        <Card
-          label={`Pending withdrawals (${data?.pendingWithdrawals.length ?? 0})`}
-          value={formatINR(wd)}
-        />
-        <Card label={`Pending deposits (${data?.pendingDeposits.length ?? 0})`} value={formatINR(dp)} />
-        <Link to="/admin/push" className="col-span-2">
-          <Card label="Push Notification" value="Bhejo →" hint="Click → Push page khulega" />
-        </Link>
+      <div>
+        <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Management aur tournaments ek jagah.</p>
       </div>
+
+      <section className="mt-5">
+        <h2 className="mb-2 text-xs font-bold uppercase text-muted-foreground">Management</h2>
+        <div className="grid grid-cols-2 gap-2">
+        <Link to="/admin/users" className="contents">
+          <Card icon={Users} label="Total Users" value={String(data?.users ?? 0)} hint="Click → Users" />
+        </Link>
+        <Link to="/admin/users?status=blocked" className="contents">
+          <Card icon={Ban} label="Blocked users" value={String(data?.blocked ?? 0)} hint="Review / unblock" />
+        </Link>
+        <Link to="/admin/deposits" className="contents">
+          <Card icon={CreditCard}
+          label={`Pending withdrawals (${data?.pendingWithdrawals.length ?? 0})`}
+          value={`${formatINR(dp)} deposits`}
+          hint={`Withdrawals: ${formatINR(wd)}`} />
+        </Link>
+        <Link to="/admin/withdrawals" className="contents">
+          <Card icon={CreditCard} label={`Payments · ${data?.pendingWithdrawals.length ?? 0} withdrawals`} value={formatINR(wd)} hint={`Deposits: ${formatINR(dp)}`} />
+        </Link>
+        <Link to="/admin/push" className="col-span-2">
+          <Card icon={BellRing} label="Push Notification" value="Open →" hint="Push page khulega" />
+        </Link>
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <h2 className="mb-2 text-xs font-bold uppercase text-muted-foreground">Tournament</h2>
+        <Link to="/admin/tournaments" className="block">
+          <Card icon={Trophy} label="Tournaments" value={String(data?.tournaments ?? 0)} hint="Create aur manage contests →" />
+        </Link>
+      </section>
 
       <h2 className="mt-6 font-display text-lg font-bold">Recent admin activity</h2>
       <ul className="mt-2 space-y-2">
@@ -81,11 +103,14 @@ function AdminDashboard() {
   );
 }
 
-function Card({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Card({ icon: Icon, label, value, hint }: { icon: typeof Users; label: string; value: string; hint?: string }) {
   return (
-    <div className="card-elevated h-full rounded-2xl border border-border p-4">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="font-display text-xl font-bold text-gold">{value}</p>
+    <div className="card-elevated h-full rounded-lg border border-border p-3">
+      <div className="flex items-center gap-2">
+        <Icon className="size-4 shrink-0 text-primary" />
+        <p className="min-w-0 truncate text-[10px] font-bold uppercase text-muted-foreground">{label}</p>
+      </div>
+      <p className="mt-2 break-words font-display text-lg font-bold text-gold">{value}</p>
       {hint && <p className="mt-1 text-[10px] font-semibold text-muted-foreground">{hint}</p>}
     </div>
   );

@@ -2,13 +2,20 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useIsAdmin } from "@/lib/api";
 
-const tabs = [
-  { to: "/admin", label: "Dashboard" },
-  { to: "/admin/tournaments", label: "Tournaments" },
-  { to: "/admin/deposits", label: "Deposits" },
-  { to: "/admin/withdrawals", label: "Withdrawals" },
-  { to: "/admin/users", label: "Users" },
-  { to: "/admin/push", label: "Push Notification" },
+const navigationGroups = [
+  {
+    heading: "Management",
+    links: [
+      { to: "/admin/users", label: "Users" },
+      { to: "/admin/deposits", label: "Deposits" },
+      { to: "/admin/withdrawals", label: "Withdrawals" },
+      { to: "/admin/push", label: "Push Notification" },
+    ],
+  },
+  {
+    heading: "Tournament",
+    links: [{ to: "/admin/tournaments", label: "Tournaments" }],
+  },
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -46,17 +53,26 @@ export function AdminShell({ children }: { children: ReactNode }) {
             Exit
           </Link>
         </div>
-        <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {tabs.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold ${
-                pathname === t.to ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted-foreground"
-              }`}
-            >
-              {t.label}
-            </Link>
+        <nav className="mt-3 space-y-2">
+          {navigationGroups.map((group) => (
+            <section key={group.heading}>
+              <p className="mb-1 px-1 text-[10px] font-bold uppercase text-muted-foreground">{group.heading}</p>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {group.links.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-bold ${
+                      pathname === link.to || pathname.startsWith(`${link.to}/`)
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-surface-2 text-muted-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </section>
           ))}
         </nav>
       </header>
