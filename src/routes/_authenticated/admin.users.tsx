@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, UserRound, Ban, CircleCheck } from "lucide-react";
@@ -9,6 +9,7 @@ import { listAdminUsers } from "@/lib/admin-users.functions";
 import { formatINR } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
+  validateSearch: (search: Record<string, unknown>) => ({ status: search.status === "blocked" ? "blocked" as const : "all" as const }),
   head: () => ({
     meta: [
       { title: "User Management | FireZone Admin" },
@@ -23,9 +24,10 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 });
 
 function AdminUsers() {
+  const searchParams = Route.useSearch();
   const listUsers = useServerFn(listAdminUsers);
   const [search, setSearch] = useState("");
-  const [showBlocked, setShowBlocked] = useState(false);
+  const showBlocked = searchParams.status === "blocked";
   const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ["admin", "user-list", search, showBlocked],
     queryFn: () => listUsers({ data: { search, status: showBlocked ? "blocked" : "all", page: 1 } }),
@@ -43,7 +45,7 @@ function AdminUsers() {
           type="button"
           variant={showBlocked ? "default" : "outline"}
           size="sm"
-          onClick={() => setShowBlocked((value) => !value)}
+          onClick={() => window.history.replaceState(window.history.state, "", showBlocked ? "/admin/users" : "/admin/users?status=blocked")}
         >
           {showBlocked ? <CircleCheck /> : <Ban />}
           {showBlocked ? "All users" : "Blocked"}
