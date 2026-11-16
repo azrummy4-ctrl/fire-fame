@@ -1,10 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
-const adminRole = async (context: { supabase: any; userId: string }) => {
-  const { data, error } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
+const assertAdmin = async (supabase: SupabaseClient<Database>, userId: string) => {
+  const { data, error } = await supabase.rpc("has_role", {
+    _user_id: userId,
     _role: "admin",
   });
   if (error || !data) throw new Error("Admin access required");
@@ -20,7 +22,7 @@ export const listAdminUsers = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await adminRole(context);
+    await assertAdmin(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase.rpc("admin_list_users", {
       _search: data.search,
       _status: data.status,
@@ -34,7 +36,7 @@ export const getAdminUserDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ userId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await adminRole(context);
+    await assertAdmin(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase.rpc("admin_get_user_detail", {
       _user_id: data.userId,
     });
@@ -50,7 +52,7 @@ export const setAdminUserStatus = createServerFn({ method: "POST" })
     z.object({ userId: z.string().uuid(), status: z.enum(["active", "banned"]) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await adminRole(context);
+    await assertAdmin(context.supabase, context.userId);
     const { data: status, error } = await context.supabase.rpc("admin_set_user_status", {
       _user_id: data.userId,
       _status: data.status,
@@ -69,7 +71,7 @@ export const adjustAdminUserCoins = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await adminRole(context);
+    await assertAdmin(context.supabase, context.userId);
     const { data: balance, error } = await context.supabase.rpc("admin_adjust_coins", {
       _user_id: data.userId,
       _amount: data.amount,
