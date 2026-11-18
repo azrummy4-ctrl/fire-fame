@@ -28,10 +28,11 @@ function AdminUsers() {
   const navigate = Route.useNavigate();
   const listUsers = useServerFn(listAdminUsers);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const showBlocked = searchParams.status === "blocked";
   const { data: users = [], isLoading, isError } = useQuery({
-    queryKey: ["admin", "user-list", search, showBlocked],
-    queryFn: () => listUsers({ data: { search, status: showBlocked ? "blocked" : "all", page: 1 } }),
+    queryKey: ["admin", "user-list", search, showBlocked, page],
+    queryFn: () => listUsers({ data: { search, status: showBlocked ? "blocked" : "all", page } }),
   });
   const total = users[0]?.total_count ?? 0;
 
@@ -57,7 +58,7 @@ function AdminUsers() {
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) => { setSearch(event.target.value); setPage(1); }}
           placeholder="Search name or Gmail"
           maxLength={120}
           className="h-11 w-full rounded-md border border-input bg-surface pl-9 pr-3 text-sm outline-none focus:border-primary"
@@ -97,8 +98,12 @@ function AdminUsers() {
           ))}
         </ul>
       )}
-      {!showBlocked && total > users.length && (
-        <p className="mt-3 text-center text-xs text-muted-foreground">Showing first {users.length} of {total}; use search to find others.</p>
+      {total > 50 && (
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <Button type="button" variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</Button>
+          <span className="text-xs text-muted-foreground">Page {page} · {total} players</span>
+          <Button type="button" variant="outline" size="sm" disabled={page * 50 >= total} onClick={() => setPage((value) => value + 1)}>Next</Button>
+        </div>
       )}
     </AdminShell>
   );

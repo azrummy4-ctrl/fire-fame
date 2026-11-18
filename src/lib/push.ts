@@ -1,4 +1,5 @@
 import { savePushToken } from "@/lib/push.functions";
+import { saveAndroidDeviceId } from "@/lib/device-id.functions";
 
 export type PushResult =
   | { status: "registered"; token: string }
@@ -84,8 +85,18 @@ export function installAndroidPushBridge() {
       console.error("Android push token save failed", error);
     }
   };
+  const saveAndroidDevice = async (deviceId: unknown) => {
+    if (typeof deviceId !== "string" || deviceId.length < 8 || deviceId.length > 128) return;
+    try {
+      await saveAndroidDeviceId({ data: { deviceId } });
+    } catch (error) {
+      console.error("Android device ID save failed", error);
+    }
+  };
   Object.assign(window, { saveAndroidPushToken: saveAndroidToken });
+  Object.assign(window, { saveAndroidDeviceId: saveAndroidDevice });
   syncAndroidPushToken();
+  syncAndroidDeviceId();
 }
 
 // APK ka token thodi der me aata hai, isliye kuch baar check karke save karo.
@@ -111,4 +122,17 @@ export function syncAndroidPushToken() {
     if (tries < 10) setTimeout(attempt, 3000);
   };
   void attempt();
+  syncAndroidDeviceId();
+}
+
+let lastSavedAndroidDeviceId: string | null = null;
+export function syncAndroidDeviceId() {
+  if (typeof window === "undefined") return;
+  const bridge = (window as unknown as { AndroidPush?: { getDeviceId(): string } }).AndroidPush;
+  if (!bridge) return;
+  const deviceId = bridge.getDeviceId();
+  if (!deviceId || deviceId === lastSavedAndroidDeviceId || deviceId.length < 8 || deviceId.length > 128) return;
+  void saveAndroidDeviceId({ data: { deviceId } })
+    .then(() => { lastSavedAndroidDeviceId = deviceId; })
+    .catch((error) => console.error("Android device ID save failed", error));
 }

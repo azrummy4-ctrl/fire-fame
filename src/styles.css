@@ -130,6 +130,16 @@
   --gradient-app: linear-gradient(180deg, oklch(0.28 0.07 245) 0%, oklch(0.19 0.045 250) 42%, oklch(0.17 0.04 252) 100%);
   --gradient-header: linear-gradient(180deg, oklch(0.33 0.075 243) 0%, oklch(0.24 0.055 248) 100%);
   --shadow-card: 0 12px 30px -16px oklch(0.1 0.04 250 / 0.9);
+  --google-button-background: #131314;
+  --google-button-border: #8E918F;
+  --google-button-foreground: #E3E3E3;
+}
+
+.google-sign-in-button {
+  background: var(--google-button-background);
+  border-color: var(--google-button-border);
+  color: var(--google-button-foreground);
+  font-family: "Google Sans", var(--font-body-family);
 }
 
 @layer base {

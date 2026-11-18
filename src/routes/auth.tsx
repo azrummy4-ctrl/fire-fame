@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useSession } from "@/lib/api";
+import { useProfile, useSession } from "@/lib/api";
+import { lovable } from "@/integrations/lovable";
 import firezoneLogo from "@/assets/firezone-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
@@ -34,6 +36,7 @@ function AuthPage() {
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
   const { session } = useSession();
+  const { data: profile, isLoading: profileLoading } = useProfile();
 
   useEffect(() => {
     const r = new URLSearchParams(window.location.search).get("ref");
@@ -41,8 +44,30 @@ function AuthPage() {
   }, []);
 
   useEffect(() => {
-    if (session) navigate({ to: "/", replace: true });
-  }, [session, navigate]);
+    if (!session || profileLoading || !profile) return;
+    if (!profile.ff_uid || !profile.ign) {
+      navigate({ to: "/profile", replace: true });
+      return;
+    }
+    navigate({ to: "/", replace: true });
+  }, [session, profile, profileLoading, navigate]);
+
+  async function continueWithGoogle() {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+        extraParams: { prompt: "select_account" },
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      // Session changes are handled above; Gmail selection alone is never treated as login.
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Google sign-in nahi ho paya.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,7 +83,6 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back!");
-        navigate({ to: "/", replace: true });
       } else {
         if (!ign.trim() || !ffUid.trim()) throw new Error("In-game name and Free Fire UID required");
         const { data, error } = await supabase.auth.signUp({
@@ -118,6 +142,29 @@ function AuthPage() {
           </button>
         ))}
       </div>
+
+      {!sent && mode !== "forgot" && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={continueWithGoogle}
+          disabled={busy}
+          className="google-sign-in-button mt-4 h-11 w-full rounded-md px-3 text-sm font-medium"
+        >
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" />
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" />
+            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" />
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" />
+          </svg>
+          {mode === "login" ? "Sign in with Google" : "Continue with Google"}
+        </Button>
+      )}
+      {!sent && mode !== "forgot" && (
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Gmail choose karne ke baad secure sign-in complete hoga; phir profile details maangi ja sakti hain.
+        </p>
+      )}
 
       {sent ? (
         <div className="card-elevated mt-5 rounded-xl border border-border p-5 text-center text-sm">

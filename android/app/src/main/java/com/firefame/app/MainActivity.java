@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
@@ -96,10 +97,16 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
-    public static class PushBridge {
+    public class PushBridge {
         @JavascriptInterface
         public String getToken() {
             return fcmToken == null ? "" : fcmToken;
+        }
+
+        @JavascriptInterface
+        public String getDeviceId() {
+            String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            return id == null ? "" : id;
         }
     }
 }

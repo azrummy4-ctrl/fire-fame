@@ -23,7 +23,7 @@ function AdminDashboard() {
   const { data } = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: async () => {
-      const [users, tournaments, withdrawals, deposits, logs] = await Promise.all([
+      const [users, blockedUsers, tournaments, withdrawals, deposits, logs] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("id", { count: "exact", head: true }).neq("status", "active"),
         supabase.from("tournaments").select("id", { count: "exact", head: true }),
@@ -33,7 +33,7 @@ function AdminDashboard() {
       ]);
       return {
         users: users.count ?? 0,
-        blocked: 0,
+        blocked: blockedUsers.count ?? 0,
         tournaments: tournaments.count ?? 0,
         pendingWithdrawals: withdrawals.data ?? [],
         pendingDeposits: deposits.data ?? [],
@@ -63,12 +63,11 @@ function AdminDashboard() {
         </Link>
         <Link to="/admin/deposits" className="contents">
           <Card icon={CreditCard}
-          label={`Pending withdrawals (${data?.pendingWithdrawals.length ?? 0})`}
-          value={`${formatINR(dp)} deposits`}
-          hint={`Withdrawals: ${formatINR(wd)}`} />
+            label={`Pending deposits (${data?.pendingDeposits.length ?? 0})`}
+            value={formatINR(dp)} />
         </Link>
         <Link to="/admin/withdrawals" className="contents">
-          <Card icon={CreditCard} label={`Payments · ${data?.pendingWithdrawals.length ?? 0} withdrawals`} value={formatINR(wd)} hint={`Deposits: ${formatINR(dp)}`} />
+          <Card icon={CreditCard} label={`Pending withdrawals (${data?.pendingWithdrawals.length ?? 0})`} value={formatINR(wd)} />
         </Link>
         <Link to="/admin/push" className="col-span-2">
           <Card icon={BellRing} label="Push Notification" value="Open →" hint="Push page khulega" />
