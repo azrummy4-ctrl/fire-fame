@@ -44,8 +44,8 @@ function AuthPage() {
   }, []);
 
   useEffect(() => {
-    if (!session || profileLoading || !profile) return;
-    if (!profile.ff_uid || !profile.ign) {
+    if (!session || profileLoading) return;
+    if (!profile || !profile.ff_uid || !profile.ign) {
       navigate({ to: "/profile", replace: true });
       return;
     }

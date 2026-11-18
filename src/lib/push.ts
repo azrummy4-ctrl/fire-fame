@@ -87,8 +87,10 @@ export function installAndroidPushBridge() {
   };
   const saveAndroidDevice = async (deviceId: unknown) => {
     if (typeof deviceId !== "string" || deviceId.length < 8 || deviceId.length > 128) return;
+    if (deviceId === lastSavedAndroidDeviceId) return;
     try {
       await saveAndroidDeviceId({ data: { deviceId } });
+      lastSavedAndroidDeviceId = deviceId;
     } catch (error) {
       console.error("Android device ID save failed", error);
     }

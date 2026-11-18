@@ -169,6 +169,13 @@
       "when": 1795035777777,
       "tag": "0023_notify_admin_settled_deposits",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1795036091945,
+      "tag": "0024_atomic_zapupi_deposit_completion",
+      "breakpoints": true
     }
   ]
 }

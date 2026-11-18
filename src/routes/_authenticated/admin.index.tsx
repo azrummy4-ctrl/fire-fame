@@ -58,7 +58,7 @@ function AdminDashboard() {
         <Link to="/admin/users" className="contents">
           <Card icon={Users} label="Total Users" value={String(data?.users ?? 0)} hint="Click → Users" />
         </Link>
-        <Link to="/admin/users?status=blocked" className="contents">
+        <Link to="/admin/users" search={{ status: "blocked" }} className="contents">
           <Card icon={Ban} label="Blocked users" value={String(data?.blocked ?? 0)} hint="Review / unblock" />
         </Link>
         <Link to="/admin/deposits" className="contents">

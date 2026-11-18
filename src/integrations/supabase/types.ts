@@ -606,6 +606,7 @@ export type Database = {
       }
       can_manage_tournament: { Args: { _tid: string }; Returns: boolean }
       claim_milestone_spin: { Args: { _milestone: number }; Returns: Json }
+      complete_zapupi_deposit: { Args: { _id: string }; Returns: string }
       create_deposit: {
         Args: { _amount: number; _provider_ref: string }
         Returns: {

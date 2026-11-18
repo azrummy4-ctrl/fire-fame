@@ -17,5 +17,7 @@
 - Award promotional deposit bonuses on the server when a deposit changes to completed; this keeps gateway, webhook, and admin settlements consistent and prevents client-side bonus claims.
 - Send push notifications only through the DB trigger (`notify_push_fanout` → pg_net → `/api/public/push/fanout`) with the `x-push-secret` shared secret; the route fans out via the Firebase connector gateway. Do not send FCM from client code or bypass the secret check.
 - Never expose tournament `room_id`/`room_password` through the data API — column-level grants withhold them, so tournament queries must use `TOURNAMENT_COLUMNS` (never `select("*")`), and room credentials are served only by the `get_room_details()` RPC and written only by the `admin_publish_room()` RPC; adding a tournament column means updating that constant and the column grant list together.
+- Keep admin user-email/wallet access behind authenticated admin-only database RPCs and server functions; browser interfaces cannot enforce privileged actions alone.
+- Google sign-in must use a provider-verified session; Android bridges supply device metadata only, never identity or login state.
 
 - The Android APK is a Capacitor wrapper whose `server.url` loads the published site, and `.github/workflows/android-apk.yml` builds it with Bun, Node 22 and Java 21; this keeps server functions working and avoids needing Android Studio.
