@@ -57,6 +57,14 @@ export const createDepositOrder = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const zapKey = zapupiKey();
 
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", userId)
+      .maybeSingle();
+    if (profileError) throw new Error("Account status verify nahi ho paya.");
+    if (profile?.status !== "active") throw new Error("Blocked account se naya deposit nahi ho sakta.");
+
     // Ek time par sirf ek pending gateway deposit.
     // Agar purana pending hai to pehle gateway se status check karo —
     // failed/cancelled/expired ho to use failed mark karke naya order allow karo,
@@ -173,28 +181,14 @@ export const verifyDepositPayment = createServerFn({ method: "POST" })
         throw new Error("Payment amount mismatch. Support se contact karein.");
       }
 
-      // Privileged write: user has no UPDATE on deposits; credit wallet atomically
+      // Privileged atomic database operation: update status, credit wallet,
+      // promotional bonus and personal push notification commit together.
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-      // Idempotency: only one completion wins
-      const { data: updated, error: upErr } = await supabaseAdmin
-        .from("deposits")
-        .update({ status: "completed", updated_at: new Date().toISOString() })
-        .eq("id", deposit.id)
-        .eq("status", "pending")
-        .select("id")
-        .maybeSingle();
-      if (upErr) throw new Error("Deposit update failed.");
-      if (!updated) return { status: "completed" as const, amount: Number(deposit.amount) }; // already settled concurrently
-
-      const { error: walletErr } = await supabaseAdmin.rpc("wallet_apply", {
-        _user_id: userId,
-        _type: "deposit",
-        _amount: Number(deposit.amount),
-        _ref: deposit.id,
-        _note: `ZapUpi deposit ${data.orderId}`,
+      const { data: settlement, error: settleError } = await supabaseAdmin.rpc("complete_zapupi_deposit", {
+        _id: deposit.id,
       });
-      if (walletErr) throw new Error("Wallet credit failed. Support se contact karein.");
+      if (settleError) throw new Error("Deposit wallet me add nahi ho paya. Support se contact karein.");
+      if (settlement !== "completed") return { status: settlement as "failed", amount: Number(deposit.amount) };
 
       return { status: "completed" as const, amount: Number(deposit.amount) };
     }

@@ -77,6 +77,8 @@ export const Route = createFileRoute("/api/public/push/fanout")({
                         ? "https://fire-fame.lovable.app/my-games"
                         : notification.kind === "result"
                           ? "https://fire-fame.lovable.app/leaderboard"
+                          : notification.kind === "wallet" || notification.kind === "withdrawal"
+                            ? "https://fire-fame.lovable.app/wallet"
                           : "https://fire-fame.lovable.app/notifications",
                   },
                 },

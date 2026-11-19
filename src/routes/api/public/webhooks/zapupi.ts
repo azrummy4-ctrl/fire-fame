@@ -76,23 +76,12 @@ export const Route = createFileRoute("/api/public/webhooks/zapupi")({
             return new Response("amount mismatch", { status: 400 });
           }
 
-          // Idempotent: only one pending -> completed transition wins
-          const { data: updated } = await supabaseAdmin
-            .from("deposits")
-            .update({ status: "completed", updated_at: new Date().toISOString() })
-            .eq("id", deposit.id)
-            .eq("status", "pending")
-            .select("id")
-            .maybeSingle();
-
-          if (updated) {
-            await supabaseAdmin.rpc("wallet_apply", {
-              _user_id: deposit.user_id,
-              _type: "deposit",
-              _amount: Number(deposit.amount),
-              _ref: deposit.id,
-              _note: `ZapUpi deposit ${orderId}`,
-            });
+          const { error: settleError } = await supabaseAdmin.rpc("complete_zapupi_deposit", {
+            _id: deposit.id,
+          });
+          if (settleError) {
+            console.error("ZapUpi deposit settlement failed:", settleError.message);
+            return new Response("settlement failed", { status: 500 });
           }
           return new Response("ok", { status: 200 });
         }
